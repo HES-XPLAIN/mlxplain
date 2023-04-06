@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "mlxplain"
+version = "0.0.0"
+description = "An open platform for accelerating the development of eXplainable AI systems"
+authors = ["Arthur Babey <arthur.babey@heig-vd.ch>", "Jean-Marc Boutay <jean-marc.boutay@heige.ch>", "Rémy Marquis <remy.marquis@heig-vd.ch>"]
+license = "3-Clause BSD License"
+readme = "README.md"
+packages = [{include = "mlxplain"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
