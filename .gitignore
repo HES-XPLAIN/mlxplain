@@ -110,9 +110,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# PyCharm
-.idea/
-
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -130,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# PyCharm
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
