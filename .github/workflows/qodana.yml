@@ -1,0 +1,39 @@
+# Qodana is a code quality monitoring tool that identifies and suggests fixes
+# for bugs, security vulnerabilities, duplications, and imperfections.
+
+name: Qodana Scan
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+permissions:
+  contents: write
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@main
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+      - name: Scanning alerts
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+      - name: Deploy quality report
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ runner.temp }}/qodana/results/report
+          destination_dir: ./qodana/
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
