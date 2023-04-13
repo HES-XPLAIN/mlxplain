@@ -26,6 +26,10 @@ packages = [{include = "mlxplain"}]
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
+omnixai = "^1.2.5"
+shap = "^0.41.0"
+xgboost = "^1.7.5"
+numpy = "1.23.1" # bump down version for numba compatibility
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"
