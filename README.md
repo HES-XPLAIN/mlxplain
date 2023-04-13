@@ -1,6 +1,9 @@
 # MLxplain ![build](https://github.com/HES-XPLAIN/mlxplain/actions/workflows/build.yml/badge.svg)
 An open platform for accelerating the development of eXplainable AI systems
 
+* [Documentations](https://hes-xplain.github.io/mlxplain/docs/)
+* [Static analysis](https://hes-xplain.github.io/mlxplain/qodana/)
+
 ## Installation
 
 ### Install Python and Poetry
