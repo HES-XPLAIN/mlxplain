@@ -1,4 +1,4 @@
-# MLxplain ![Python checks](https://github.com/HES-XPLAIN/mlxplain/actions/workflows/tests.yml/badge.svg) [![Qodana Scan](https://github.com/HES-XPLAIN/mlxplain/actions/workflows/qodana.yml/badge.svg)](https://hes-xplain.github.io/mlxplain/qodana/)
+# MLxplain ![build](https://github.com/HES-XPLAIN/mlxplain/actions/workflows/build.yml/badge.svg)
 An open platform for accelerating the development of eXplainable AI systems
 
 ## Installation
