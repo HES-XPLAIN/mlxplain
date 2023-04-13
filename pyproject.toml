@@ -31,6 +31,11 @@ shap = "^0.41.0"
 xgboost = "^1.7.5"
 numpy = "1.23.1" # bump down version for numba compatibility
 
+[tool.poetry.group.plot.dependencies]
+dash = "^2.9.2"
+jupyter-dash = "^0.4.2"
+dash-bootstrap-components = "^1.4.1"
+
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"
 pre-commit = "^3.2.2"
