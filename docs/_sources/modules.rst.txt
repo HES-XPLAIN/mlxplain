@@ -1,0 +1,8 @@
+mlxplain
+========
+
+.. toctree::
+   :maxdepth: 4
+
+   mlxplain
+   tests

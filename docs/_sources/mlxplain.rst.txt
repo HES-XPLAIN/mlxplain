@@ -1,0 +1,21 @@
+mlxplain package
+================
+
+Submodules
+----------
+
+mlxplain.hello module
+---------------------
+
+.. automodule:: mlxplain.hello
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mlxplain
+   :members:
+   :undoc-members:
+   :show-inheritance:

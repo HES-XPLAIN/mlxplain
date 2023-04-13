@@ -327,16 +327,16 @@
           "description": "Reports code fragments that cannot be normally reached.\n\n**Example:**\n\n```\nif True:\n    print('Yes')\nelse:\n    print('No')\n```\n\nAs a fix, you might want to check and modify the algorithm to ensure it implements\nthe expected logic."
         },
         {
-          "shortName": "PyMethodParametersInspection",
-          "displayName": "Improper first parameter",
-          "enabled": true,
-          "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
-        },
-        {
           "shortName": "PyChainedComparisonsInspection",
           "displayName": "Too complex chained comparisons",
           "enabled": true,
           "description": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
+        },
+        {
+          "shortName": "PyMethodParametersInspection",
+          "displayName": "Improper first parameter",
+          "enabled": true,
+          "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
         },
         {
           "shortName": "PyDocstringTypesInspection",
@@ -798,16 +798,16 @@
           "description": "Reports incorrect usages of transition table variables in triggers.\n\nExample (HSQLDB):\n\n    CREATE TABLE foo(a INT);\n\n    CREATE TRIGGER trg\n     AFTER DELETE ON foo\n    BEGIN\n       SELECT * FROM NEW;\n    END;\n\n    CREATE TRIGGER trig AFTER INSERT ON foo\n       REFERENCING OLD ROW AS newrow\n       FOR EACH ROW WHEN (a > 1)\n       INSERT INTO foo VALUES (1)\n\nIn HSQLDB, DELETE triggers may be used only with the OLD state while INSERT triggers may have only the NEW state. So, in the previous\nexample, NEW in `SELECT * FROM NEW;` will be highlighted as well as OLD in `REFERENCING OLD ROW AS newrow`."
         },
         {
-          "shortName": "SqlMultipleLimitClausesInspection",
-          "displayName": "Multiple row limiting/offset clauses in queries",
-          "enabled": false,
-          "description": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
-        },
-        {
           "shortName": "SqlNamedArgumentsInspection",
           "displayName": "Named arguments should be used",
           "enabled": false,
           "description": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
+        },
+        {
+          "shortName": "SqlMultipleLimitClausesInspection",
+          "displayName": "Multiple row limiting/offset clauses in queries",
+          "enabled": false,
+          "description": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
         },
         {
           "shortName": "SqlCaseVsCoalesceInspection",
@@ -870,16 +870,16 @@
           "description": "Reports situations when source code of a database object has been changed.\n\nThe inspection is triggered when you perform database or object introspection. The introspection is run when you open source code of an\nobject, run statements, and perform code refactoring.\nAlso, you can run introspection by right-clicking an object and selecting **Refresh**.\n\nThe inspection covers the following situations:\n\n* Object source code was changed in the database but code in the editor was not updated. Works in PostgreSQL, Microsoft SQL Server, Oracle, and Sybase ASE.\n* You changed the object source code, introspected the database, but source code has been already changed by someone else.\n* The database introspector was updated in the IDE and you need to download new object properties that were missing in the previous introspector version."
         },
         {
-          "shortName": "SqlDtInspection",
-          "displayName": "Ill-formed date/time literals",
-          "enabled": false,
-          "description": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2.\n\nExample (MySQL):\n\n    SELECT TIME '10 -12:13:14' FROM dual;\n    SELECT TIME ' 12 : 13 : 14 ' FROM dual;\n    SELECT TIME '12 13 14' FROM dual;\n    SELECT TIME '12-13-14' FROM dual;\n    SELECT TIME '12.13.14' FROM dual;\n    SELECT TIME '12:13:' FROM dual;\n    SELECT TIME '12:13' FROM dual;\n    SELECT TIME '12:' FROM dual;\n\nIn this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted.\nFor more information about date and time literals in MySQL, see [Date and Time Literals at dev.mysql.com](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-literals.html).\n\nThe following date and type literals are valid for MySQL.\n\n    SELECT TIME '12:13:14' FROM dual;\n    SELECT TIME '12:13:14.555' FROM dual;\n    SELECT TIME '12:13:14.' FROM dual;\n    SELECT TIME '-12:13:14' FROM dual;\n    SELECT TIME '10 12:13:14' FROM dual;\n    SELECT TIME '-10 12:13:14' FROM dual;\n"
-        },
-        {
           "shortName": "SqlSideEffectsInspection",
           "displayName": "Statement with side effects",
           "enabled": false,
           "description": "Reports statements that might lead to modification of a database during a read-only connection.\n\nTo enable read-only mode for a\nconnection,\nright-click a data source in the **Database** tool window (**View \\| Tool Windows \\| Database** ) and select **Properties** .\nIn the **Data Sources and Drivers** dialog, click the **Options** tab and select the **Read-only** checkbox.\n\nExample (MySQL):\n\n    CREATE TABLE foo(a INT);\n    INSERT INTO foo VALUES (1);\n\nAs `CREATE TABLE` and `INSERT INTO` statements lead to a database modification, these statements will be highlighted\nin read-only connection mode."
+        },
+        {
+          "shortName": "SqlDtInspection",
+          "displayName": "Ill-formed date/time literals",
+          "enabled": false,
+          "description": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2.\n\nExample (MySQL):\n\n    SELECT TIME '10 -12:13:14' FROM dual;\n    SELECT TIME ' 12 : 13 : 14 ' FROM dual;\n    SELECT TIME '12 13 14' FROM dual;\n    SELECT TIME '12-13-14' FROM dual;\n    SELECT TIME '12.13.14' FROM dual;\n    SELECT TIME '12:13:' FROM dual;\n    SELECT TIME '12:13' FROM dual;\n    SELECT TIME '12:' FROM dual;\n\nIn this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted.\nFor more information about date and time literals in MySQL, see [Date and Time Literals at dev.mysql.com](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-literals.html).\n\nThe following date and type literals are valid for MySQL.\n\n    SELECT TIME '12:13:14' FROM dual;\n    SELECT TIME '12:13:14.555' FROM dual;\n    SELECT TIME '12:13:14.' FROM dual;\n    SELECT TIME '-12:13:14' FROM dual;\n    SELECT TIME '10 12:13:14' FROM dual;\n    SELECT TIME '-10 12:13:14' FROM dual;\n"
         },
         {
           "shortName": "SqlIllegalCursorStateInspection",
