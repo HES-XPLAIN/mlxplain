@@ -3,7 +3,9 @@ linter: jetbrains/qodana-python:2022.3-eap
 profile:
   name: qodana.recommended
 exclude:
-  - name: docs
+  - name: All
     paths:
       - docs
+include:
+  - name: CheckDependencyLicenses
 bootstrap: rm -rf .idea
