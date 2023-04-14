@@ -20,7 +20,7 @@
         "startLine": 8,
         "length": 9,
         "offset": 22,
-        "surroundingCode": "\nproject = \"MLxplain\"\ncopyright = '2023, \"Arthur Babey <arthur.babey@heig-vd.ch>\", \"Jean-Marc Boutay <jean-marc.boutay@heige.ch>\", \"Rémy Marquis <remy.marquis@heig-vd.ch>\"'\nauthor = '\"Arthur Babey <arthur.babey@heig-vd.ch>\", \"Jean-Marc Boutay <jean-marc.boutay@heige.ch>\", \"Rémy Marquis <remy.marquis@heig-vd.ch>\"'\nrelease = \"0.0.0\""
+        "surroundingCode": "\nproject = \"MLxplain\"\ncopyright = \"2023, HES-XPLAIN\"\nauthor = (\n    '\"Arthur Babey <arthur.babey@heig-vd.ch>\", '"
       }
     }
   ],
@@ -28,67 +28,5 @@
     "module": "project",
     "inspectionName": "PyShadowingBuiltinsInspection"
   },
-  "hash": "b52967ef040e81c39cda54ecac3eb3efbe1ed34335f2740a8434cf4af0e8f83b"
-},{
-  "tool": "Code Inspection",
-  "category": "Python",
-  "type": "PEP 8 coding style violation",
-  "tags": [
-    "Python"
-  ],
-  "severity": "Moderate",
-  "comment": "PEP 8: E501 line too long (150 > 120 characters)",
-  "detailsInfo": "Reports violations of the [PEP 8 coding style guide](https://www.python.org/dev/peps/pep-0008/) by running the bundled [pycodestyle.py](https://github.com/PyCQA/pycodestyle) tool.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "docs/conf.py",
-      "language": "Python",
-      "line": 10,
-      "offset": 13,
-      "length": 138,
-      "code": {
-        "startLine": 8,
-        "length": 138,
-        "offset": 34,
-        "surroundingCode": "\nproject = \"MLxplain\"\ncopyright = '2023, \"Arthur Babey <arthur.babey@heig-vd.ch>\", \"Jean-Marc Boutay <jean-marc.boutay@heige.ch>\", \"Rémy Marquis <remy.marquis@heig-vd.ch>\"'\nauthor = '\"Arthur Babey <arthur.babey@heig-vd.ch>\", \"Jean-Marc Boutay <jean-marc.boutay@heige.ch>\", \"Rémy Marquis <remy.marquis@heig-vd.ch>\"'\nrelease = \"0.0.0\""
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "PyPep8Inspection"
-  },
-  "hash": "f6af7cf96bb5f918c48bd399d8481e4b788fa2bc271d981d3b79ac8e92f349ff"
-},{
-  "tool": "Code Inspection",
-  "category": "Python",
-  "type": "PEP 8 coding style violation",
-  "tags": [
-    "Python"
-  ],
-  "severity": "Moderate",
-  "comment": "PEP 8: E501 line too long (141 > 120 characters)",
-  "detailsInfo": "Reports violations of the [PEP 8 coding style guide](https://www.python.org/dev/peps/pep-0008/) by running the bundled [pycodestyle.py](https://github.com/PyCQA/pycodestyle) tool.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "docs/conf.py",
-      "language": "Python",
-      "line": 11,
-      "offset": 10,
-      "length": 132,
-      "code": {
-        "startLine": 9,
-        "length": 132,
-        "offset": 181,
-        "surroundingCode": "project = \"MLxplain\"\ncopyright = '2023, \"Arthur Babey <arthur.babey@heig-vd.ch>\", \"Jean-Marc Boutay <jean-marc.boutay@heige.ch>\", \"Rémy Marquis <remy.marquis@heig-vd.ch>\"'\nauthor = '\"Arthur Babey <arthur.babey@heig-vd.ch>\", \"Jean-Marc Boutay <jean-marc.boutay@heige.ch>\", \"Rémy Marquis <remy.marquis@heig-vd.ch>\"'\nrelease = \"0.0.0\"\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "PyPep8Inspection"
-  },
-  "hash": "1a1bff6f9e2c4a37c71a4c44d0cf6cfa78b2e78e192879eb87f70cd35971279d"
+  "hash": "197ca364dccf0d5b04f82d91dd1e1a24850552a428a7f34038fbcacfce48b1d7"
 }]}

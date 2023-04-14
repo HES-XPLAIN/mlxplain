@@ -1,19 +1,19 @@
 {
-  "total": 3,
+  "total": 1,
   "tools inspection": {
-    "Code Inspection": 3
+    "Code Inspection": 1
   },
   "linter": "QDPY",
   "attributes": {
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/HES-XPLAIN/mlxplain.git",
-        "revisionId": "7bbb7242a5d15b745b0f6888bc593719288e00b1",
+        "revisionId": "4de33348c09ff81932cebbfe6c9016d7939102b5",
         "branch": "main"
       }
     },
     "deviceId": "200820300000000-436b-58d7-7a19-ea732b9fab8c",
-    "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/4686304634",
+    "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/4697204850",
     "repoUrl": "https://github.com/HES-XPLAIN/mlxplain.git"
   }
 }
