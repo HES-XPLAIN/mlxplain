@@ -327,16 +327,16 @@
           "description": "Reports code fragments that cannot be normally reached.\n\n**Example:**\n\n```\nif True:\n    print('Yes')\nelse:\n    print('No')\n```\n\nAs a fix, you might want to check and modify the algorithm to ensure it implements\nthe expected logic."
         },
         {
-          "shortName": "PyChainedComparisonsInspection",
-          "displayName": "Too complex chained comparisons",
-          "enabled": true,
-          "description": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
-        },
-        {
           "shortName": "PyMethodParametersInspection",
           "displayName": "Improper first parameter",
           "enabled": true,
           "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
+        },
+        {
+          "shortName": "PyChainedComparisonsInspection",
+          "displayName": "Too complex chained comparisons",
+          "enabled": true,
+          "description": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
         },
         {
           "shortName": "PyDocstringTypesInspection",
@@ -798,16 +798,16 @@
           "description": "Reports incorrect usages of transition table variables in triggers.\n\nExample (HSQLDB):\n\n    CREATE TABLE foo(a INT);\n\n    CREATE TRIGGER trg\n     AFTER DELETE ON foo\n    BEGIN\n       SELECT * FROM NEW;\n    END;\n\n    CREATE TRIGGER trig AFTER INSERT ON foo\n       REFERENCING OLD ROW AS newrow\n       FOR EACH ROW WHEN (a > 1)\n       INSERT INTO foo VALUES (1)\n\nIn HSQLDB, DELETE triggers may be used only with the OLD state while INSERT triggers may have only the NEW state. So, in the previous\nexample, NEW in `SELECT * FROM NEW;` will be highlighted as well as OLD in `REFERENCING OLD ROW AS newrow`."
         },
         {
-          "shortName": "SqlNamedArgumentsInspection",
-          "displayName": "Named arguments should be used",
-          "enabled": false,
-          "description": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
-        },
-        {
           "shortName": "SqlMultipleLimitClausesInspection",
           "displayName": "Multiple row limiting/offset clauses in queries",
           "enabled": false,
           "description": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
+        },
+        {
+          "shortName": "SqlNamedArgumentsInspection",
+          "displayName": "Named arguments should be used",
+          "enabled": false,
+          "description": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
         },
         {
           "shortName": "SqlCaseVsCoalesceInspection",
@@ -828,16 +828,16 @@
           "description": "Reports columns that are not in the GROUP BY clause or inside an aggregate function call.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE t1 (a INT, b INT);\n    SELECT a, b FROM t1 GROUP BY a;\n\nIf you run the SELECT query, you will receive an error because Microsoft SQL Server expects the `b` column in GROUP BY or used\ninside an aggregate function. The following two examples will fix the error.\n\n    SELECT a, b FROM t1 GROUP BY a, b;\n    SELECT a, max(b) max_b FROM t1 GROUP BY a;\n"
         },
         {
-          "shortName": "SqlRedundantAliasInspection",
-          "displayName": "Redundant alias expressions",
-          "enabled": false,
-          "description": "Reports alias expressions that duplicate names of columns in tables and might be redundant.\n\nExample (PostgreSQL):\n\n    CREATE TABLE foo(a INT, b INT);\n\n    SELECT * FROM foo foo(a, b);\n    SELECT * FROM foo foo(a);\n    SELECT * FROM foo foo(x);\n    SELECT * FROM foo foo(x, y);\n\nThe first two aliases use the same column names as in the `foo` table. They are considered redundant because they\ncolumn names are identical."
-        },
-        {
           "shortName": "SqlIdentifierInspection",
           "displayName": "Identifier should be quoted",
           "enabled": false,
           "description": "Reports situations when you use SQL reserved keywords as identifier names in your query.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);\n\nWe use `select`, `identity`, and `order` as table and column names.\nBut they are also reserved keywords in Microsoft SQL Server.\nTherefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the\n**Quote identifier** quick-fix.\n\nAfter the quick-fix is applied:\n\n    CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);\n"
+        },
+        {
+          "shortName": "SqlRedundantAliasInspection",
+          "displayName": "Redundant alias expressions",
+          "enabled": false,
+          "description": "Reports alias expressions that duplicate names of columns in tables and might be redundant.\n\nExample (PostgreSQL):\n\n    CREATE TABLE foo(a INT, b INT);\n\n    SELECT * FROM foo foo(a, b);\n    SELECT * FROM foo foo(a);\n    SELECT * FROM foo foo(x);\n    SELECT * FROM foo foo(x, y);\n\nThe first two aliases use the same column names as in the `foo` table. They are considered redundant because they\ncolumn names are identical."
         },
         {
           "shortName": "SqlAutoIncrementDuplicateInspection",
@@ -1339,16 +1339,16 @@
           "description": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character `[`, `]` and `^`, because those would need additional escaping inside a character class.\n\n**Example:**\n\n\n      \\d+\\.\\d+\n\nAfter the quick-fix is applied:\n\n\n      \\d+[.]\\d+\n\nNew in 2017.1"
         },
         {
-          "shortName": "RegExpRepeatedSpace",
-          "displayName": "Consecutive spaces",
-          "enabled": true,
-          "description": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
-        },
-        {
           "shortName": "RegExpDuplicateAlternationBranch",
           "displayName": "Duplicate branch in alternation",
           "enabled": true,
           "description": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression.\n\n**Example:**\n\n\n      (alpha|bravo|charlie|alpha)\n\nAfter the quick-fix is applied:\n\n\n      (alpha|bravo|charlie)\n\nNew in 2017.1"
+        },
+        {
+          "shortName": "RegExpRepeatedSpace",
+          "displayName": "Consecutive spaces",
+          "enabled": true,
+          "description": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
         }
       ]
     },
