@@ -7,8 +7,12 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "MLxplain"
-copyright = '2023, "Arthur Babey <arthur.babey@heig-vd.ch>", "Jean-Marc Boutay <jean-marc.boutay@heige.ch>", "Rémy Marquis <remy.marquis@heig-vd.ch>"'
-author = '"Arthur Babey <arthur.babey@heig-vd.ch>", "Jean-Marc Boutay <jean-marc.boutay@heige.ch>", "Rémy Marquis <remy.marquis@heig-vd.ch>"'
+copyright = "2023, HES-XPLAIN"
+author = (
+    '"Arthur Babey <arthur.babey@heig-vd.ch>", '
+    '"Jean-Marc Boutay <jean-marc.boutay@heige.ch>", '
+    '"Rémy Marquis <remy.marquis@heig-vd.ch>"'
+)
 release = "0.0.0"
 
 # -- General configuration ---------------------------------------------------
