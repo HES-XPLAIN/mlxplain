@@ -1580,13 +1580,13 @@
                 ]
               },
               {
-                "id": "PyDefaultArgumentInspection",
+                "id": "PyMissingConstructorInspection",
                 "shortDescription": {
-                  "text": "The default argument is mutable"
+                  "text": "Missed call to '__init__' of the super class"
                 },
                 "fullDescription": {
-                  "text": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for an argument. Default argument values are evaluated only once at function definition time, which means that modifying the default value of the argument will affect all subsequent calls of that function. Example: def func(s, cache={}):\n    cache[s] = None\n When the quick-fix is applied, the code changes to: def func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None",
-                  "markdown": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for\nan argument.   \n\nDefault argument values are evaluated only once at function definition time,\nwhich means that modifying the\ndefault value of the argument will affect all subsequent calls of that function.\n\n**Example:**\n\n```\ndef func(s, cache={}):\n    cache[s] = None\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\ndef func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None\n```"
+                  "text": "Reports cases when a call to the 'super' constructor in a class is missed. Example: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n The 'Pear' class should have a 'super' call in the '__init__' method. When the quick-fix is applied, the code changes to: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()",
+                  "markdown": "Reports cases when a call to the `super` constructor in a class is missed.\n\n**Example:**\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n```\n\nThe `Pear` class should have a `super` call in the `__init__`\nmethod.\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -1611,13 +1611,13 @@
                 ]
               },
               {
-                "id": "PyMissingConstructorInspection",
+                "id": "PyDefaultArgumentInspection",
                 "shortDescription": {
-                  "text": "Missed call to '__init__' of the super class"
+                  "text": "The default argument is mutable"
                 },
                 "fullDescription": {
-                  "text": "Reports cases when a call to the 'super' constructor in a class is missed. Example: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n The 'Pear' class should have a 'super' call in the '__init__' method. When the quick-fix is applied, the code changes to: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()",
-                  "markdown": "Reports cases when a call to the `super` constructor in a class is missed.\n\n**Example:**\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n```\n\nThe `Pear` class should have a `super` call in the `__init__`\nmethod.\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()\n```"
+                  "text": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for an argument. Default argument values are evaluated only once at function definition time, which means that modifying the default value of the argument will affect all subsequent calls of that function. Example: def func(s, cache={}):\n    cache[s] = None\n When the quick-fix is applied, the code changes to: def func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None",
+                  "markdown": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for\nan argument.   \n\nDefault argument values are evaluated only once at function definition time,\nwhich means that modifying the\ndefault value of the argument will affect all subsequent calls of that function.\n\n**Example:**\n\n```\ndef func(s, cache={}):\n    cache[s] = None\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\ndef func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -1828,19 +1828,19 @@
                 ]
               },
               {
-                "id": "PyComparisonWithNoneInspection",
+                "id": "CommandLineInspection",
                 "shortDescription": {
-                  "text": "Using equality operators to compare with None"
+                  "text": "Incorrect CLI syntax"
                 },
                 "fullDescription": {
-                  "text": "Reports comparisons with 'None'. That type of comparisons should always be done with 'is' or 'is not', never the equality operators. Example: a = 2\n\n\nif a == None:\n    print(\"Success\")\n Once the quick-fix is applied, the code changes to: a = 2\n\n\nif a is None:\n    print(\"Success\")",
-                  "markdown": "Reports comparisons with `None`. That type of comparisons\nshould always be done with `is` or `is not`, never\nthe equality operators.\n\n**Example:**\n\n```\na = 2\n\n\nif a == None:\n    print(\"Success\")\n```\n\nOnce the quick-fix is applied, the code changes to:\n\n```\na = 2\n\n\nif a is None:\n    print(\"Success\")\n```"
+                  "text": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies that option names and arguments are correct. Do not disable the inspection if you are going to use command-line interfaces like manage.py in Django.",
+                  "markdown": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "note",
+                  "level": "warning",
                   "parameters": {
-                    "ideaSeverity": "WEAK WARNING"
+                    "ideaSeverity": "WARNING"
                   }
                 },
                 "relationships": [
@@ -1859,19 +1859,19 @@
                 ]
               },
               {
-                "id": "CommandLineInspection",
+                "id": "PyComparisonWithNoneInspection",
                 "shortDescription": {
-                  "text": "Incorrect CLI syntax"
+                  "text": "Using equality operators to compare with None"
                 },
                 "fullDescription": {
-                  "text": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies that option names and arguments are correct. Do not disable the inspection if you are going to use command-line interfaces like manage.py in Django.",
-                  "markdown": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
+                  "text": "Reports comparisons with 'None'. That type of comparisons should always be done with 'is' or 'is not', never the equality operators. Example: a = 2\n\n\nif a == None:\n    print(\"Success\")\n Once the quick-fix is applied, the code changes to: a = 2\n\n\nif a is None:\n    print(\"Success\")",
+                  "markdown": "Reports comparisons with `None`. That type of comparisons\nshould always be done with `is` or `is not`, never\nthe equality operators.\n\n**Example:**\n\n```\na = 2\n\n\nif a == None:\n    print(\"Success\")\n```\n\nOnce the quick-fix is applied, the code changes to:\n\n```\na = 2\n\n\nif a is None:\n    print(\"Success\")\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "warning",
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING"
+                    "ideaSeverity": "WEAK WARNING"
                   }
                 },
                 "relationships": [
@@ -1952,13 +1952,13 @@
                 ]
               },
               {
-                "id": "PyMethodParametersInspection",
+                "id": "PyChainedComparisonsInspection",
                 "shortDescription": {
-                  "text": "Improper first parameter"
+                  "text": "Too complex chained comparisons"
                 },
                 "fullDescription": {
-                  "text": "Reports methods that lack the first parameter that is usually named 'self'. Example: class Movie:\n\n   def show():\n       pass\n When the quick-fix is applied, the code changes to: class Movie:\n\n   def show(self):\n       pass\n The inspection also reports naming issues in class methods. Example: class Movie:\n    @classmethod\n    def show(abc):\n        pass\n Since the first parameter of a class method should be 'cls', the IDE provides a quick-fix to rename it.",
-                  "markdown": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
+                  "text": "Reports chained comparisons that can be simplified. Example: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if x >= xmin and x <= xmax:\n          pass' The IDE offers to simplify 'if x >= xmin and x <= xmax'. When the quick-fix is applied, the code changes to: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if xmin <= x <= xmax:\n          pass'",
+                  "markdown": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -1983,13 +1983,13 @@
                 ]
               },
               {
-                "id": "PyChainedComparisonsInspection",
+                "id": "PyMethodParametersInspection",
                 "shortDescription": {
-                  "text": "Too complex chained comparisons"
+                  "text": "Improper first parameter"
                 },
                 "fullDescription": {
-                  "text": "Reports chained comparisons that can be simplified. Example: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if x >= xmin and x <= xmax:\n          pass' The IDE offers to simplify 'if x >= xmin and x <= xmax'. When the quick-fix is applied, the code changes to: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if xmin <= x <= xmax:\n          pass'",
-                  "markdown": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
+                  "text": "Reports methods that lack the first parameter that is usually named 'self'. Example: class Movie:\n\n   def show():\n       pass\n When the quick-fix is applied, the code changes to: class Movie:\n\n   def show(self):\n       pass\n The inspection also reports naming issues in class methods. Example: class Movie:\n    @classmethod\n    def show(abc):\n        pass\n Since the first parameter of a class method should be 'cls', the IDE provides a quick-fix to rename it.",
+                  "markdown": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -2913,19 +2913,19 @@
                 ]
               },
               {
-                "id": "PyTrailingSemicolonInspection",
+                "id": "PyRedundantParenthesesInspection",
                 "shortDescription": {
-                  "text": "Prohibited trailing semicolon in a statement"
+                  "text": "Redundant parentheses"
                 },
                 "fullDescription": {
-                  "text": "Reports trailing semicolons in statements. Example: def my_func(a):\n    c = a ** 2;\n    return c\n IDE provides a quick-fix that removes a trailing semicolon. When you apply it, the code changes to: def my_func(a):\n    c = a ** 2\n    return c",
-                  "markdown": "Reports trailing semicolons in statements.\n\n**Example:**\n\n```\ndef my_func(a):\n    c = a ** 2;\n    return c\n```\n\nIDE provides a quick-fix that removes a trailing semicolon. When you\napply it, the code changes to:\n\n```\ndef my_func(a):\n    c = a ** 2\n    return c\n```"
+                  "text": "Reports about redundant parentheses in expressions. The IDE provides the quick-fix action to remove the redundant parentheses.",
+                  "markdown": "Reports about redundant parentheses in expressions.\n\nThe IDE provides the quick-fix action to remove the redundant parentheses."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "warning",
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING"
+                    "ideaSeverity": "WEAK WARNING"
                   }
                 },
                 "relationships": [
@@ -2944,19 +2944,19 @@
                 ]
               },
               {
-                "id": "PyRedundantParenthesesInspection",
+                "id": "PyTrailingSemicolonInspection",
                 "shortDescription": {
-                  "text": "Redundant parentheses"
+                  "text": "Prohibited trailing semicolon in a statement"
                 },
                 "fullDescription": {
-                  "text": "Reports about redundant parentheses in expressions. The IDE provides the quick-fix action to remove the redundant parentheses.",
-                  "markdown": "Reports about redundant parentheses in expressions.\n\nThe IDE provides the quick-fix action to remove the redundant parentheses."
+                  "text": "Reports trailing semicolons in statements. Example: def my_func(a):\n    c = a ** 2;\n    return c\n IDE provides a quick-fix that removes a trailing semicolon. When you apply it, the code changes to: def my_func(a):\n    c = a ** 2\n    return c",
+                  "markdown": "Reports trailing semicolons in statements.\n\n**Example:**\n\n```\ndef my_func(a):\n    c = a ** 2;\n    return c\n```\n\nIDE provides a quick-fix that removes a trailing semicolon. When you\napply it, the code changes to:\n\n```\ndef my_func(a):\n    c = a ** 2\n    return c\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "note",
+                  "level": "warning",
                   "parameters": {
-                    "ideaSeverity": "WEAK WARNING"
+                    "ideaSeverity": "WARNING"
                   }
                 },
                 "relationships": [
@@ -3595,19 +3595,19 @@
                 ]
               },
               {
-                "id": "PyStubPackagesCompatibilityInspection",
+                "id": "PyProtectedMemberInspection",
                 "shortDescription": {
-                  "text": "Incompatible stub packages"
+                  "text": "Accessing a protected member of a class or a module"
                 },
                 "fullDescription": {
-                  "text": "Reports stub packages that do not support the version of the corresponding runtime package. A stub package contains type information for some runtime package.",
-                  "markdown": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
+                  "text": "Reports cases when a protected member is accessed outside the class, a descendant of the class where it is defined, or a module. class Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method",
+                  "markdown": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
                 },
                 "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
+                  "enabled": true,
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING"
+                    "ideaSeverity": "WEAK WARNING"
                   }
                 },
                 "relationships": [
@@ -3626,19 +3626,19 @@
                 ]
               },
               {
-                "id": "PyProtectedMemberInspection",
+                "id": "PyStubPackagesCompatibilityInspection",
                 "shortDescription": {
-                  "text": "Accessing a protected member of a class or a module"
+                  "text": "Incompatible stub packages"
                 },
                 "fullDescription": {
-                  "text": "Reports cases when a protected member is accessed outside the class, a descendant of the class where it is defined, or a module. class Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method",
-                  "markdown": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
+                  "text": "Reports stub packages that do not support the version of the corresponding runtime package. A stub package contains type information for some runtime package.",
+                  "markdown": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
                 },
                 "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "note",
+                  "enabled": false,
+                  "level": "warning",
                   "parameters": {
-                    "ideaSeverity": "WEAK WARNING"
+                    "ideaSeverity": "WARNING"
                   }
                 },
                 "relationships": [
@@ -4971,13 +4971,13 @@
                 ]
               },
               {
-                "id": "SqlIdentifierInspection",
+                "id": "SqlAutoIncrementDuplicateInspection",
                 "shortDescription": {
-                  "text": "Identifier should be quoted"
+                  "text": "Auto-increment duplicate"
                 },
                 "fullDescription": {
-                  "text": "Reports situations when you use SQL reserved keywords as identifier names in your query. Example (Microsoft SQL Server): 'CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);' We use 'select', 'identity', and 'order' as table and column names. But they are also reserved keywords in Microsoft SQL Server. Therefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the Quote identifier quick-fix. After the quick-fix is applied: 'CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);'",
-                  "markdown": "Reports situations when you use SQL reserved keywords as identifier names in your query.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);\n\nWe use `select`, `identity`, and `order` as table and column names.\nBut they are also reserved keywords in Microsoft SQL Server.\nTherefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the\n**Quote identifier** quick-fix.\n\nAfter the quick-fix is applied:\n\n    CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);\n"
+                  "text": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key. Example (MySQL): 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT,\n    c2 INT AUTO_INCREMENT,\n);' The AUTO_INCREMENT constraint for 'c2' will be highlighted as 'c1' already has this constraint. To fix the warning, you can make 'id' a primary key and delete AUTO_INCREMENT for 'c2'. 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    c2 INT,\n);'",
+                  "markdown": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5002,13 +5002,13 @@
                 ]
               },
               {
-                "id": "SqlAutoIncrementDuplicateInspection",
+                "id": "SqlIdentifierInspection",
                 "shortDescription": {
-                  "text": "Auto-increment duplicate"
+                  "text": "Identifier should be quoted"
                 },
                 "fullDescription": {
-                  "text": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key. Example (MySQL): 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT,\n    c2 INT AUTO_INCREMENT,\n);' The AUTO_INCREMENT constraint for 'c2' will be highlighted as 'c1' already has this constraint. To fix the warning, you can make 'id' a primary key and delete AUTO_INCREMENT for 'c2'. 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    c2 INT,\n);'",
-                  "markdown": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
+                  "text": "Reports situations when you use SQL reserved keywords as identifier names in your query. Example (Microsoft SQL Server): 'CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);' We use 'select', 'identity', and 'order' as table and column names. But they are also reserved keywords in Microsoft SQL Server. Therefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the Quote identifier quick-fix. After the quick-fix is applied: 'CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);'",
+                  "markdown": "Reports situations when you use SQL reserved keywords as identifier names in your query.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);\n\nWe use `select`, `identity`, and `order` as table and column names.\nBut they are also reserved keywords in Microsoft SQL Server.\nTherefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the\n**Quote identifier** quick-fix.\n\nAfter the quick-fix is applied:\n\n    CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);\n"
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5622,37 +5622,6 @@
                 ]
               },
               {
-                "id": "MysqlParsingInspection",
-                "shortDescription": {
-                  "text": "Unsupported syntax in pre-8.0 versions"
-                },
-                "fullDescription": {
-                  "text": "Reports invalid usages of UNION in queries. The inspection works in MySQL versions that are earlier than 8.0. Example (MySQL): 'SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;'",
-                  "markdown": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "MySQL",
-                      "index": 11,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "SqlCallNotationInspection",
                 "shortDescription": {
                   "text": "Using of named and positional arguments"
@@ -5673,6 +5642,37 @@
                     "target": {
                       "id": "SQL",
                       "index": 5,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "MysqlParsingInspection",
+                "shortDescription": {
+                  "text": "Unsupported syntax in pre-8.0 versions"
+                },
+                "fullDescription": {
+                  "text": "Reports invalid usages of UNION in queries. The inspection works in MySQL versions that are earlier than 8.0. Example (MySQL): 'SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;'",
+                  "markdown": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "MySQL",
+                      "index": 11,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -6087,13 +6087,13 @@
                 ]
               },
               {
-                "id": "SqlUnusedVariableInspection",
+                "id": "SqlNoDataSourceInspection",
                 "shortDescription": {
-                  "text": "Unused variable"
+                  "text": "No data sources configured"
                 },
                 "fullDescription": {
-                  "text": "Reports unused arguments, variables, or parameters. Example (PostgreSQL): 'CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n$$\nBEGIN\n    RETURN PARAMUSED;\nEND\n$$ LANGUAGE plpgsql;' The 'PARAMUNUSED' parameter is not used in the function and might be deleted.",
-                  "markdown": "Reports unused arguments, variables, or parameters.\n\nExample (PostgreSQL):\n\n    CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n    $$\n    BEGIN\n        RETURN PARAMUSED;\n    END\n    $$ LANGUAGE plpgsql;\n\nThe `PARAMUNUSED` parameter is not used in the function and might be deleted."
+                  "text": "Reports the absence of data sources in the Database tool window (View | Tool Windows | Database).",
+                  "markdown": "Reports the absence of data sources in the **Database** tool window (**View \\| Tool Windows \\| Database**)."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -6118,13 +6118,13 @@
                 ]
               },
               {
-                "id": "SqlNoDataSourceInspection",
+                "id": "SqlUnusedVariableInspection",
                 "shortDescription": {
-                  "text": "No data sources configured"
+                  "text": "Unused variable"
                 },
                 "fullDescription": {
-                  "text": "Reports the absence of data sources in the Database tool window (View | Tool Windows | Database).",
-                  "markdown": "Reports the absence of data sources in the **Database** tool window (**View \\| Tool Windows \\| Database**)."
+                  "text": "Reports unused arguments, variables, or parameters. Example (PostgreSQL): 'CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n$$\nBEGIN\n    RETURN PARAMUSED;\nEND\n$$ LANGUAGE plpgsql;' The 'PARAMUNUSED' parameter is not used in the function and might be deleted.",
+                  "markdown": "Reports unused arguments, variables, or parameters.\n\nExample (PostgreSQL):\n\n    CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n    $$\n    BEGIN\n        RETURN PARAMUSED;\n    END\n    $$ LANGUAGE plpgsql;\n\nThe `PARAMUNUSED` parameter is not used in the function and might be deleted."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -6378,37 +6378,6 @@
                 ]
               },
               {
-                "id": "JsonSchemaDeprecation",
-                "shortDescription": {
-                  "text": "Deprecated JSON property"
-                },
-                "fullDescription": {
-                  "text": "Reports a deprecated property in a JSON file. Note that deprecation mechanism is not defined in the JSON Schema specification yet, and this inspection uses a non-standard extension 'deprecationMessage'.",
-                  "markdown": "Reports a deprecated property in a JSON file.  \nNote that deprecation mechanism is not defined in the JSON Schema specification yet, and this inspection uses a non-standard extension 'deprecationMessage'."
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "note",
-                  "parameters": {
-                    "ideaSeverity": "WEAK WARNING"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "JSON and JSON5",
-                      "index": 8,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "XmlDuplicatedId",
                 "shortDescription": {
                   "text": "Duplicate 'id' attribute"
@@ -6429,6 +6398,37 @@
                     "target": {
                       "id": "XML",
                       "index": 6,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "JsonSchemaDeprecation",
+                "shortDescription": {
+                  "text": "Deprecated JSON property"
+                },
+                "fullDescription": {
+                  "text": "Reports a deprecated property in a JSON file. Note that deprecation mechanism is not defined in the JSON Schema specification yet, and this inspection uses a non-standard extension 'deprecationMessage'.",
+                  "markdown": "Reports a deprecated property in a JSON file.  \nNote that deprecation mechanism is not defined in the JSON Schema specification yet, and this inspection uses a non-standard extension 'deprecationMessage'."
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "note",
+                  "parameters": {
+                    "ideaSeverity": "WEAK WARNING"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "JSON and JSON5",
+                      "index": 8,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -6595,37 +6595,6 @@
                 ]
               },
               {
-                "id": "DuplicatedCode",
-                "shortDescription": {
-                  "text": "Duplicated code fragment"
-                },
-                "fullDescription": {
-                  "text": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in File | Settings | Editor | Duplicates.",
-                  "markdown": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in [File \\| Settings \\| Editor \\| Duplicates](settings://duplicates.index)."
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "note",
-                  "parameters": {
-                    "ideaSeverity": "WEAK WARNING"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "General",
-                      "index": 17,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "RequiredAttributes",
                 "shortDescription": {
                   "text": "Missing required attribute"
@@ -6646,6 +6615,37 @@
                     "target": {
                       "id": "HTML",
                       "index": 15,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "DuplicatedCode",
+                "shortDescription": {
+                  "text": "Duplicated code fragment"
+                },
+                "fullDescription": {
+                  "text": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in File | Settings | Editor | Duplicates.",
+                  "markdown": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in [File \\| Settings \\| Editor \\| Duplicates](settings://duplicates.index)."
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "note",
+                  "parameters": {
+                    "ideaSeverity": "WEAK WARNING"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "General",
+                      "index": 17,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -7525,37 +7525,6 @@
                 ]
               },
               {
-                "id": "XmlDeprecatedElement",
-                "shortDescription": {
-                  "text": "Deprecated symbol"
-                },
-                "fullDescription": {
-                  "text": "Reports a deprecated XML element or attribute. Symbols can be marked by XML comment or documentation tag with text 'deprecated'.",
-                  "markdown": "Reports a deprecated XML element or attribute.\n\nSymbols can be marked by XML comment or documentation tag with text 'deprecated'."
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "XML",
-                      "index": 6,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "RegExpRedundantNestedCharacterClass",
                 "shortDescription": {
                   "text": "Redundant nested character class"
@@ -7576,6 +7545,37 @@
                     "target": {
                       "id": "RegExp",
                       "index": 10,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "XmlDeprecatedElement",
+                "shortDescription": {
+                  "text": "Deprecated symbol"
+                },
+                "fullDescription": {
+                  "text": "Reports a deprecated XML element or attribute. Symbols can be marked by XML comment or documentation tag with text 'deprecated'.",
+                  "markdown": "Reports a deprecated XML element or attribute.\n\nSymbols can be marked by XML comment or documentation tag with text 'deprecated'."
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "XML",
+                      "index": 6,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -7742,37 +7742,6 @@
                 ]
               },
               {
-                "id": "UnusedDefine",
-                "shortDescription": {
-                  "text": "Unused define"
-                },
-                "fullDescription": {
-                  "text": "Reports an unused named pattern ('define') in a RELAX-NG file (XML or Compact Syntax). 'define' elements that are used through an include in another file are ignored.",
-                  "markdown": "Reports an unused named pattern (`define`) in a RELAX-NG file (XML or Compact Syntax). `define` elements that are used through an include in another file are ignored."
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "RELAX NG",
-                      "index": 25,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "HtmlUnknownAnchorTarget",
                 "shortDescription": {
                   "text": "Unresolved fragment in a link"
@@ -7793,6 +7762,37 @@
                     "target": {
                       "id": "HTML",
                       "index": 15,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "UnusedDefine",
+                "shortDescription": {
+                  "text": "Unused define"
+                },
+                "fullDescription": {
+                  "text": "Reports an unused named pattern ('define') in a RELAX-NG file (XML or Compact Syntax). 'define' elements that are used through an include in another file are ignored.",
+                  "markdown": "Reports an unused named pattern (`define`) in a RELAX-NG file (XML or Compact Syntax). `define` elements that are used through an include in another file are ignored."
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "RELAX NG",
+                      "index": 25,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -8114,37 +8114,6 @@
                 ]
               },
               {
-                "id": "RegExpEscapedMetaCharacter",
-                "shortDescription": {
-                  "text": "Escaped meta character"
-                },
-                "fullDescription": {
-                  "text": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character '[', ']' and '^', because those would need additional escaping inside a character class. Example: '\\d+\\.\\d+' After the quick-fix is applied: '\\d+[.]\\d+' New in 2017.1",
-                  "markdown": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character `[`, `]` and `^`, because those would need additional escaping inside a character class.\n\n**Example:**\n\n\n      \\d+\\.\\d+\n\nAfter the quick-fix is applied:\n\n\n      \\d+[.]\\d+\n\nNew in 2017.1"
-                },
-                "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "note",
-                  "parameters": {
-                    "ideaSeverity": "INFORMATION"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "RegExp",
-                      "index": 10,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "LossyEncoding",
                 "shortDescription": {
                   "text": "Lossy encoding"
@@ -8176,19 +8145,19 @@
                 ]
               },
               {
-                "id": "RegExpRepeatedSpace",
+                "id": "RegExpEscapedMetaCharacter",
                 "shortDescription": {
-                  "text": "Consecutive spaces"
+                  "text": "Escaped meta character"
                 },
                 "fullDescription": {
-                  "text": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier. Example: '(     )' After the quick-fix is applied: '( {5})' New in 2017.1",
-                  "markdown": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
+                  "text": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character '[', ']' and '^', because those would need additional escaping inside a character class. Example: '\\d+\\.\\d+' After the quick-fix is applied: '\\d+[.]\\d+' New in 2017.1",
+                  "markdown": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character `[`, `]` and `^`, because those would need additional escaping inside a character class.\n\n**Example:**\n\n\n      \\d+\\.\\d+\n\nAfter the quick-fix is applied:\n\n\n      \\d+[.]\\d+\n\nNew in 2017.1"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "warning",
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING"
+                    "ideaSeverity": "INFORMATION"
                   }
                 },
                 "relationships": [
@@ -8214,6 +8183,37 @@
                 "fullDescription": {
                   "text": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression. Example: '(alpha|bravo|charlie|alpha)' After the quick-fix is applied: '(alpha|bravo|charlie)' New in 2017.1",
                   "markdown": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression.\n\n**Example:**\n\n\n      (alpha|bravo|charlie|alpha)\n\nAfter the quick-fix is applied:\n\n\n      (alpha|bravo|charlie)\n\nNew in 2017.1"
+                },
+                "defaultConfiguration": {
+                  "enabled": true,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "RegExp",
+                      "index": 10,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "RegExpRepeatedSpace",
+                "shortDescription": {
+                  "text": "Consecutive spaces"
+                },
+                "fullDescription": {
+                  "text": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier. Example: '(     )' After the quick-fix is applied: '( {5})' New in 2017.1",
+                  "markdown": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -10295,7 +10295,7 @@
       "versionControlProvenance": [
         {
           "repositoryUri": "https://github.com/HES-XPLAIN/mlxplain.git",
-          "revisionId": "66f11b38719070b4e7ace3fd868b8aeaa779ee6d",
+          "revisionId": "7fa829144589234f95cd61a0bc7d9a67009a4b26",
           "branch": "publishcicd",
           "properties": {
             "repoUrl": "https://github.com/HES-XPLAIN/mlxplain.git",
@@ -10308,9 +10308,9 @@
       "results": [],
       "automationDetails": {
         "id": "project/qodana/2023-04-17",
-        "guid": "5b76d046-243b-46ef-a483-f7929812473a",
+        "guid": "fb0f45a3-8589-40ea-8052-4e3d0fba50aa",
         "properties": {
-          "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/4719305672"
+          "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/4719414067"
         }
       },
       "newlineSequences": [
