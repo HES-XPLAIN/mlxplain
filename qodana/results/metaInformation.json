@@ -6,14 +6,9 @@
   "linter": "QDPY",
   "attributes": {
     "vcs": {
-      "sarifIdea": {
-        "repositoryUri": "https://github.com/HES-XPLAIN/mlxplain.git",
-        "revisionId": "7fa829144589234f95cd61a0bc7d9a67009a4b26",
-        "branch": "publishcicd"
-      }
+      "sarifIdea": {}
     },
     "deviceId": "200820300000000-436b-58d7-7a19-ea732b9fab8c",
-    "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/4719414067",
-    "repoUrl": "https://github.com/HES-XPLAIN/mlxplain.git"
+    "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/4719414070"
   }
 }
