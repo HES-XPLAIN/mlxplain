@@ -327,16 +327,16 @@
           "description": "Reports code fragments that cannot be normally reached.\n\n**Example:**\n\n```\nif True:\n    print('Yes')\nelse:\n    print('No')\n```\n\nAs a fix, you might want to check and modify the algorithm to ensure it implements\nthe expected logic."
         },
         {
-          "shortName": "PyChainedComparisonsInspection",
-          "displayName": "Too complex chained comparisons",
-          "enabled": true,
-          "description": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
-        },
-        {
           "shortName": "PyMethodParametersInspection",
           "displayName": "Improper first parameter",
           "enabled": true,
           "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
+        },
+        {
+          "shortName": "PyChainedComparisonsInspection",
+          "displayName": "Too complex chained comparisons",
+          "enabled": true,
+          "description": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
         },
         {
           "shortName": "PyDocstringTypesInspection",
@@ -393,16 +393,16 @@
           "description": "Reports cases in Python 2 when a class has no `__init__` method, neither its parent\nclasses.\n\n**Example:**\n\n```\nclass Book():\n    pass\n```\n\nThe quick-fix adds the `__init__` method:\n\n```\nclass Book():\n    def __init__(self):\n        pass\n```"
         },
         {
-          "shortName": "CythonUsageBeforeDeclarationInspection",
-          "displayName": "Cython variable is used before its declaration",
-          "enabled": true,
-          "description": "Reports Cython variables being referenced before declaration.\n\n**Example:**\n\n```\ncdef int c_x\n\nprint(c_x, c_y)  # Variable 'c_y' is used before its declaration\n\ncdef int c_y = 0\n```"
-        },
-        {
           "shortName": "PyArgumentEqualDefaultInspection",
           "displayName": "The function argument is equal to the default parameter value",
           "enabled": false,
           "description": "Reports a problem when an argument\npassed to the function is equal to the default parameter value.\n\nThis inspection is disabled by default to avoid performance degradation.\n\n**Example:**\n\n```\ndef my_function(a: int = 2):\n    print(a)\n\n\nmy_function(2)\n```"
+        },
+        {
+          "shortName": "CythonUsageBeforeDeclarationInspection",
+          "displayName": "Cython variable is used before its declaration",
+          "enabled": true,
+          "description": "Reports Cython variables being referenced before declaration.\n\n**Example:**\n\n```\ncdef int c_x\n\nprint(c_x, c_y)  # Variable 'c_y' is used before its declaration\n\ncdef int c_y = 0\n```"
         },
         {
           "shortName": "PyClassVarInspection",
@@ -465,16 +465,16 @@
           "description": "Reports cases in Python 2 when a file contains non-ASCII characters and does not\nhave an encoding declaration at the top.\n\n**Example:**\n\n```\nclass A(object):\n# №5\n    def __init__(self):\n        pass\n```\n\nIn this example, the IDE reports a non-ASCII symbol in a comment and a lack of encoding\ndeclaration. Apply the proposed quick-fix to add a missing encoding declaration:\n\n```\n# coding=utf-8\nclass A(object)\n# №5\n    def __init__(self):\n        pass\n```"
         },
         {
-          "shortName": "PyRedundantParenthesesInspection",
-          "displayName": "Redundant parentheses",
-          "enabled": true,
-          "description": "Reports about redundant parentheses in expressions.\n\nThe IDE provides the quick-fix action to remove the redundant parentheses."
-        },
-        {
           "shortName": "PyTrailingSemicolonInspection",
           "displayName": "Prohibited trailing semicolon in a statement",
           "enabled": true,
           "description": "Reports trailing semicolons in statements.\n\n**Example:**\n\n```\ndef my_func(a):\n    c = a ** 2;\n    return c\n```\n\nIDE provides a quick-fix that removes a trailing semicolon. When you\napply it, the code changes to:\n\n```\ndef my_func(a):\n    c = a ** 2\n    return c\n```"
+        },
+        {
+          "shortName": "PyRedundantParenthesesInspection",
+          "displayName": "Redundant parentheses",
+          "enabled": true,
+          "description": "Reports about redundant parentheses in expressions.\n\nThe IDE provides the quick-fix action to remove the redundant parentheses."
         },
         {
           "shortName": "PyAbstractClassInspection",
@@ -573,16 +573,16 @@
           "description": "Reports invalid usages of final classes,\nmethods and variables.\n\n**Example:**\n\n```\nfrom typing import final\n\n\n@final\nclass A:\n    def a_method(self):\n        pass\n\n\nclass B(A):\n    def a_method(self):\n        pass\n```"
         },
         {
-          "shortName": "PyStubPackagesCompatibilityInspection",
-          "displayName": "Incompatible stub packages",
-          "enabled": false,
-          "description": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
-        },
-        {
           "shortName": "PyProtectedMemberInspection",
           "displayName": "Accessing a protected member of a class or a module",
           "enabled": true,
           "description": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
+        },
+        {
+          "shortName": "PyStubPackagesCompatibilityInspection",
+          "displayName": "Incompatible stub packages",
+          "enabled": false,
+          "description": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
         },
         {
           "shortName": "PyUnboundLocalVariableInspection",
@@ -798,16 +798,16 @@
           "description": "Reports incorrect usages of transition table variables in triggers.\n\nExample (HSQLDB):\n\n    CREATE TABLE foo(a INT);\n\n    CREATE TRIGGER trg\n     AFTER DELETE ON foo\n    BEGIN\n       SELECT * FROM NEW;\n    END;\n\n    CREATE TRIGGER trig AFTER INSERT ON foo\n       REFERENCING OLD ROW AS newrow\n       FOR EACH ROW WHEN (a > 1)\n       INSERT INTO foo VALUES (1)\n\nIn HSQLDB, DELETE triggers may be used only with the OLD state while INSERT triggers may have only the NEW state. So, in the previous\nexample, NEW in `SELECT * FROM NEW;` will be highlighted as well as OLD in `REFERENCING OLD ROW AS newrow`."
         },
         {
-          "shortName": "SqlMultipleLimitClausesInspection",
-          "displayName": "Multiple row limiting/offset clauses in queries",
-          "enabled": false,
-          "description": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
-        },
-        {
           "shortName": "SqlNamedArgumentsInspection",
           "displayName": "Named arguments should be used",
           "enabled": false,
           "description": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
+        },
+        {
+          "shortName": "SqlMultipleLimitClausesInspection",
+          "displayName": "Multiple row limiting/offset clauses in queries",
+          "enabled": false,
+          "description": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
         },
         {
           "shortName": "SqlCaseVsCoalesceInspection",
@@ -828,12 +828,6 @@
           "description": "Reports columns that are not in the GROUP BY clause or inside an aggregate function call.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE t1 (a INT, b INT);\n    SELECT a, b FROM t1 GROUP BY a;\n\nIf you run the SELECT query, you will receive an error because Microsoft SQL Server expects the `b` column in GROUP BY or used\ninside an aggregate function. The following two examples will fix the error.\n\n    SELECT a, b FROM t1 GROUP BY a, b;\n    SELECT a, max(b) max_b FROM t1 GROUP BY a;\n"
         },
         {
-          "shortName": "SqlIdentifierInspection",
-          "displayName": "Identifier should be quoted",
-          "enabled": false,
-          "description": "Reports situations when you use SQL reserved keywords as identifier names in your query.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);\n\nWe use `select`, `identity`, and `order` as table and column names.\nBut they are also reserved keywords in Microsoft SQL Server.\nTherefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the\n**Quote identifier** quick-fix.\n\nAfter the quick-fix is applied:\n\n    CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);\n"
-        },
-        {
           "shortName": "SqlRedundantAliasInspection",
           "displayName": "Redundant alias expressions",
           "enabled": false,
@@ -844,6 +838,12 @@
           "displayName": "Auto-increment duplicate",
           "enabled": false,
           "description": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
+        },
+        {
+          "shortName": "SqlIdentifierInspection",
+          "displayName": "Identifier should be quoted",
+          "enabled": false,
+          "description": "Reports situations when you use SQL reserved keywords as identifier names in your query.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);\n\nWe use `select`, `identity`, and `order` as table and column names.\nBut they are also reserved keywords in Microsoft SQL Server.\nTherefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the\n**Quote identifier** quick-fix.\n\nAfter the quick-fix is applied:\n\n    CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);\n"
         },
         {
           "shortName": "SqlStringLengthExceededInspection",
@@ -1014,16 +1014,16 @@
           "description": "Reports usages of backward GOTO statements and GOTO statements used to exit a loop.\n\nThe extensive use of GOTO statements is generally\nnot recommended. For details, see [GOTO statement in\nSQL\nprocedures at ibm.com](https://www.ibm.com/docs/no/db2/11.5?topic=procedures-goto-statement-in-sql).\n\nInstead of jumping back to a previous statement using GOTO, consider using a loop.\n\nInstead of exiting the WHILE loop with GOTO, consider using other control-of-flow statements (for example, RETURN or BREAK).\n\nExample (Oracle):\n\n    CREATE PROCEDURE test(n INT) AS\n    DECLARE\n        x INT;\n    BEGIN\n        x := 0;\n        GOTO a;\n        <<a>> x := 1;\n        IF (n = 0) THEN\n            GOTO a;\n        END IF;\n        WHILE TRUE\n            LOOP\n                GOTO b;\n            END LOOP;\n        <<b>> x := 3;\n    END;\n"
         },
         {
-          "shortName": "SqlUnusedVariableInspection",
-          "displayName": "Unused variable",
-          "enabled": false,
-          "description": "Reports unused arguments, variables, or parameters.\n\nExample (PostgreSQL):\n\n    CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n    $$\n    BEGIN\n        RETURN PARAMUSED;\n    END\n    $$ LANGUAGE plpgsql;\n\nThe `PARAMUNUSED` parameter is not used in the function and might be deleted."
-        },
-        {
           "shortName": "SqlNoDataSourceInspection",
           "displayName": "No data sources configured",
           "enabled": false,
           "description": "Reports the absence of data sources in the **Database** tool window (**View \\| Tool Windows \\| Database**)."
+        },
+        {
+          "shortName": "SqlUnusedVariableInspection",
+          "displayName": "Unused variable",
+          "enabled": false,
+          "description": "Reports unused arguments, variables, or parameters.\n\nExample (PostgreSQL):\n\n    CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n    $$\n    BEGIN\n        RETURN PARAMUSED;\n    END\n    $$ LANGUAGE plpgsql;\n\nThe `PARAMUNUSED` parameter is not used in the function and might be deleted."
         },
         {
           "shortName": "SqlWithoutWhereInspection",
@@ -1353,23 +1353,6 @@
       ]
     },
     {
-      "name": "MySQL",
-      "inspections": [
-        {
-          "shortName": "MysqlLoadDataPathInspection",
-          "displayName": "LOAD statement path",
-          "enabled": false,
-          "description": "Reports paths that start with the tilde character in LOAD statements.\n\nExample (MySQL):\n\n    CREATE TABLE table_name (id int);\n    LOAD DATA LOCAL INFILE '~/Documents/some_file.txt'\n    INTO TABLE table_name FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n'\n    IGNORE 1 LINES;\n\nInstead of the tilde character, use a full path to the file."
-        },
-        {
-          "shortName": "MysqlParsingInspection",
-          "displayName": "Unsupported syntax in pre-8.0 versions",
-          "enabled": false,
-          "description": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
-        }
-      ]
-    },
-    {
       "name": "Properties files",
       "inspections": [
         {
@@ -1407,6 +1390,23 @@
           "displayName": "Property key/value delimiter doesn't match code style settings",
           "enabled": false,
           "description": "Reports properties in which key or value delimiters do not match code style settings."
+        }
+      ]
+    },
+    {
+      "name": "MySQL",
+      "inspections": [
+        {
+          "shortName": "MysqlLoadDataPathInspection",
+          "displayName": "LOAD statement path",
+          "enabled": false,
+          "description": "Reports paths that start with the tilde character in LOAD statements.\n\nExample (MySQL):\n\n    CREATE TABLE table_name (id int);\n    LOAD DATA LOCAL INFILE '~/Documents/some_file.txt'\n    INTO TABLE table_name FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n'\n    IGNORE 1 LINES;\n\nInstead of the tilde character, use a full path to the file."
+        },
+        {
+          "shortName": "MysqlParsingInspection",
+          "displayName": "Unsupported syntax in pre-8.0 versions",
+          "enabled": false,
+          "description": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
         }
       ]
     },
