@@ -5,7 +5,7 @@ An open platform for accelerating the development of eXplainable AI systems
 * [Static analysis](https://hes-xplain.github.io/mlxplain/qodana/)
 * [Coverage](https://hes-xplain.github.io/mlxplain/cov/)
 
-## Installation
+## Contribution
 
 ### Install Python and Poetry
 
@@ -42,3 +42,7 @@ Pre-commit hooks can be run manually with:
 ```shell
 pre-commit run --all-files
 ```
+
+## Release
+
+To publish the package on [Pypi](https://pypi.org/project/mlxplain/), refer to [RELEASE.md](RELEASE.md).
