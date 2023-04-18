@@ -65,3 +65,17 @@ pre-commit run --all-files
 ## Release
 
 To publish the package on [PyPI](https://pypi.org/project/mlxplain/), refer to [RELEASE](RELEASE.md).
+
+## Template example
+
+The template branch mimics the addition of a new algorithm (named SHAP2, as a dummy copy of SHAP) while importing
+OmniXAI modules when required.
+
+To launch the provided example:
+
+```shell
+pip install .
+python tabular_explainer_example
+```
+
+And open the browser at http://127.0.0.1:8050/ to view the dashboard comparing various algorithms.
