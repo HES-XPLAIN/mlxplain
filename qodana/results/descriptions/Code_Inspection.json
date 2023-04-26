@@ -110,7 +110,7 @@
           "shortName": "EditorConfigPatternEnumerationRedundancy",
           "displayName": "Unnecessary braces",
           "enabled": false,
-          "description": "Reports pattern lists that are either empty `{}` or contain just one pattern, for example `{foo}`. The braces are needed only if there are two and more, for example: `{foo,bar}`"
+          "description": "Reports pattern lists that are either empty `{}` or contain just one pattern, for example `{foo}` in contrast to a list containing multiple patterns, for example `{foo,bar}`. In this case braces are handled as a part of the name. For example, the pattern `*.{a}` will match the file `my.{a}` but not `my.a`."
         },
         {
           "shortName": "EditorConfigEncoding",
@@ -255,16 +255,16 @@
           "description": "Reports invalid usages of a class with `__slots__` definitions.\n\n**Example:**\n\n```\nclass Foo:\n    __slots__ = ['foo', 'bar']\n\n\nfoo = Foo()\nfoo.baz = 'spam'\n```"
         },
         {
-          "shortName": "PyMissingConstructorInspection",
-          "displayName": "Missed call to '__init__' of the super class",
-          "enabled": true,
-          "description": "Reports cases when a call to the `super` constructor in a class is missed.\n\n**Example:**\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n```\n\nThe `Pear` class should have a `super` call in the `__init__`\nmethod.\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()\n```"
-        },
-        {
           "shortName": "PyDefaultArgumentInspection",
           "displayName": "The default argument is mutable",
           "enabled": true,
           "description": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for\nan argument.   \n\nDefault argument values are evaluated only once at function definition time,\nwhich means that modifying the\ndefault value of the argument will affect all subsequent calls of that function.\n\n**Example:**\n\n```\ndef func(s, cache={}):\n    cache[s] = None\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\ndef func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None\n```"
+        },
+        {
+          "shortName": "PyMissingConstructorInspection",
+          "displayName": "Missed call to '__init__' of the super class",
+          "enabled": true,
+          "description": "Reports cases when a call to the `super` constructor in a class is missed.\n\n**Example:**\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n```\n\nThe `Pear` class should have a `super` call in the `__init__`\nmethod.\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()\n```"
         },
         {
           "shortName": "PyShadowingBuiltinsInspection",
@@ -303,16 +303,16 @@
           "description": "Reports coroutines that were called\nwithout using the `await` syntax.\n\n**Example:**\n\n```\nasync def bar():\n    pass\n\n\nasync def foo():\n    bar()\n```\n\nAfter the quick-fix is applied, the code changes to:\n\n```\nasync def bar():\n    pass\n\n\nasync def foo():\n    await bar()\n```"
         },
         {
-          "shortName": "CommandLineInspection",
-          "displayName": "Incorrect CLI syntax",
-          "enabled": true,
-          "description": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
-        },
-        {
           "shortName": "PyComparisonWithNoneInspection",
           "displayName": "Using equality operators to compare with None",
           "enabled": true,
           "description": "Reports comparisons with `None`. That type of comparisons\nshould always be done with `is` or `is not`, never\nthe equality operators.\n\n**Example:**\n\n```\na = 2\n\n\nif a == None:\n    print(\"Success\")\n```\n\nOnce the quick-fix is applied, the code changes to:\n\n```\na = 2\n\n\nif a is None:\n    print(\"Success\")\n```"
+        },
+        {
+          "shortName": "CommandLineInspection",
+          "displayName": "Incorrect CLI syntax",
+          "enabled": true,
+          "description": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
         },
         {
           "shortName": "PyCallingNonCallableInspection",
@@ -327,16 +327,16 @@
           "description": "Reports code fragments that cannot be normally reached.\n\n**Example:**\n\n```\nif True:\n    print('Yes')\nelse:\n    print('No')\n```\n\nAs a fix, you might want to check and modify the algorithm to ensure it implements\nthe expected logic."
         },
         {
-          "shortName": "PyMethodParametersInspection",
-          "displayName": "Improper first parameter",
-          "enabled": true,
-          "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
-        },
-        {
           "shortName": "PyChainedComparisonsInspection",
           "displayName": "Too complex chained comparisons",
           "enabled": true,
           "description": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
+        },
+        {
+          "shortName": "PyMethodParametersInspection",
+          "displayName": "Improper first parameter",
+          "enabled": true,
+          "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
         },
         {
           "shortName": "PyDocstringTypesInspection",
@@ -393,16 +393,16 @@
           "description": "Reports cases in Python 2 when a class has no `__init__` method, neither its parent\nclasses.\n\n**Example:**\n\n```\nclass Book():\n    pass\n```\n\nThe quick-fix adds the `__init__` method:\n\n```\nclass Book():\n    def __init__(self):\n        pass\n```"
         },
         {
-          "shortName": "PyArgumentEqualDefaultInspection",
-          "displayName": "The function argument is equal to the default parameter value",
-          "enabled": false,
-          "description": "Reports a problem when an argument\npassed to the function is equal to the default parameter value.\n\nThis inspection is disabled by default to avoid performance degradation.\n\n**Example:**\n\n```\ndef my_function(a: int = 2):\n    print(a)\n\n\nmy_function(2)\n```"
-        },
-        {
           "shortName": "CythonUsageBeforeDeclarationInspection",
           "displayName": "Cython variable is used before its declaration",
           "enabled": true,
           "description": "Reports Cython variables being referenced before declaration.\n\n**Example:**\n\n```\ncdef int c_x\n\nprint(c_x, c_y)  # Variable 'c_y' is used before its declaration\n\ncdef int c_y = 0\n```"
+        },
+        {
+          "shortName": "PyArgumentEqualDefaultInspection",
+          "displayName": "The function argument is equal to the default parameter value",
+          "enabled": false,
+          "description": "Reports a problem when an argument\npassed to the function is equal to the default parameter value.\n\nThis inspection is disabled by default to avoid performance degradation.\n\n**Example:**\n\n```\ndef my_function(a: int = 2):\n    print(a)\n\n\nmy_function(2)\n```"
         },
         {
           "shortName": "PyClassVarInspection",
@@ -455,7 +455,7 @@
         {
           "shortName": "PyPackageRequirementsInspection",
           "displayName": "Unsatisfied package requirements",
-          "enabled": false,
+          "enabled": true,
           "description": "Reports packages mentioned in requirements files (for example, `requirements.txt` or `Pipfile`) but not installed,\nor imported but not mentioned in requirements files.\n\n\nThe IDE shows a quick-fix banner so that you can install the missing packages in one click."
         },
         {
@@ -497,7 +497,7 @@
         {
           "shortName": "PyInterpreterInspection",
           "displayName": "An invalid interpreter",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports problems if there is no Python interpreter configured for the project or if the interpreter is invalid. Without a properly\nconfigured interpreter, you cannot execute your Python scripts and benefit from some Python code insight features.\n\nThe IDE provides quick access to the interpreter settings."
         },
         {
@@ -521,7 +521,7 @@
         {
           "shortName": "PyStubPackagesAdvertiser",
           "displayName": "Stub packages advertiser",
-          "enabled": false,
+          "enabled": true,
           "description": "Reports availability of stub packages.\n\n\n[Stub package](https://www.python.org/dev/peps/pep-0561/) is a package that contains type information for the corresponding\nruntime package.\n\nUsing stub packages ensures better coding assistance for the corresponding python package."
         },
         {
@@ -573,16 +573,16 @@
           "description": "Reports invalid usages of final classes,\nmethods and variables.\n\n**Example:**\n\n```\nfrom typing import final\n\n\n@final\nclass A:\n    def a_method(self):\n        pass\n\n\nclass B(A):\n    def a_method(self):\n        pass\n```"
         },
         {
+          "shortName": "PyStubPackagesCompatibilityInspection",
+          "displayName": "Incompatible stub packages",
+          "enabled": true,
+          "description": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
+        },
+        {
           "shortName": "PyProtectedMemberInspection",
           "displayName": "Accessing a protected member of a class or a module",
           "enabled": true,
           "description": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
-        },
-        {
-          "shortName": "PyStubPackagesCompatibilityInspection",
-          "displayName": "Incompatible stub packages",
-          "enabled": false,
-          "description": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
         },
         {
           "shortName": "PyUnboundLocalVariableInspection",
@@ -870,16 +870,16 @@
           "description": "Reports situations when source code of a database object has been changed.\n\nThe inspection is triggered when you perform database or object introspection. The introspection is run when you open source code of an\nobject, run statements, and perform code refactoring.\nAlso, you can run introspection by right-clicking an object and selecting **Refresh**.\n\nThe inspection covers the following situations:\n\n* Object source code was changed in the database but code in the editor was not updated. Works in PostgreSQL, Microsoft SQL Server, Oracle, and Sybase ASE.\n* You changed the object source code, introspected the database, but source code has been already changed by someone else.\n* The database introspector was updated in the IDE and you need to download new object properties that were missing in the previous introspector version."
         },
         {
-          "shortName": "SqlSideEffectsInspection",
-          "displayName": "Statement with side effects",
-          "enabled": false,
-          "description": "Reports statements that might lead to modification of a database during a read-only connection.\n\nTo enable read-only mode for a\nconnection,\nright-click a data source in the **Database** tool window (**View \\| Tool Windows \\| Database** ) and select **Properties** .\nIn the **Data Sources and Drivers** dialog, click the **Options** tab and select the **Read-only** checkbox.\n\nExample (MySQL):\n\n    CREATE TABLE foo(a INT);\n    INSERT INTO foo VALUES (1);\n\nAs `CREATE TABLE` and `INSERT INTO` statements lead to a database modification, these statements will be highlighted\nin read-only connection mode."
-        },
-        {
           "shortName": "SqlDtInspection",
           "displayName": "Ill-formed date/time literals",
           "enabled": false,
           "description": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2.\n\nExample (MySQL):\n\n    SELECT TIME '10 -12:13:14' FROM dual;\n    SELECT TIME ' 12 : 13 : 14 ' FROM dual;\n    SELECT TIME '12 13 14' FROM dual;\n    SELECT TIME '12-13-14' FROM dual;\n    SELECT TIME '12.13.14' FROM dual;\n    SELECT TIME '12:13:' FROM dual;\n    SELECT TIME '12:13' FROM dual;\n    SELECT TIME '12:' FROM dual;\n\nIn this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted.\nFor more information about date and time literals in MySQL, see [Date and Time Literals at dev.mysql.com](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-literals.html).\n\nThe following date and type literals are valid for MySQL.\n\n    SELECT TIME '12:13:14' FROM dual;\n    SELECT TIME '12:13:14.555' FROM dual;\n    SELECT TIME '12:13:14.' FROM dual;\n    SELECT TIME '-12:13:14' FROM dual;\n    SELECT TIME '10 12:13:14' FROM dual;\n    SELECT TIME '-10 12:13:14' FROM dual;\n"
+        },
+        {
+          "shortName": "SqlSideEffectsInspection",
+          "displayName": "Statement with side effects",
+          "enabled": false,
+          "description": "Reports statements that might lead to modification of a database during a read-only connection.\n\nTo enable read-only mode for a\nconnection,\nright-click a data source in the **Database** tool window (**View \\| Tool Windows \\| Database** ) and select **Properties** .\nIn the **Data Sources and Drivers** dialog, click the **Options** tab and select the **Read-only** checkbox.\n\nExample (MySQL):\n\n    CREATE TABLE foo(a INT);\n    INSERT INTO foo VALUES (1);\n\nAs `CREATE TABLE` and `INSERT INTO` statements lead to a database modification, these statements will be highlighted\nin read-only connection mode."
         },
         {
           "shortName": "SqlIllegalCursorStateInspection",
@@ -1014,16 +1014,16 @@
           "description": "Reports usages of backward GOTO statements and GOTO statements used to exit a loop.\n\nThe extensive use of GOTO statements is generally\nnot recommended. For details, see [GOTO statement in\nSQL\nprocedures at ibm.com](https://www.ibm.com/docs/no/db2/11.5?topic=procedures-goto-statement-in-sql).\n\nInstead of jumping back to a previous statement using GOTO, consider using a loop.\n\nInstead of exiting the WHILE loop with GOTO, consider using other control-of-flow statements (for example, RETURN or BREAK).\n\nExample (Oracle):\n\n    CREATE PROCEDURE test(n INT) AS\n    DECLARE\n        x INT;\n    BEGIN\n        x := 0;\n        GOTO a;\n        <<a>> x := 1;\n        IF (n = 0) THEN\n            GOTO a;\n        END IF;\n        WHILE TRUE\n            LOOP\n                GOTO b;\n            END LOOP;\n        <<b>> x := 3;\n    END;\n"
         },
         {
-          "shortName": "SqlNoDataSourceInspection",
-          "displayName": "No data sources configured",
-          "enabled": false,
-          "description": "Reports the absence of data sources in the **Database** tool window (**View \\| Tool Windows \\| Database**)."
-        },
-        {
           "shortName": "SqlUnusedVariableInspection",
           "displayName": "Unused variable",
           "enabled": false,
           "description": "Reports unused arguments, variables, or parameters.\n\nExample (PostgreSQL):\n\n    CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n    $$\n    BEGIN\n        RETURN PARAMUSED;\n    END\n    $$ LANGUAGE plpgsql;\n\nThe `PARAMUNUSED` parameter is not used in the function and might be deleted."
+        },
+        {
+          "shortName": "SqlNoDataSourceInspection",
+          "displayName": "No data sources configured",
+          "enabled": false,
+          "description": "Reports the absence of data sources in the **Database** tool window (**View \\| Tool Windows \\| Database**)."
         },
         {
           "shortName": "SqlWithoutWhereInspection",
@@ -1054,6 +1054,17 @@
           "displayName": "Null comparison",
           "enabled": false,
           "description": "Reports comparisons with NULL that can be replaced with IS NULL or IS NOT NULL operators.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE foo ( id int );\n\n    SELECT * FROM foo WHERE NULL = NULL;\n    SELECT * FROM foo WHERE NULL != NULL;\n\nThe `NULL = NULL` can be replaced with `IS NULL`, the `NULL != NULL` comparison\nwith `IS NOT NULL`. To do this replacement, you can use **Use IS NULL operator** or **Use IS NOT NULL operator**\nquick-fixes.\n\n    SELECT * FROM foo WHERE NULL IS NULL;\n    SELECT * FROM foo WHERE NULL IS NOT NULL;\n"
+        }
+      ]
+    },
+    {
+      "name": "Shell script",
+      "inspections": [
+        {
+          "shortName": "ShellCheck",
+          "displayName": "ShellCheck",
+          "enabled": false,
+          "description": "Reports shell script bugs detected by the integrated [ShellCheck](https://github.com/koalaman/shellcheck) static analysis tool."
         }
       ]
     },
@@ -1269,7 +1280,7 @@
         {
           "shortName": "RegExpRedundantClassElement",
           "displayName": "Redundant '\\d', '[:digit:]', or '\\D' class elements",
-          "enabled": false,
+          "enabled": true,
           "description": "Reports redundant `\\d` or `[:digit:]` that are used in one class with `\\w` or `[:word:]` (`\\D` with `\\W`) and can be removed.\n\n**Example:**\n\n\n      [\\w\\d]\n\nAfter the quick-fix is applied:\n\n\n      [\\w]\n\nNew in 2022.2"
         },
         {
@@ -1315,9 +1326,15 @@
           "description": "Reports unnecessary nested character classes.\n\n**Example:**\n\n\n      [a-c[x-z]]\n\nAfter the quick-fix is applied:\n\n\n      [a-cx-z]\n\nNew in 2020.2"
         },
         {
+          "shortName": "CustomRegExpInspection",
+          "displayName": "Custom RegExp inspection",
+          "enabled": true,
+          "description": "Custom Regex Inspection"
+        },
+        {
           "shortName": "RegExpOctalEscape",
           "displayName": "Octal escape",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports octal escapes, which are easily confused with back references. Use hexadecimal escapes to avoid confusion.\n\n**Example:**\n\n\n      \\07\n\nAfter the quick-fix is applied:\n\n\n      \\x07\n\nNew in 2017.1"
         },
         {
@@ -1335,7 +1352,7 @@
         {
           "shortName": "RegExpEscapedMetaCharacter",
           "displayName": "Escaped meta character",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character `[`, `]` and `^`, because those would need additional escaping inside a character class.\n\n**Example:**\n\n\n      \\d+\\.\\d+\n\nAfter the quick-fix is applied:\n\n\n      \\d+[.]\\d+\n\nNew in 2017.1"
         },
         {
@@ -1349,6 +1366,29 @@
           "displayName": "Duplicate branch in alternation",
           "enabled": true,
           "description": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression.\n\n**Example:**\n\n\n      (alpha|bravo|charlie|alpha)\n\nAfter the quick-fix is applied:\n\n\n      (alpha|bravo|charlie)\n\nNew in 2017.1"
+        }
+      ]
+    },
+    {
+      "name": "MySQL",
+      "inspections": [
+        {
+          "shortName": "MysqlLoadDataPathInspection",
+          "displayName": "LOAD statement path",
+          "enabled": false,
+          "description": "Reports paths that start with the tilde character in LOAD statements.\n\nExample (MySQL):\n\n    CREATE TABLE table_name (id int);\n    LOAD DATA LOCAL INFILE '~/Documents/some_file.txt'\n    INTO TABLE table_name FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n'\n    IGNORE 1 LINES;\n\nInstead of the tilde character, use a full path to the file."
+        },
+        {
+          "shortName": "MysqlSpaceAfterFunctionNameInspection",
+          "displayName": "Whitespace between the function name and the open parenthesis",
+          "enabled": false,
+          "description": "Reports any whitespace in a function call between the function name and the open parenthesis, which is not supported by default.\n\nExample (MySQL):\n\n    SELECT MAX (qty) FROM orders;\n"
+        },
+        {
+          "shortName": "MysqlParsingInspection",
+          "displayName": "Unsupported syntax in pre-8.0 versions",
+          "enabled": false,
+          "description": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
         }
       ]
     },
@@ -1390,23 +1430,6 @@
           "displayName": "Property key/value delimiter doesn't match code style settings",
           "enabled": false,
           "description": "Reports properties in which key or value delimiters do not match code style settings."
-        }
-      ]
-    },
-    {
-      "name": "MySQL",
-      "inspections": [
-        {
-          "shortName": "MysqlLoadDataPathInspection",
-          "displayName": "LOAD statement path",
-          "enabled": false,
-          "description": "Reports paths that start with the tilde character in LOAD statements.\n\nExample (MySQL):\n\n    CREATE TABLE table_name (id int);\n    LOAD DATA LOCAL INFILE '~/Documents/some_file.txt'\n    INTO TABLE table_name FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n'\n    IGNORE 1 LINES;\n\nInstead of the tilde character, use a full path to the file."
-        },
-        {
-          "shortName": "MysqlParsingInspection",
-          "displayName": "Unsupported syntax in pre-8.0 versions",
-          "enabled": false,
-          "description": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
         }
       ]
     },
@@ -1469,7 +1492,7 @@
         {
           "shortName": "DjangoUnresolvedStaticReferenceInspection",
           "displayName": "Unresolved static reference",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports unresolved references to static resources.\n\n**Example:**\n\n```\n{% load staticfiles %}\n<link rel=\"stylesheet\" type=\"text/css\" href=\"{% static 'polls/style.css' %}\" />\n```\n\nIn this example, `style.css` is highlighted if there is no such a file in the `static/poll`\ndirectory."
         },
         {
@@ -1481,43 +1504,43 @@
         {
           "shortName": "DjangoBrokenLineCommentInspection",
           "displayName": "Broken line comment",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports `#}` line comment ends in Django templates that do not have a\nmatching line comment start.\n\n**Example:**\n\n```\ncomment #}\n```\n\nThe IDE highlights `#}` as it requires the corresponding `{#` token."
         },
         {
           "shortName": "DjangoUnresolvedFilterInspection",
           "displayName": "Unresolved filter",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports unresolved filters in Django templates.\n\n**Example:**\n\n```\n  {{ my_value|cool_filter:\"arg\" }}\n```"
         },
         {
           "shortName": "DjangoRelationInspection",
           "displayName": "Incorrect comparison expression in Django templates",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports missing whitespaces before and after comparison operators in Django templates.\n\n**Example:**\n\n```\n{% if my_var==1 %}\n{% endif %}\n```"
         },
         {
           "shortName": "DjangoUnresolvedTagInspection",
           "displayName": "Unresolved tag",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports unresolved tags in Django templates.\n\n**Example:**\n\n```\n<h1>{{ question.question_text }}</h1>\n<start>\n```\n\nThe IDE highlights `<start>`. You can either remove the tag or apply the quick-fix to\nadd `<start>` to custom HTML tags."
         },
         {
           "shortName": "DjangoOrmInspection",
           "displayName": "Django ORM error",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports several methods that may not be called due to some ORM reasons.\n\n**Example:**\n\n```\nclass Choice:\n    question = ForeignKey(Question, null=False)\n\n\nchoice_set = Question.objects.get(id=1).choice_set.remove()\n```\n\nThe `remove` function can not be called if the foreign key has `null=False`."
         },
         {
           "shortName": "DjangoUnresolvedTemplateReferenceInspection",
           "displayName": "Unresolved template reference",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports unresolved file references in string literals of\n`extends`\\> and `include`\\> Django tags.\n\n**Example:**\n\n```\n{% extends \"../DjangoApp/templatetags/base.html\"%}\n```\n\nIn this example, the `base.html` tag is highlighted, because it is not available in the\nspecified location."
         },
         {
           "shortName": "DjangoIncompatibleInspection",
           "displayName": "Incompatible code in Django templates",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports features that are not available in the current Django version.\n\n**Example:**\n\n```\n{% if my_var is True %}\n{% endif %}\n```\n\nAvailable since 1.10. The IDE shows warning when discovered in the earlier versions."
         },
         {
@@ -1529,7 +1552,7 @@
         {
           "shortName": "DjangoCloseTagInspection",
           "displayName": "Mismatched opening and closing tags",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports cases when opening tags in Django templates are not correctly matched by closing tags.\n\n**Example:**\n\n```\n{% if error_message %}<p><strong>{{ error_message }}</p>{% endif %}\n```\n\nThe IDE reports an error on the `strong` tag not being closed."
         },
         {
@@ -1541,13 +1564,13 @@
         {
           "shortName": "DjangoUnresolvedLoadInspection",
           "displayName": "Unresolved library inspection",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports unresolved references in Django load tags.\n\n**Example:**\n\n```\n  {% load something_nonexistent %}\n```"
         },
         {
           "shortName": "DjangoUrlArgumentsInspection",
           "displayName": "Incorrect arguments in the ' {% url %}' tag",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports missing parameters in the template file if the `url()`\nfunction has parameters in its URL path.\n\n**Example:**\n\nIn the `url.py` file\n\n```\nurl(r'^(?P<question_id>[0-9]+)/', views.detail, name='detail')\n```\n\nIn the template file\n\n```\n{% url 'polls:detail' %}\n```"
         }
       ]
@@ -1594,7 +1617,7 @@
         {
           "shortName": "HtmlWrongAttributeValue",
           "displayName": "Wrong attribute value",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports an incorrect HTML attribute value."
         },
         {
@@ -1682,7 +1705,7 @@
         {
           "shortName": "DuplicatedCode",
           "displayName": "Duplicated code fragment",
-          "enabled": false,
+          "enabled": true,
           "description": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in [File \\| Settings \\| Editor \\| Duplicates](settings://duplicates.index)."
         },
         {
@@ -1694,7 +1717,7 @@
         {
           "shortName": "ReassignedToPlainText",
           "displayName": "Reassigned to plain text",
-          "enabled": false,
+          "enabled": true,
           "description": "Reports files that were explicitly re-assigned to Plain Text File Type. This association is unnecessary because the platform auto-detects text files by content automatically.\n\nYou can dismiss this warning by removing the file type association\nin **Settings \\| Editor \\| File Types \\| Text**."
         },
         {
@@ -1719,7 +1742,7 @@
           "shortName": "Annotator",
           "displayName": "Annotator",
           "enabled": false,
-          "description": "Reports problems that are found by language annotators in the result of a batch code inspection run."
+          "description": "Reports issues essential to this file (e.g., syntax errors) in the result of a batch code inspection run. These kinds of issues are usually always highlighted when you open the file in the editor and can't be configured (unlike inspections). The options below are controlling the analysis level of this inspection:\n\n* Option \"**Highlight syntax errors**\" allows to report parser-related issues.\n* Option \"**Run language annotators** \" allows to report issues found by annotators configured for this language. See [Custom Language Support: Annotators](https://plugins.jetbrains.com/docs/intellij/annotator.html) for details.\n* Option \"**Run language-specific highlight visitors** \" allows to report issues inherent to this file language (e.g., type mismatches or unreported exceptions etc.). See [Custom Language Support: Highlighting](https://plugins.jetbrains.com/docs/intellij/syntax-highlighting-and-error-highlighting.html#semantic-highlighting) for details."
         },
         {
           "shortName": "TodoComment",
@@ -1738,12 +1761,6 @@
           "displayName": "Empty directory",
           "enabled": false,
           "description": "Reports empty directories.\n\nAvailable only from **Code \\| Inspect Code** or\n**Code \\| Analyze Code \\| Run Inspection by Name** and isn't reported in the editor.\n\nUse the **Only report empty directories located under a source folder** option to have only directories under source\nroots reported."
-        },
-        {
-          "shortName": "SyntaxError",
-          "displayName": "Syntax error",
-          "enabled": false,
-          "description": "Reports syntax errors that have been found in the result of a batch code inspection run."
         },
         {
           "shortName": "InjectedReferences",
@@ -1906,7 +1923,7 @@
         {
           "shortName": "SSBasedInspection",
           "displayName": "Structural search inspection",
-          "enabled": true,
+          "enabled": false,
           "description": "Allows configuring **Structural Search/Structural Replace** templates that you can apply to the file you are editing.\n\nAll matches will be highlighted and marked with the template name that you have configured.\nIf you configure the **Structural Replace** pattern as well, the corresponding replace option will be available as a quick-fix."
         }
       ]
@@ -1931,12 +1948,6 @@
           "displayName": "Check module licenses",
           "enabled": false,
           "description": "Check module licenses for possible problems: missing licenses or other compliance issues"
-        },
-        {
-          "shortName": "IncorrectProjectDependenciesConfiguration",
-          "displayName": "Check configuration of project dependencies",
-          "enabled": false,
-          "description": "Checking configuration of project dependencies"
         }
       ]
     },
@@ -1963,13 +1974,13 @@
         {
           "shortName": "DuplicateKeyInSection",
           "displayName": "Duplicate directive in section",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports duplicate properties in the `ini` file section."
         },
         {
           "shortName": "DuplicateSectionInFile",
           "displayName": "Duplicate section in file",
-          "enabled": true,
+          "enabled": false,
           "description": "Reports duplicate sections in the `ini` file."
         }
       ]

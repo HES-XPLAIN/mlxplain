@@ -5,12 +5,14 @@
       "contentEntries": [
         {
           "path": "file://$PROJECT_DIR$",
+          "excludePatterns": [],
+          "excludeFolders": [],
           "sourceFolders": []
         }
       ],
       "orderEntries": [
         {
-          "name": "Python 3.9",
+          "name": "Python 3.10",
           "type": "SDK"
         },
         {

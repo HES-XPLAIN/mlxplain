@@ -1,8 +1,8 @@
 {
   "languages": [
     "Python",
-    "textmate",
     "Plain text",
+    "textmate",
     "YAML",
     ".gitignore (GitIgnore)",
     "EditorConfig"
