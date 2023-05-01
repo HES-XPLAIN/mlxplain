@@ -13,6 +13,9 @@ on:
     branches:
       - main
 
+env:
+  PYTHON_VERSION: '3.11'
+
 permissions:
   contents: write
 
@@ -27,16 +30,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set up Poetry
+        run: pipx install poetry
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
 
-      - name: Install poetry and dependencies
-        run: |
-          python -m pip install --upgrade pip
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install
+      - name: Install Python dependencies
+        run: poetry install
 
       - name: Run pre-commit checks
         uses: pre-commit/action@v3.0.0
@@ -52,8 +56,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Run Qodana scan
         uses: JetBrains/qodana-action@main
@@ -79,18 +81,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+
+      - name: Set up Poetry
+        run: pipx install poetry
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'poetry'
 
-      - name: Install poetry and dependencies
+      - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          curl -sSL https://install.python-poetry.org | python3 -
+          poetry run python -m pip install -U pip
           poetry install
 
       - name: Generate docs
@@ -110,18 +113,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+
+      - name: Set up Poetry
+        run: pipx install poetry
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'poetry'
 
-      - name: Install poetry and dependencies
+      - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          curl -sSL https://install.python-poetry.org | python3 -
+          poetry run python -m pip install -U pip
           poetry install
 
       - name: Run coverage
@@ -142,8 +146,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Download artifact (qodana)
         uses: actions/download-artifact@v3
