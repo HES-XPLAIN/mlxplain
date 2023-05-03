@@ -9,10 +9,10 @@ An open platform for accelerating the development of eXplainable AI systems
 
 ### Install Python and Poetry
 
-* Install [Python](https://www.python.org/) >= 3.8.
+* Install [Python](https://www.python.org/).
 * Install [poetry](https://python-poetry.org/docs/#installation) and add it to your PATH.
 
-Ensure `python.exe` and `poetry.exe` are accessible in the `$PATH` environment variable.
+Ensure `python` and `poetry` are accessible in the `$PATH` environment variable.
 
 To check the installation, check the following commands return an output:
 
@@ -45,4 +45,4 @@ pre-commit run --all-files
 
 ## Release
 
-To publish the package on [Pypi](https://pypi.org/project/mlxplain/), refer to [RELEASE.md](RELEASE.md).
+To publish the package on [Pypi](https://pypi.org/project/mlxplain/), refer to [RELEASE](RELEASE.md).
