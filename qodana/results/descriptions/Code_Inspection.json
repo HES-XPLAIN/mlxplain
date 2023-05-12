@@ -303,16 +303,16 @@
           "description": "Reports coroutines that were called\nwithout using the `await` syntax.\n\n**Example:**\n\n```\nasync def bar():\n    pass\n\n\nasync def foo():\n    bar()\n```\n\nAfter the quick-fix is applied, the code changes to:\n\n```\nasync def bar():\n    pass\n\n\nasync def foo():\n    await bar()\n```"
         },
         {
-          "shortName": "CommandLineInspection",
-          "displayName": "Incorrect CLI syntax",
-          "enabled": true,
-          "description": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
-        },
-        {
           "shortName": "PyComparisonWithNoneInspection",
           "displayName": "Using equality operators to compare with None",
           "enabled": true,
           "description": "Reports comparisons with `None`. That type of comparisons\nshould always be done with `is` or `is not`, never\nthe equality operators.\n\n**Example:**\n\n```\na = 2\n\n\nif a == None:\n    print(\"Success\")\n```\n\nOnce the quick-fix is applied, the code changes to:\n\n```\na = 2\n\n\nif a is None:\n    print(\"Success\")\n```"
+        },
+        {
+          "shortName": "CommandLineInspection",
+          "displayName": "Incorrect CLI syntax",
+          "enabled": true,
+          "description": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
         },
         {
           "shortName": "PyCallingNonCallableInspection",
@@ -327,16 +327,16 @@
           "description": "Reports code fragments that cannot be normally reached.\n\n**Example:**\n\n```\nif True:\n    print('Yes')\nelse:\n    print('No')\n```\n\nAs a fix, you might want to check and modify the algorithm to ensure it implements\nthe expected logic."
         },
         {
-          "shortName": "PyMethodParametersInspection",
-          "displayName": "Improper first parameter",
-          "enabled": true,
-          "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
-        },
-        {
           "shortName": "PyChainedComparisonsInspection",
           "displayName": "Too complex chained comparisons",
           "enabled": true,
           "description": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
+        },
+        {
+          "shortName": "PyMethodParametersInspection",
+          "displayName": "Improper first parameter",
+          "enabled": true,
+          "description": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
         },
         {
           "shortName": "PyDocstringTypesInspection",
@@ -465,16 +465,16 @@
           "description": "Reports cases in Python 2 when a file contains non-ASCII characters and does not\nhave an encoding declaration at the top.\n\n**Example:**\n\n```\nclass A(object):\n# №5\n    def __init__(self):\n        pass\n```\n\nIn this example, the IDE reports a non-ASCII symbol in a comment and a lack of encoding\ndeclaration. Apply the proposed quick-fix to add a missing encoding declaration:\n\n```\n# coding=utf-8\nclass A(object)\n# №5\n    def __init__(self):\n        pass\n```"
         },
         {
-          "shortName": "PyTrailingSemicolonInspection",
-          "displayName": "Prohibited trailing semicolon in a statement",
-          "enabled": true,
-          "description": "Reports trailing semicolons in statements.\n\n**Example:**\n\n```\ndef my_func(a):\n    c = a ** 2;\n    return c\n```\n\nIDE provides a quick-fix that removes a trailing semicolon. When you\napply it, the code changes to:\n\n```\ndef my_func(a):\n    c = a ** 2\n    return c\n```"
-        },
-        {
           "shortName": "PyRedundantParenthesesInspection",
           "displayName": "Redundant parentheses",
           "enabled": true,
           "description": "Reports about redundant parentheses in expressions.\n\nThe IDE provides the quick-fix action to remove the redundant parentheses."
+        },
+        {
+          "shortName": "PyTrailingSemicolonInspection",
+          "displayName": "Prohibited trailing semicolon in a statement",
+          "enabled": true,
+          "description": "Reports trailing semicolons in statements.\n\n**Example:**\n\n```\ndef my_func(a):\n    c = a ** 2;\n    return c\n```\n\nIDE provides a quick-fix that removes a trailing semicolon. When you\napply it, the code changes to:\n\n```\ndef my_func(a):\n    c = a ** 2\n    return c\n```"
         },
         {
           "shortName": "PyAbstractClassInspection",
@@ -573,16 +573,16 @@
           "description": "Reports invalid usages of final classes,\nmethods and variables.\n\n**Example:**\n\n```\nfrom typing import final\n\n\n@final\nclass A:\n    def a_method(self):\n        pass\n\n\nclass B(A):\n    def a_method(self):\n        pass\n```"
         },
         {
-          "shortName": "PyProtectedMemberInspection",
-          "displayName": "Accessing a protected member of a class or a module",
-          "enabled": true,
-          "description": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
-        },
-        {
           "shortName": "PyStubPackagesCompatibilityInspection",
           "displayName": "Incompatible stub packages",
           "enabled": true,
           "description": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
+        },
+        {
+          "shortName": "PyProtectedMemberInspection",
+          "displayName": "Accessing a protected member of a class or a module",
+          "enabled": true,
+          "description": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
         },
         {
           "shortName": "PyUnboundLocalVariableInspection",
@@ -828,16 +828,16 @@
           "description": "Reports columns that are not in the GROUP BY clause or inside an aggregate function call.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE t1 (a INT, b INT);\n    SELECT a, b FROM t1 GROUP BY a;\n\nIf you run the SELECT query, you will receive an error because Microsoft SQL Server expects the `b` column in GROUP BY or used\ninside an aggregate function. The following two examples will fix the error.\n\n    SELECT a, b FROM t1 GROUP BY a, b;\n    SELECT a, max(b) max_b FROM t1 GROUP BY a;\n"
         },
         {
-          "shortName": "SqlIdentifierInspection",
-          "displayName": "Identifier should be quoted",
-          "enabled": false,
-          "description": "Reports situations when you use SQL reserved keywords as identifier names in your query.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);\n\nWe use `select`, `identity`, and `order` as table and column names.\nBut they are also reserved keywords in Microsoft SQL Server.\nTherefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the\n**Quote identifier** quick-fix.\n\nAfter the quick-fix is applied:\n\n    CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);\n"
-        },
-        {
           "shortName": "SqlAutoIncrementDuplicateInspection",
           "displayName": "Auto-increment duplicate",
           "enabled": false,
           "description": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
+        },
+        {
+          "shortName": "SqlIdentifierInspection",
+          "displayName": "Identifier should be quoted",
+          "enabled": false,
+          "description": "Reports situations when you use SQL reserved keywords as identifier names in your query.\n\nExample (Microsoft SQL Server):\n\n    CREATE TABLE select (identity INT IDENTITY NOT NULL, order INT NOT NULL);\n\nWe use `select`, `identity`, and `order` as table and column names.\nBut they are also reserved keywords in Microsoft SQL Server.\nTherefore, in order to use them as object names in the query, you must quote these identifiers. To quote them, you can use the\n**Quote identifier** quick-fix.\n\nAfter the quick-fix is applied:\n\n    CREATE TABLE [select] ([identity] INT IDENTITY NOT NULL, [order] INT NOT NULL);\n"
         },
         {
           "shortName": "SqlRedundantAliasInspection",
@@ -870,16 +870,16 @@
           "description": "Reports situations when source code of a database object has been changed.\n\nThe inspection is triggered when you perform database or object introspection. The introspection is run when you open source code of an\nobject, run statements, and perform code refactoring.\nAlso, you can run introspection by right-clicking an object and selecting **Refresh**.\n\nThe inspection covers the following situations:\n\n* Object source code was changed in the database but code in the editor was not updated. Works in PostgreSQL, Microsoft SQL Server, Oracle, and Sybase ASE.\n* You changed the object source code, introspected the database, but source code has been already changed by someone else.\n* The database introspector was updated in the IDE and you need to download new object properties that were missing in the previous introspector version."
         },
         {
-          "shortName": "SqlDtInspection",
-          "displayName": "Ill-formed date/time literals",
-          "enabled": false,
-          "description": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2.\n\nExample (MySQL):\n\n    SELECT TIME '10 -12:13:14' FROM dual;\n    SELECT TIME ' 12 : 13 : 14 ' FROM dual;\n    SELECT TIME '12 13 14' FROM dual;\n    SELECT TIME '12-13-14' FROM dual;\n    SELECT TIME '12.13.14' FROM dual;\n    SELECT TIME '12:13:' FROM dual;\n    SELECT TIME '12:13' FROM dual;\n    SELECT TIME '12:' FROM dual;\n\nIn this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted.\nFor more information about date and time literals in MySQL, see [Date and Time Literals at dev.mysql.com](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-literals.html).\n\nThe following date and type literals are valid for MySQL.\n\n    SELECT TIME '12:13:14' FROM dual;\n    SELECT TIME '12:13:14.555' FROM dual;\n    SELECT TIME '12:13:14.' FROM dual;\n    SELECT TIME '-12:13:14' FROM dual;\n    SELECT TIME '10 12:13:14' FROM dual;\n    SELECT TIME '-10 12:13:14' FROM dual;\n"
-        },
-        {
           "shortName": "SqlSideEffectsInspection",
           "displayName": "Statement with side effects",
           "enabled": false,
           "description": "Reports statements that might lead to modification of a database during a read-only connection.\n\nTo enable read-only mode for a\nconnection,\nright-click a data source in the **Database** tool window (**View \\| Tool Windows \\| Database** ) and select **Properties** .\nIn the **Data Sources and Drivers** dialog, click the **Options** tab and select the **Read-only** checkbox.\n\nExample (MySQL):\n\n    CREATE TABLE foo(a INT);\n    INSERT INTO foo VALUES (1);\n\nAs `CREATE TABLE` and `INSERT INTO` statements lead to a database modification, these statements will be highlighted\nin read-only connection mode."
+        },
+        {
+          "shortName": "SqlDtInspection",
+          "displayName": "Ill-formed date/time literals",
+          "enabled": false,
+          "description": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2.\n\nExample (MySQL):\n\n    SELECT TIME '10 -12:13:14' FROM dual;\n    SELECT TIME ' 12 : 13 : 14 ' FROM dual;\n    SELECT TIME '12 13 14' FROM dual;\n    SELECT TIME '12-13-14' FROM dual;\n    SELECT TIME '12.13.14' FROM dual;\n    SELECT TIME '12:13:' FROM dual;\n    SELECT TIME '12:13' FROM dual;\n    SELECT TIME '12:' FROM dual;\n\nIn this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted.\nFor more information about date and time literals in MySQL, see [Date and Time Literals at dev.mysql.com](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-literals.html).\n\nThe following date and type literals are valid for MySQL.\n\n    SELECT TIME '12:13:14' FROM dual;\n    SELECT TIME '12:13:14.555' FROM dual;\n    SELECT TIME '12:13:14.' FROM dual;\n    SELECT TIME '-12:13:14' FROM dual;\n    SELECT TIME '10 12:13:14' FROM dual;\n    SELECT TIME '-10 12:13:14' FROM dual;\n"
         },
         {
           "shortName": "SqlIllegalCursorStateInspection",
@@ -1370,6 +1370,29 @@
       ]
     },
     {
+      "name": "MySQL",
+      "inspections": [
+        {
+          "shortName": "MysqlLoadDataPathInspection",
+          "displayName": "LOAD statement path",
+          "enabled": false,
+          "description": "Reports paths that start with the tilde character in LOAD statements.\n\nExample (MySQL):\n\n    CREATE TABLE table_name (id int);\n    LOAD DATA LOCAL INFILE '~/Documents/some_file.txt'\n    INTO TABLE table_name FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n'\n    IGNORE 1 LINES;\n\nInstead of the tilde character, use a full path to the file."
+        },
+        {
+          "shortName": "MysqlSpaceAfterFunctionNameInspection",
+          "displayName": "Whitespace between the function name and the open parenthesis",
+          "enabled": false,
+          "description": "Reports any whitespace in a function call between the function name and the open parenthesis, which is not supported by default.\n\nExample (MySQL):\n\n    SELECT MAX (qty) FROM orders;\n"
+        },
+        {
+          "shortName": "MysqlParsingInspection",
+          "displayName": "Unsupported syntax in pre-8.0 versions",
+          "enabled": false,
+          "description": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
+        }
+      ]
+    },
+    {
       "name": "Properties files",
       "inspections": [
         {
@@ -1407,29 +1430,6 @@
           "displayName": "Property key/value delimiter doesn't match code style settings",
           "enabled": false,
           "description": "Reports properties in which key or value delimiters do not match code style settings."
-        }
-      ]
-    },
-    {
-      "name": "MySQL",
-      "inspections": [
-        {
-          "shortName": "MysqlLoadDataPathInspection",
-          "displayName": "LOAD statement path",
-          "enabled": false,
-          "description": "Reports paths that start with the tilde character in LOAD statements.\n\nExample (MySQL):\n\n    CREATE TABLE table_name (id int);\n    LOAD DATA LOCAL INFILE '~/Documents/some_file.txt'\n    INTO TABLE table_name FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n'\n    IGNORE 1 LINES;\n\nInstead of the tilde character, use a full path to the file."
-        },
-        {
-          "shortName": "MysqlSpaceAfterFunctionNameInspection",
-          "displayName": "Whitespace between the function name and the open parenthesis",
-          "enabled": false,
-          "description": "Reports any whitespace in a function call between the function name and the open parenthesis, which is not supported by default.\n\nExample (MySQL):\n\n    SELECT MAX (qty) FROM orders;\n"
-        },
-        {
-          "shortName": "MysqlParsingInspection",
-          "displayName": "Unsupported syntax in pre-8.0 versions",
-          "enabled": false,
-          "description": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
         }
       ]
     },
