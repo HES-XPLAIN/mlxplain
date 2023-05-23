@@ -14,7 +14,7 @@ import shap
 
 from sklearn.ensemble import RandomForestRegressor
 
-from hes_xplain.methods.tabular.shap import ShapTabular
+from mlxplain.tabular.shap import ShapTabular
 
 
 
