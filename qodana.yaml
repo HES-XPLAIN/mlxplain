@@ -1,0 +1,10 @@
+version: "1.0"
+profile:
+  name: qodana.recommended
+bootstrap: rm -rf .idea
+include:
+  - name: CheckDependencyLicenses
+exclude:
+  - name: All
+    paths:
+      - docs
