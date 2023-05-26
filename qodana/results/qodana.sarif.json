@@ -59,12 +59,12 @@
               "name": "RegExp"
             },
             {
-              "id": "Properties files",
-              "name": "Properties files"
-            },
-            {
               "id": "MySQL",
               "name": "MySQL"
+            },
+            {
+              "id": "Properties files",
+              "name": "Properties files"
             },
             {
               "id": "CSS",
@@ -1628,13 +1628,13 @@
                 ]
               },
               {
-                "id": "PyDefaultArgumentInspection",
+                "id": "PyMissingConstructorInspection",
                 "shortDescription": {
-                  "text": "The default argument is mutable"
+                  "text": "Missed call to '__init__' of the super class"
                 },
                 "fullDescription": {
-                  "text": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for an argument. Default argument values are evaluated only once at function definition time, which means that modifying the default value of the argument will affect all subsequent calls of that function. Example: def func(s, cache={}):\n    cache[s] = None\n When the quick-fix is applied, the code changes to: def func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None",
-                  "markdown": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for\nan argument.   \n\nDefault argument values are evaluated only once at function definition time,\nwhich means that modifying the\ndefault value of the argument will affect all subsequent calls of that function.\n\n**Example:**\n\n```\ndef func(s, cache={}):\n    cache[s] = None\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\ndef func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None\n```"
+                  "text": "Reports cases when a call to the 'super' constructor in a class is missed. Example: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n The 'Pear' class should have a 'super' call in the '__init__' method. When the quick-fix is applied, the code changes to: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()",
+                  "markdown": "Reports cases when a call to the `super` constructor in a class is missed.\n\n**Example:**\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n```\n\nThe `Pear` class should have a `super` call in the `__init__`\nmethod.\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -1660,13 +1660,13 @@
                 ]
               },
               {
-                "id": "PyMissingConstructorInspection",
+                "id": "PyDefaultArgumentInspection",
                 "shortDescription": {
-                  "text": "Missed call to '__init__' of the super class"
+                  "text": "The default argument is mutable"
                 },
                 "fullDescription": {
-                  "text": "Reports cases when a call to the 'super' constructor in a class is missed. Example: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n The 'Pear' class should have a 'super' call in the '__init__' method. When the quick-fix is applied, the code changes to: class Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()",
-                  "markdown": "Reports cases when a call to the `super` constructor in a class is missed.\n\n**Example:**\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        pass\n```\n\nThe `Pear` class should have a `super` call in the `__init__`\nmethod.\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Fruit:\n    def __init__(self):\n        pass\n\n\nclass Pear(Fruit):\n    def __init__(self):\n        super().__init__()\n```"
+                  "text": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for an argument. Default argument values are evaluated only once at function definition time, which means that modifying the default value of the argument will affect all subsequent calls of that function. Example: def func(s, cache={}):\n    cache[s] = None\n When the quick-fix is applied, the code changes to: def func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None",
+                  "markdown": "Reports a problem when a mutable value as a list or dictionary is detected in a default value for\nan argument.   \n\nDefault argument values are evaluated only once at function definition time,\nwhich means that modifying the\ndefault value of the argument will affect all subsequent calls of that function.\n\n**Example:**\n\n```\ndef func(s, cache={}):\n    cache[s] = None\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\ndef func(s, cache=None):\n    if cache is None:\n        cache = {}\n    cache[s] = None\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -2012,13 +2012,13 @@
                 ]
               },
               {
-                "id": "PyChainedComparisonsInspection",
+                "id": "PyMethodParametersInspection",
                 "shortDescription": {
-                  "text": "Too complex chained comparisons"
+                  "text": "Improper first parameter"
                 },
                 "fullDescription": {
-                  "text": "Reports chained comparisons that can be simplified. Example: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if x >= xmin and x <= xmax:\n          pass' The IDE offers to simplify 'if x >= xmin and x <= xmax'. When the quick-fix is applied, the code changes to: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if xmin <= x <= xmax:\n          pass'",
-                  "markdown": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
+                  "text": "Reports methods that lack the first parameter that is usually named 'self'. Example: class Movie:\n\n   def show():\n       pass\n When the quick-fix is applied, the code changes to: class Movie:\n\n   def show(self):\n       pass\n The inspection also reports naming issues in class methods. Example: class Movie:\n    @classmethod\n    def show(abc):\n        pass\n Since the first parameter of a class method should be 'cls', the IDE provides a quick-fix to rename it.",
+                  "markdown": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -2044,13 +2044,13 @@
                 ]
               },
               {
-                "id": "PyMethodParametersInspection",
+                "id": "PyChainedComparisonsInspection",
                 "shortDescription": {
-                  "text": "Improper first parameter"
+                  "text": "Too complex chained comparisons"
                 },
                 "fullDescription": {
-                  "text": "Reports methods that lack the first parameter that is usually named 'self'. Example: class Movie:\n\n   def show():\n       pass\n When the quick-fix is applied, the code changes to: class Movie:\n\n   def show(self):\n       pass\n The inspection also reports naming issues in class methods. Example: class Movie:\n    @classmethod\n    def show(abc):\n        pass\n Since the first parameter of a class method should be 'cls', the IDE provides a quick-fix to rename it.",
-                  "markdown": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
+                  "text": "Reports chained comparisons that can be simplified. Example: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if x >= xmin and x <= xmax:\n          pass' The IDE offers to simplify 'if x >= xmin and x <= xmax'. When the quick-fix is applied, the code changes to: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if xmin <= x <= xmax:\n          pass'",
+                  "markdown": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -3004,38 +3004,6 @@
                 ]
               },
               {
-                "id": "PyRedundantParenthesesInspection",
-                "shortDescription": {
-                  "text": "Redundant parentheses"
-                },
-                "fullDescription": {
-                  "text": "Reports about redundant parentheses in expressions. The IDE provides the quick-fix action to remove the redundant parentheses.",
-                  "markdown": "Reports about redundant parentheses in expressions.\n\nThe IDE provides the quick-fix action to remove the redundant parentheses."
-                },
-                "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "note",
-                  "parameters": {
-                    "ideaSeverity": "WEAK WARNING",
-                    "qodanaSeverity": "Moderate"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "Python",
-                      "index": 2,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "PyTrailingSemicolonInspection",
                 "shortDescription": {
                   "text": "Prohibited trailing semicolon in a statement"
@@ -3068,20 +3036,20 @@
                 ]
               },
               {
-                "id": "PyOldStyleClassesInspection",
+                "id": "PyRedundantParenthesesInspection",
                 "shortDescription": {
-                  "text": "Old-style class contains new-style class features"
+                  "text": "Redundant parentheses"
                 },
                 "fullDescription": {
-                  "text": "Reports occurrences of new-style class features in old-style classes. The inspection highlights '__slots__', '__getattribute__', and 'super()' inside old-style classes.",
-                  "markdown": "Reports occurrences of\n[new-style class features](https://www.python.org/doc/newstyle/)\nin old-style classes. The inspection highlights\n`__slots__`, `__getattribute__`, and `super()`\ninside old-style classes."
+                  "text": "Reports about redundant parentheses in expressions. The IDE provides the quick-fix action to remove the redundant parentheses.",
+                  "markdown": "Reports about redundant parentheses in expressions.\n\nThe IDE provides the quick-fix action to remove the redundant parentheses."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "warning",
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
+                    "ideaSeverity": "WEAK WARNING",
+                    "qodanaSeverity": "Moderate"
                   }
                 },
                 "relationships": [
@@ -3114,6 +3082,38 @@
                   "parameters": {
                     "ideaSeverity": "WEAK WARNING",
                     "qodanaSeverity": "Moderate"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "Python",
+                      "index": 2,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "PyOldStyleClassesInspection",
+                "shortDescription": {
+                  "text": "Old-style class contains new-style class features"
+                },
+                "fullDescription": {
+                  "text": "Reports occurrences of new-style class features in old-style classes. The inspection highlights '__slots__', '__getattribute__', and 'super()' inside old-style classes.",
+                  "markdown": "Reports occurrences of\n[new-style class features](https://www.python.org/doc/newstyle/)\nin old-style classes. The inspection highlights\n`__slots__`, `__getattribute__`, and `super()`\ninside old-style classes."
+                },
+                "defaultConfiguration": {
+                  "enabled": true,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
                   }
                 },
                 "relationships": [
@@ -3708,20 +3708,20 @@
                 ]
               },
               {
-                "id": "PyStubPackagesCompatibilityInspection",
+                "id": "PyProtectedMemberInspection",
                 "shortDescription": {
-                  "text": "Incompatible stub packages"
+                  "text": "Accessing a protected member of a class or a module"
                 },
                 "fullDescription": {
-                  "text": "Reports stub packages that do not support the version of the corresponding runtime package. A stub package contains type information for some runtime package.",
-                  "markdown": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
+                  "text": "Reports cases when a protected member is accessed outside the class, a descendant of the class where it is defined, or a module. class Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method",
+                  "markdown": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "warning",
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
+                    "ideaSeverity": "WEAK WARNING",
+                    "qodanaSeverity": "Moderate"
                   }
                 },
                 "relationships": [
@@ -3772,20 +3772,20 @@
                 ]
               },
               {
-                "id": "PyProtectedMemberInspection",
+                "id": "PyStubPackagesCompatibilityInspection",
                 "shortDescription": {
-                  "text": "Accessing a protected member of a class or a module"
+                  "text": "Incompatible stub packages"
                 },
                 "fullDescription": {
-                  "text": "Reports cases when a protected member is accessed outside the class, a descendant of the class where it is defined, or a module. class Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method",
-                  "markdown": "Reports cases when a protected member is accessed outside the class,\na descendant of the class where it is defined, or a module.\n\n```\nclass Foo:\n    def _protected_method(self):\n        pass\n\n\nclass Bar(Foo):\n    def public_method(self):\n        self._protected_method()\n\n\nfoo = Foo()\nfoo._protected_method() # Access to a protected method\n```"
+                  "text": "Reports stub packages that do not support the version of the corresponding runtime package. A stub package contains type information for some runtime package.",
+                  "markdown": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "note",
+                  "level": "warning",
                   "parameters": {
-                    "ideaSeverity": "WEAK WARNING",
-                    "qodanaSeverity": "Moderate"
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
                   }
                 },
                 "relationships": [
@@ -4616,38 +4616,6 @@
                 ]
               },
               {
-                "id": "MongoJSSideEffectsInspection",
-                "shortDescription": {
-                  "text": "Statement with side effects"
-                },
-                "fullDescription": {
-                  "text": "Reports statements that can cause side effects while the data source is in read-only mode. For more information about enabling read-only mode, see Enable read-only mode for a connection in the IDE documentation. The Disable read-only mode quick-fix turns off the read-only mode for the respective data source. Example: 'db.my_collection.insertOne()'",
-                  "markdown": "Reports statements that can cause side effects while the data source is in read-only mode.\n\nFor more information about enabling read-only mode, see\n[Enable\nread-only mode for a connection in the IDE documentation](https://www.jetbrains.com/help/datagrip/configuring-database-connections.html#enable-read-only-mode-for-a-connection).\n\nThe **Disable read-only mode** quick-fix turns off the read-only mode for the respective data source.\n\nExample:\n\n\n    db.my_collection.insertOne()\n"
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "MongoJS",
-                      "index": 10,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "SqlInsertIntoGeneratedColumnInspection",
                 "shortDescription": {
                   "text": "Insertion into generated columns"
@@ -4680,6 +4648,38 @@
                 ]
               },
               {
+                "id": "MongoJSSideEffectsInspection",
+                "shortDescription": {
+                  "text": "Statement with side effects"
+                },
+                "fullDescription": {
+                  "text": "Reports statements that can cause side effects while the data source is in read-only mode. For more information about enabling read-only mode, see Enable read-only mode for a connection in the IDE documentation. The Disable read-only mode quick-fix turns off the read-only mode for the respective data source. Example: 'db.my_collection.insertOne()'",
+                  "markdown": "Reports statements that can cause side effects while the data source is in read-only mode.\n\nFor more information about enabling read-only mode, see\n[Enable\nread-only mode for a connection in the IDE documentation](https://www.jetbrains.com/help/datagrip/configuring-database-connections.html#enable-read-only-mode-for-a-connection).\n\nThe **Disable read-only mode** quick-fix turns off the read-only mode for the respective data source.\n\nExample:\n\n\n    db.my_collection.insertOne()\n"
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "MongoJS",
+                      "index": 10,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
                 "id": "MysqlLoadDataPathInspection",
                 "shortDescription": {
                   "text": "LOAD statement path"
@@ -4700,7 +4700,7 @@
                   {
                     "target": {
                       "id": "MySQL",
-                      "index": 13,
+                      "index": 12,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -4776,6 +4776,38 @@
                 ]
               },
               {
+                "id": "MysqlSpaceAfterFunctionNameInspection",
+                "shortDescription": {
+                  "text": "Whitespace between the function name and the open parenthesis"
+                },
+                "fullDescription": {
+                  "text": "Reports any whitespace in a function call between the function name and the open parenthesis, which is not supported by default. Example (MySQL): 'SELECT MAX (qty) FROM orders;'",
+                  "markdown": "Reports any whitespace in a function call between the function name and the open parenthesis, which is not supported by default.\n\nExample (MySQL):\n\n    SELECT MAX (qty) FROM orders;\n"
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "error",
+                  "parameters": {
+                    "ideaSeverity": "ERROR",
+                    "qodanaSeverity": "Critical"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "MySQL",
+                      "index": 12,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
                 "id": "SqlDerivedTableAliasInspection",
                 "shortDescription": {
                   "text": "Each derived table should have alias"
@@ -4797,38 +4829,6 @@
                     "target": {
                       "id": "SQL",
                       "index": 5,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
-                "id": "MysqlSpaceAfterFunctionNameInspection",
-                "shortDescription": {
-                  "text": "Whitespace between the function name and the open parenthesis"
-                },
-                "fullDescription": {
-                  "text": "Reports any whitespace in a function call between the function name and the open parenthesis, which is not supported by default. Example (MySQL): 'SELECT MAX (qty) FROM orders;'",
-                  "markdown": "Reports any whitespace in a function call between the function name and the open parenthesis, which is not supported by default.\n\nExample (MySQL):\n\n    SELECT MAX (qty) FROM orders;\n"
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "error",
-                  "parameters": {
-                    "ideaSeverity": "ERROR",
-                    "qodanaSeverity": "Critical"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "MySQL",
-                      "index": 13,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -4968,13 +4968,13 @@
                 ]
               },
               {
-                "id": "SqlNamedArgumentsInspection",
+                "id": "SqlMultipleLimitClausesInspection",
                 "shortDescription": {
-                  "text": "Named arguments should be used"
+                  "text": "Multiple row limiting/offset clauses in queries"
                 },
                 "fullDescription": {
-                  "text": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled. For more information about the difference between named and unnamed parameters, see Binding Parameters by Name (Named Parameters) at docs.microsoft.com . Example (Microsoft SQL Server): 'CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\nBEGIN\n    RETURN n + m;\nEND;\n\nCREATE PROCEDURE test AS\nBEGIN\n    foo n = 1, m = 2;\n\n--- The following call misses parameter names and will be highlighted\n    foo 1, 2;\nEND;' Parameters '1, 2' in the 'foo 1, 2;' call are highlighted because they miss names.",
-                  "markdown": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
+                  "text": "Reports usages of multiple row limiting clauses in a single query. Example (Microsoft SQL Server): 'create table foo(a int);\nselect top 1 * from foo order by a offset 10 rows fetch next 20 rows only;' The SELECT TOP clause is used to specify that only 1 record must be returned. The FETCH clause specifies the number of rows to return after the OFFSET clause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant.",
+                  "markdown": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5000,13 +5000,13 @@
                 ]
               },
               {
-                "id": "SqlMultipleLimitClausesInspection",
+                "id": "SqlNamedArgumentsInspection",
                 "shortDescription": {
-                  "text": "Multiple row limiting/offset clauses in queries"
+                  "text": "Named arguments should be used"
                 },
                 "fullDescription": {
-                  "text": "Reports usages of multiple row limiting clauses in a single query. Example (Microsoft SQL Server): 'create table foo(a int);\nselect top 1 * from foo order by a offset 10 rows fetch next 20 rows only;' The SELECT TOP clause is used to specify that only 1 record must be returned. The FETCH clause specifies the number of rows to return after the OFFSET clause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant.",
-                  "markdown": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
+                  "text": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled. For more information about the difference between named and unnamed parameters, see Binding Parameters by Name (Named Parameters) at docs.microsoft.com . Example (Microsoft SQL Server): 'CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\nBEGIN\n    RETURN n + m;\nEND;\n\nCREATE PROCEDURE test AS\nBEGIN\n    foo n = 1, m = 2;\n\n--- The following call misses parameter names and will be highlighted\n    foo 1, 2;\nEND;' Parameters '1, 2' in the 'foo 1, 2;' call are highlighted because they miss names.",
+                  "markdown": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5160,13 +5160,13 @@
                 ]
               },
               {
-                "id": "SqlRedundantAliasInspection",
+                "id": "SqlAutoIncrementDuplicateInspection",
                 "shortDescription": {
-                  "text": "Redundant alias expressions"
+                  "text": "Auto-increment duplicate"
                 },
                 "fullDescription": {
-                  "text": "Reports alias expressions that duplicate names of columns in tables and might be redundant. Example (PostgreSQL): 'CREATE TABLE foo(a INT, b INT);\n\nSELECT * FROM foo foo(a, b);\nSELECT * FROM foo foo(a);\nSELECT * FROM foo foo(x);\nSELECT * FROM foo foo(x, y);' The first two aliases use the same column names as in the 'foo' table. They are considered redundant because they column names are identical.",
-                  "markdown": "Reports alias expressions that duplicate names of columns in tables and might be redundant.\n\nExample (PostgreSQL):\n\n    CREATE TABLE foo(a INT, b INT);\n\n    SELECT * FROM foo foo(a, b);\n    SELECT * FROM foo foo(a);\n    SELECT * FROM foo foo(x);\n    SELECT * FROM foo foo(x, y);\n\nThe first two aliases use the same column names as in the `foo` table. They are considered redundant because they\ncolumn names are identical."
+                  "text": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key. Example (MySQL): 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT,\n    c2 INT AUTO_INCREMENT,\n);' The AUTO_INCREMENT constraint for 'c2' will be highlighted as 'c1' already has this constraint. To fix the warning, you can make 'id' a primary key and delete AUTO_INCREMENT for 'c2'. 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    c2 INT,\n);'",
+                  "markdown": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5192,13 +5192,13 @@
                 ]
               },
               {
-                "id": "SqlAutoIncrementDuplicateInspection",
+                "id": "SqlRedundantAliasInspection",
                 "shortDescription": {
-                  "text": "Auto-increment duplicate"
+                  "text": "Redundant alias expressions"
                 },
                 "fullDescription": {
-                  "text": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key. Example (MySQL): 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT,\n    c2 INT AUTO_INCREMENT,\n);' The AUTO_INCREMENT constraint for 'c2' will be highlighted as 'c1' already has this constraint. To fix the warning, you can make 'id' a primary key and delete AUTO_INCREMENT for 'c2'. 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    c2 INT,\n);'",
-                  "markdown": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
+                  "text": "Reports alias expressions that duplicate names of columns in tables and might be redundant. Example (PostgreSQL): 'CREATE TABLE foo(a INT, b INT);\n\nSELECT * FROM foo foo(a, b);\nSELECT * FROM foo foo(a);\nSELECT * FROM foo foo(x);\nSELECT * FROM foo foo(x, y);' The first two aliases use the same column names as in the 'foo' table. They are considered redundant because they column names are identical.",
+                  "markdown": "Reports alias expressions that duplicate names of columns in tables and might be redundant.\n\nExample (PostgreSQL):\n\n    CREATE TABLE foo(a INT, b INT);\n\n    SELECT * FROM foo foo(a, b);\n    SELECT * FROM foo foo(a);\n    SELECT * FROM foo foo(x);\n    SELECT * FROM foo foo(x, y);\n\nThe first two aliases use the same column names as in the `foo` table. They are considered redundant because they\ncolumn names are identical."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5384,13 +5384,13 @@
                 ]
               },
               {
-                "id": "SqlSideEffectsInspection",
+                "id": "SqlDtInspection",
                 "shortDescription": {
-                  "text": "Statement with side effects"
+                  "text": "Ill-formed date/time literals"
                 },
                 "fullDescription": {
-                  "text": "Reports statements that might lead to modification of a database during a read-only connection. To enable read-only mode for a connection, right-click a data source in the Database tool window (View | Tool Windows | Database) and select Properties. In the Data Sources and Drivers dialog, click the Options tab and select the Read-only checkbox. Example (MySQL): 'CREATE TABLE foo(a INT);\nINSERT INTO foo VALUES (1);' As 'CREATE TABLE' and 'INSERT INTO' statements lead to a database modification, these statements will be highlighted in read-only connection mode.",
-                  "markdown": "Reports statements that might lead to modification of a database during a read-only connection.\n\nTo enable read-only mode for a\nconnection,\nright-click a data source in the **Database** tool window (**View \\| Tool Windows \\| Database** ) and select **Properties** .\nIn the **Data Sources and Drivers** dialog, click the **Options** tab and select the **Read-only** checkbox.\n\nExample (MySQL):\n\n    CREATE TABLE foo(a INT);\n    INSERT INTO foo VALUES (1);\n\nAs `CREATE TABLE` and `INSERT INTO` statements lead to a database modification, these statements will be highlighted\nin read-only connection mode."
+                  "text": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2. Example (MySQL): 'SELECT TIME '10 -12:13:14' FROM dual;\nSELECT TIME ' 12 : 13 : 14 ' FROM dual;\nSELECT TIME '12 13 14' FROM dual;\nSELECT TIME '12-13-14' FROM dual;\nSELECT TIME '12.13.14' FROM dual;\nSELECT TIME '12:13:' FROM dual;\nSELECT TIME '12:13' FROM dual;\nSELECT TIME '12:' FROM dual;' In this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted. For more information about date and time literals in MySQL, see Date and Time Literals at dev.mysql.com. The following date and type literals are valid for MySQL. 'SELECT TIME '12:13:14' FROM dual;\nSELECT TIME '12:13:14.555' FROM dual;\nSELECT TIME '12:13:14.' FROM dual;\nSELECT TIME '-12:13:14' FROM dual;\nSELECT TIME '10 12:13:14' FROM dual;\nSELECT TIME '-10 12:13:14' FROM dual;'",
+                  "markdown": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2.\n\nExample (MySQL):\n\n    SELECT TIME '10 -12:13:14' FROM dual;\n    SELECT TIME ' 12 : 13 : 14 ' FROM dual;\n    SELECT TIME '12 13 14' FROM dual;\n    SELECT TIME '12-13-14' FROM dual;\n    SELECT TIME '12.13.14' FROM dual;\n    SELECT TIME '12:13:' FROM dual;\n    SELECT TIME '12:13' FROM dual;\n    SELECT TIME '12:' FROM dual;\n\nIn this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted.\nFor more information about date and time literals in MySQL, see [Date and Time Literals at dev.mysql.com](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-literals.html).\n\nThe following date and type literals are valid for MySQL.\n\n    SELECT TIME '12:13:14' FROM dual;\n    SELECT TIME '12:13:14.555' FROM dual;\n    SELECT TIME '12:13:14.' FROM dual;\n    SELECT TIME '-12:13:14' FROM dual;\n    SELECT TIME '10 12:13:14' FROM dual;\n    SELECT TIME '-10 12:13:14' FROM dual;\n"
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5416,13 +5416,13 @@
                 ]
               },
               {
-                "id": "SqlDtInspection",
+                "id": "SqlSideEffectsInspection",
                 "shortDescription": {
-                  "text": "Ill-formed date/time literals"
+                  "text": "Statement with side effects"
                 },
                 "fullDescription": {
-                  "text": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2. Example (MySQL): 'SELECT TIME '10 -12:13:14' FROM dual;\nSELECT TIME ' 12 : 13 : 14 ' FROM dual;\nSELECT TIME '12 13 14' FROM dual;\nSELECT TIME '12-13-14' FROM dual;\nSELECT TIME '12.13.14' FROM dual;\nSELECT TIME '12:13:' FROM dual;\nSELECT TIME '12:13' FROM dual;\nSELECT TIME '12:' FROM dual;' In this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted. For more information about date and time literals in MySQL, see Date and Time Literals at dev.mysql.com. The following date and type literals are valid for MySQL. 'SELECT TIME '12:13:14' FROM dual;\nSELECT TIME '12:13:14.555' FROM dual;\nSELECT TIME '12:13:14.' FROM dual;\nSELECT TIME '-12:13:14' FROM dual;\nSELECT TIME '10 12:13:14' FROM dual;\nSELECT TIME '-10 12:13:14' FROM dual;'",
-                  "markdown": "Reports errors in date and time literals. This inspection is available in MySQL, Oracle, Db2, and H2.\n\nExample (MySQL):\n\n    SELECT TIME '10 -12:13:14' FROM dual;\n    SELECT TIME ' 12 : 13 : 14 ' FROM dual;\n    SELECT TIME '12 13 14' FROM dual;\n    SELECT TIME '12-13-14' FROM dual;\n    SELECT TIME '12.13.14' FROM dual;\n    SELECT TIME '12:13:' FROM dual;\n    SELECT TIME '12:13' FROM dual;\n    SELECT TIME '12:' FROM dual;\n\nIn this example, dates ignore the MySQL standard for date and time literals. Therefore, they will be highlighted.\nFor more information about date and time literals in MySQL, see [Date and Time Literals at dev.mysql.com](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-literals.html).\n\nThe following date and type literals are valid for MySQL.\n\n    SELECT TIME '12:13:14' FROM dual;\n    SELECT TIME '12:13:14.555' FROM dual;\n    SELECT TIME '12:13:14.' FROM dual;\n    SELECT TIME '-12:13:14' FROM dual;\n    SELECT TIME '10 12:13:14' FROM dual;\n    SELECT TIME '-10 12:13:14' FROM dual;\n"
+                  "text": "Reports statements that might lead to modification of a database during a read-only connection. To enable read-only mode for a connection, right-click a data source in the Database tool window (View | Tool Windows | Database) and select Properties. In the Data Sources and Drivers dialog, click the Options tab and select the Read-only checkbox. Example (MySQL): 'CREATE TABLE foo(a INT);\nINSERT INTO foo VALUES (1);' As 'CREATE TABLE' and 'INSERT INTO' statements lead to a database modification, these statements will be highlighted in read-only connection mode.",
+                  "markdown": "Reports statements that might lead to modification of a database during a read-only connection.\n\nTo enable read-only mode for a\nconnection,\nright-click a data source in the **Database** tool window (**View \\| Tool Windows \\| Database** ) and select **Properties** .\nIn the **Data Sources and Drivers** dialog, click the **Options** tab and select the **Read-only** checkbox.\n\nExample (MySQL):\n\n    CREATE TABLE foo(a INT);\n    INSERT INTO foo VALUES (1);\n\nAs `CREATE TABLE` and `INSERT INTO` statements lead to a database modification, these statements will be highlighted\nin read-only connection mode."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5852,7 +5852,7 @@
                   {
                     "target": {
                       "id": "MySQL",
-                      "index": 13,
+                      "index": 12,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -6312,13 +6312,13 @@
                 ]
               },
               {
-                "id": "SqlUnusedVariableInspection",
+                "id": "SqlNoDataSourceInspection",
                 "shortDescription": {
-                  "text": "Unused variable"
+                  "text": "No data sources configured"
                 },
                 "fullDescription": {
-                  "text": "Reports unused arguments, variables, or parameters. Example (PostgreSQL): 'CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n$$\nBEGIN\n    RETURN PARAMUSED;\nEND\n$$ LANGUAGE plpgsql;' The 'PARAMUNUSED' parameter is not used in the function and might be deleted.",
-                  "markdown": "Reports unused arguments, variables, or parameters.\n\nExample (PostgreSQL):\n\n    CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n    $$\n    BEGIN\n        RETURN PARAMUSED;\n    END\n    $$ LANGUAGE plpgsql;\n\nThe `PARAMUNUSED` parameter is not used in the function and might be deleted."
+                  "text": "Reports the absence of data sources in the Database tool window (View | Tool Windows | Database).",
+                  "markdown": "Reports the absence of data sources in the **Database** tool window (**View \\| Tool Windows \\| Database**)."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -6344,13 +6344,13 @@
                 ]
               },
               {
-                "id": "SqlNoDataSourceInspection",
+                "id": "SqlUnusedVariableInspection",
                 "shortDescription": {
-                  "text": "No data sources configured"
+                  "text": "Unused variable"
                 },
                 "fullDescription": {
-                  "text": "Reports the absence of data sources in the Database tool window (View | Tool Windows | Database).",
-                  "markdown": "Reports the absence of data sources in the **Database** tool window (**View \\| Tool Windows \\| Database**)."
+                  "text": "Reports unused arguments, variables, or parameters. Example (PostgreSQL): 'CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n$$\nBEGIN\n    RETURN PARAMUSED;\nEND\n$$ LANGUAGE plpgsql;' The 'PARAMUNUSED' parameter is not used in the function and might be deleted.",
+                  "markdown": "Reports unused arguments, variables, or parameters.\n\nExample (PostgreSQL):\n\n    CREATE FUNCTION foo(PARAMUSED INT, PARAMUNUSED INT) RETURNS INT AS\n    $$\n    BEGIN\n        RETURN PARAMUSED;\n    END\n    $$ LANGUAGE plpgsql;\n\nThe `PARAMUNUSED` parameter is not used in the function and might be deleted."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -6656,38 +6656,6 @@
                 ]
               },
               {
-                "id": "XmlDuplicatedId",
-                "shortDescription": {
-                  "text": "Duplicate 'id' attribute"
-                },
-                "fullDescription": {
-                  "text": "Reports a duplicate 'id' attribute in XML.",
-                  "markdown": "Reports a duplicate `id` attribute in XML."
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "error",
-                  "parameters": {
-                    "ideaSeverity": "ERROR",
-                    "qodanaSeverity": "Critical"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "XML",
-                      "index": 7,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "JsonSchemaDeprecation",
                 "shortDescription": {
                   "text": "Deprecated JSON property"
@@ -6709,6 +6677,38 @@
                     "target": {
                       "id": "JSON and JSON5",
                       "index": 9,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "XmlDuplicatedId",
+                "shortDescription": {
+                  "text": "Duplicate 'id' attribute"
+                },
+                "fullDescription": {
+                  "text": "Reports a duplicate 'id' attribute in XML.",
+                  "markdown": "Reports a duplicate `id` attribute in XML."
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "error",
+                  "parameters": {
+                    "ideaSeverity": "ERROR",
+                    "qodanaSeverity": "Critical"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "XML",
+                      "index": 7,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -8096,38 +8096,6 @@
                 ]
               },
               {
-                "id": "HtmlUnknownAnchorTarget",
-                "shortDescription": {
-                  "text": "Unresolved fragment in a link"
-                },
-                "fullDescription": {
-                  "text": "Reports an unresolved last part of an URL after the '#' sign.",
-                  "markdown": "Reports an unresolved last part of an URL after the `#` sign."
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "HTML",
-                      "index": 16,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "UnusedDefine",
                 "shortDescription": {
                   "text": "Unused define"
@@ -8149,6 +8117,38 @@
                     "target": {
                       "id": "RELAX NG",
                       "index": 26,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "HtmlUnknownAnchorTarget",
+                "shortDescription": {
+                  "text": "Unresolved fragment in a link"
+                },
+                "fullDescription": {
+                  "text": "Reports an unresolved last part of an URL after the '#' sign.",
+                  "markdown": "Reports an unresolved last part of an URL after the `#` sign."
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "HTML",
+                      "index": 16,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -8448,38 +8448,6 @@
                 ]
               },
               {
-                "id": "LossyEncoding",
-                "shortDescription": {
-                  "text": "Lossy encoding"
-                },
-                "fullDescription": {
-                  "text": "Reports characters that cannot be displayed because of the current document encoding. Examples: If you type international characters in a document with the US-ASCII charset, some characters will be lost on save. If you load a UTF-8-encoded file using the ISO-8859-1 one-byte charset, some characters will be displayed incorrectly. You can fix this by changing the file encoding either by specifying the encoding directly in the file, e.g. by editing 'encoding=' attribute in the XML prolog of XML file, or by changing the corresponding options in Settings | Editor | File Encodings.",
-                  "markdown": "Reports characters that cannot be displayed because of the current document encoding.\n\nExamples:\n\n* If you type international characters in a document with the **US-ASCII** charset, some characters will be lost on save.\n* If you load a **UTF-8** -encoded file using the **ISO-8859-1** one-byte charset, some characters will be displayed incorrectly.\n\nYou can fix this by changing the file encoding\neither by specifying the encoding directly in the file, e.g. by editing `encoding=` attribute in the XML prolog of XML file,\nor by changing the corresponding options in **Settings \\| Editor \\| File Encodings**."
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "Internationalization",
-                      "index": 30,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "RegExpEscapedMetaCharacter",
                 "shortDescription": {
                   "text": "Escaped meta character"
@@ -8501,6 +8469,38 @@
                     "target": {
                       "id": "RegExp",
                       "index": 11,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "LossyEncoding",
+                "shortDescription": {
+                  "text": "Lossy encoding"
+                },
+                "fullDescription": {
+                  "text": "Reports characters that cannot be displayed because of the current document encoding. Examples: If you type international characters in a document with the US-ASCII charset, some characters will be lost on save. If you load a UTF-8-encoded file using the ISO-8859-1 one-byte charset, some characters will be displayed incorrectly. You can fix this by changing the file encoding either by specifying the encoding directly in the file, e.g. by editing 'encoding=' attribute in the XML prolog of XML file, or by changing the corresponding options in Settings | Editor | File Encodings.",
+                  "markdown": "Reports characters that cannot be displayed because of the current document encoding.\n\nExamples:\n\n* If you type international characters in a document with the **US-ASCII** charset, some characters will be lost on save.\n* If you load a **UTF-8** -encoded file using the **ISO-8859-1** one-byte charset, some characters will be displayed incorrectly.\n\nYou can fix this by changing the file encoding\neither by specifying the encoding directly in the file, e.g. by editing `encoding=` attribute in the XML prolog of XML file,\nor by changing the corresponding options in **Settings \\| Editor \\| File Encodings**."
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "Internationalization",
+                      "index": 30,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -8940,7 +8940,7 @@
                   {
                     "target": {
                       "id": "Properties files",
-                      "index": 12,
+                      "index": 13,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -8972,7 +8972,7 @@
                   {
                     "target": {
                       "id": "Properties files",
-                      "index": 12,
+                      "index": 13,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -9004,7 +9004,7 @@
                   {
                     "target": {
                       "id": "Properties files",
-                      "index": 12,
+                      "index": 13,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -9036,7 +9036,7 @@
                   {
                     "target": {
                       "id": "Properties files",
-                      "index": 12,
+                      "index": 13,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -9068,7 +9068,7 @@
                   {
                     "target": {
                       "id": "Properties files",
-                      "index": 12,
+                      "index": 13,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -9100,7 +9100,7 @@
                   {
                     "target": {
                       "id": "Properties files",
-                      "index": 12,
+                      "index": 13,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -10663,22 +10663,22 @@
       "versionControlProvenance": [
         {
           "repositoryUri": "https://github.com/HES-XPLAIN/mlxplain.git",
-          "revisionId": "9ec15ff7da204f95c3d754abf01d1c540021e547",
-          "branch": "main",
+          "revisionId": "10df9222d1036fd341768a41a420ced78d2c176e",
+          "branch": "classifiers",
           "properties": {
             "repoUrl": "https://github.com/HES-XPLAIN/mlxplain.git",
             "lastAuthorName": "Rémy Marquis",
             "vcsType": "Git",
-            "lastAuthorEmail": "remy.marquis@heig-vd.ch"
+            "lastAuthorEmail": "remy.marquis@gmail.com"
           }
         }
       ],
       "results": [],
       "automationDetails": {
-        "id": "project/qodana/2023-05-12",
-        "guid": "523a3cc1-aa92-4ab4-b1ee-b7e1956bb9c2",
+        "id": "project/qodana/2023-05-26",
+        "guid": "2d8159b8-fbb3-43e6-b73c-49b337bc40ed",
         "properties": {
-          "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/4958393854"
+          "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/5089463934"
         }
       },
       "newlineSequences": [
