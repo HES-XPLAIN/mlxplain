@@ -5,6 +5,23 @@ description = "An open platform for accelerating the development of eXplainable 
 authors = ["Arthur Babey <arthur.babey@heig-vd.ch>", "Jean-Marc Boutay <jean-marc.boutay@heige.ch>", "Rémy Marquis <remy.marquis@heig-vd.ch>"]
 license = "3-Clause BSD License"
 readme = "README.md"
+homepage = "https://hes-xplain.github.io/"
+repository = "https://github.com/HES-XPLAIN/mlxplain"
+keywords = ["machine learning", "xai"]
+classifiers=[
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX',
+    'Operating System :: Unix',
+    'Operating System :: MacOS',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Education',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: BSD License',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Scientific/Engineering :: Mathematics',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'Programming Language :: Python :: 3',
+]
 packages = [{include = "mlxplain"}]
 
 [tool.poetry.dependencies]
