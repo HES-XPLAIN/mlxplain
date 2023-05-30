@@ -5,6 +5,7 @@
     "textmate",
     "YAML",
     ".gitignore (GitIgnore)",
-    "EditorConfig"
+    "EditorConfig",
+    "Properties"
   ]
 }
