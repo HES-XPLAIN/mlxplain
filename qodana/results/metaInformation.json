@@ -8,12 +8,12 @@
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/HES-XPLAIN/mlxplain.git",
-        "revisionId": "23622e7a4f6607d82e71a0eafc4742eddbe718de",
-        "branch": "publish"
+        "revisionId": "920a11e2b1ab4cc05cb552ea88ea86bd660c3196",
+        "branch": "main"
       }
     },
     "deviceId": "200820300000000-436b-58d7-7a19-ea732b9fab8c",
-    "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/5119220536",
+    "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/5119261423",
     "repoUrl": "https://github.com/HES-XPLAIN/mlxplain.git"
   }
 }
