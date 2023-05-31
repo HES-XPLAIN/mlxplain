@@ -1884,20 +1884,20 @@
                 ]
               },
               {
-                "id": "CommandLineInspection",
+                "id": "PyComparisonWithNoneInspection",
                 "shortDescription": {
-                  "text": "Incorrect CLI syntax"
+                  "text": "Using equality operators to compare with None"
                 },
                 "fullDescription": {
-                  "text": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies that option names and arguments are correct. Do not disable the inspection if you are going to use command-line interfaces like manage.py in Django.",
-                  "markdown": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
+                  "text": "Reports comparisons with 'None'. That type of comparisons should always be done with 'is' or 'is not', never the equality operators. Example: a = 2\n\n\nif a == None:\n    print(\"Success\")\n Once the quick-fix is applied, the code changes to: a = 2\n\n\nif a is None:\n    print(\"Success\")",
+                  "markdown": "Reports comparisons with `None`. That type of comparisons\nshould always be done with `is` or `is not`, never\nthe equality operators.\n\n**Example:**\n\n```\na = 2\n\n\nif a == None:\n    print(\"Success\")\n```\n\nOnce the quick-fix is applied, the code changes to:\n\n```\na = 2\n\n\nif a is None:\n    print(\"Success\")\n```"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "warning",
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
+                    "ideaSeverity": "WEAK WARNING",
+                    "qodanaSeverity": "Moderate"
                   }
                 },
                 "relationships": [
@@ -1916,20 +1916,20 @@
                 ]
               },
               {
-                "id": "PyComparisonWithNoneInspection",
+                "id": "CommandLineInspection",
                 "shortDescription": {
-                  "text": "Using equality operators to compare with None"
+                  "text": "Incorrect CLI syntax"
                 },
                 "fullDescription": {
-                  "text": "Reports comparisons with 'None'. That type of comparisons should always be done with 'is' or 'is not', never the equality operators. Example: a = 2\n\n\nif a == None:\n    print(\"Success\")\n Once the quick-fix is applied, the code changes to: a = 2\n\n\nif a is None:\n    print(\"Success\")",
-                  "markdown": "Reports comparisons with `None`. That type of comparisons\nshould always be done with `is` or `is not`, never\nthe equality operators.\n\n**Example:**\n\n```\na = 2\n\n\nif a == None:\n    print(\"Success\")\n```\n\nOnce the quick-fix is applied, the code changes to:\n\n```\na = 2\n\n\nif a is None:\n    print(\"Success\")\n```"
+                  "text": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies that option names and arguments are correct. Do not disable the inspection if you are going to use command-line interfaces like manage.py in Django.",
+                  "markdown": "Reports the problems if the arguments of the command you type in the console are not in the proper order. The inspection also verifies\nthat option names and arguments are correct.\n\nDo not disable the inspection if you are going to use command-line interfaces like [manage.py in Django](https://www.jetbrains.com/help/pycharm/running-manage-py.html)."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
-                  "level": "note",
+                  "level": "warning",
                   "parameters": {
-                    "ideaSeverity": "WEAK WARNING",
-                    "qodanaSeverity": "Moderate"
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
                   }
                 },
                 "relationships": [
@@ -2012,13 +2012,13 @@
                 ]
               },
               {
-                "id": "PyChainedComparisonsInspection",
+                "id": "PyMethodParametersInspection",
                 "shortDescription": {
-                  "text": "Too complex chained comparisons"
+                  "text": "Improper first parameter"
                 },
                 "fullDescription": {
-                  "text": "Reports chained comparisons that can be simplified. Example: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if x >= xmin and x <= xmax:\n          pass' The IDE offers to simplify 'if x >= xmin and x <= xmax'. When the quick-fix is applied, the code changes to: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if xmin <= x <= xmax:\n          pass'",
-                  "markdown": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
+                  "text": "Reports methods that lack the first parameter that is usually named 'self'. Example: class Movie:\n\n   def show():\n       pass\n When the quick-fix is applied, the code changes to: class Movie:\n\n   def show(self):\n       pass\n The inspection also reports naming issues in class methods. Example: class Movie:\n    @classmethod\n    def show(abc):\n        pass\n Since the first parameter of a class method should be 'cls', the IDE provides a quick-fix to rename it.",
+                  "markdown": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -2044,13 +2044,13 @@
                 ]
               },
               {
-                "id": "PyMethodParametersInspection",
+                "id": "PyChainedComparisonsInspection",
                 "shortDescription": {
-                  "text": "Improper first parameter"
+                  "text": "Too complex chained comparisons"
                 },
                 "fullDescription": {
-                  "text": "Reports methods that lack the first parameter that is usually named 'self'. Example: class Movie:\n\n   def show():\n       pass\n When the quick-fix is applied, the code changes to: class Movie:\n\n   def show(self):\n       pass\n The inspection also reports naming issues in class methods. Example: class Movie:\n    @classmethod\n    def show(abc):\n        pass\n Since the first parameter of a class method should be 'cls', the IDE provides a quick-fix to rename it.",
-                  "markdown": "Reports methods that lack the first parameter that is usually\nnamed `self`.\n\n**Example:**\n\n```\nclass Movie:\n\n   def show():\n       pass\n```\n\nWhen the quick-fix is applied, the code changes to:\n\n```\nclass Movie:\n\n   def show(self):\n       pass\n```\n\nThe inspection also reports naming issues in class methods.\n\n**Example:**\n\n```\nclass Movie:\n    @classmethod\n    def show(abc):\n        pass\n```\n\nSince the first parameter of a class method should be `cls`, the IDE provides a quick-fix\nto rename it."
+                  "text": "Reports chained comparisons that can be simplified. Example: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if x >= xmin and x <= xmax:\n          pass' The IDE offers to simplify 'if x >= xmin and x <= xmax'. When the quick-fix is applied, the code changes to: 'def do_comparison(x):\n      xmin = 10\n      xmax = 100\n      if xmin <= x <= xmax:\n          pass'",
+                  "markdown": "Reports chained comparisons that can be simplified.\n\n**Example:**\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if x >= xmin and x <= xmax:\n              pass\n\nThe IDE offers to simplify `if x >= xmin and x <= xmax`.\nWhen the quick-fix is applied, the code changes to:\n\n\n      def do_comparison(x):\n          xmin = 10\n          xmax = 100\n          if xmin <= x <= xmax:\n              pass\n"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -2396,20 +2396,20 @@
                 ]
               },
               {
-                "id": "CythonUsageBeforeDeclarationInspection",
+                "id": "PyArgumentEqualDefaultInspection",
                 "shortDescription": {
-                  "text": "Cython variable is used before its declaration"
+                  "text": "The function argument is equal to the default parameter value"
                 },
                 "fullDescription": {
-                  "text": "Reports Cython variables being referenced before declaration. Example: cdef int c_x\n\nprint(c_x, c_y)  # Variable 'c_y' is used before its declaration\n\ncdef int c_y = 0",
-                  "markdown": "Reports Cython variables being referenced before declaration.\n\n**Example:**\n\n```\ncdef int c_x\n\nprint(c_x, c_y)  # Variable 'c_y' is used before its declaration\n\ncdef int c_y = 0\n```"
+                  "text": "Reports a problem when an argument passed to the function is equal to the default parameter value. This inspection is disabled by default to avoid performance degradation. Example: def my_function(a: int = 2):\n    print(a)\n\n\nmy_function(2)",
+                  "markdown": "Reports a problem when an argument\npassed to the function is equal to the default parameter value.\n\nThis inspection is disabled by default to avoid performance degradation.\n\n**Example:**\n\n```\ndef my_function(a: int = 2):\n    print(a)\n\n\nmy_function(2)\n```"
                 },
                 "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "warning",
+                  "enabled": false,
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
+                    "ideaSeverity": "WEAK WARNING",
+                    "qodanaSeverity": "Moderate"
                   }
                 },
                 "relationships": [
@@ -2428,20 +2428,20 @@
                 ]
               },
               {
-                "id": "PyArgumentEqualDefaultInspection",
+                "id": "CythonUsageBeforeDeclarationInspection",
                 "shortDescription": {
-                  "text": "The function argument is equal to the default parameter value"
+                  "text": "Cython variable is used before its declaration"
                 },
                 "fullDescription": {
-                  "text": "Reports a problem when an argument passed to the function is equal to the default parameter value. This inspection is disabled by default to avoid performance degradation. Example: def my_function(a: int = 2):\n    print(a)\n\n\nmy_function(2)",
-                  "markdown": "Reports a problem when an argument\npassed to the function is equal to the default parameter value.\n\nThis inspection is disabled by default to avoid performance degradation.\n\n**Example:**\n\n```\ndef my_function(a: int = 2):\n    print(a)\n\n\nmy_function(2)\n```"
+                  "text": "Reports Cython variables being referenced before declaration. Example: cdef int c_x\n\nprint(c_x, c_y)  # Variable 'c_y' is used before its declaration\n\ncdef int c_y = 0",
+                  "markdown": "Reports Cython variables being referenced before declaration.\n\n**Example:**\n\n```\ncdef int c_x\n\nprint(c_x, c_y)  # Variable 'c_y' is used before its declaration\n\ncdef int c_y = 0\n```"
                 },
                 "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "note",
+                  "enabled": true,
+                  "level": "warning",
                   "parameters": {
-                    "ideaSeverity": "WEAK WARNING",
-                    "qodanaSeverity": "Moderate"
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
                   }
                 },
                 "relationships": [
@@ -3196,38 +3196,6 @@
                 ]
               },
               {
-                "id": "Query_bound_parameters",
-                "shortDescription": {
-                  "text": "Query does not have required bound parameters"
-                },
-                "fullDescription": {
-                  "text": "Reports GQL queries with bound parameters that don't have the necessary parameters passed to the query method call.",
-                  "markdown": "Reports GQL queries with bound parameters that don't have the necessary\nparameters passed to the query method call."
-                },
-                "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "Google App Engine (Python)",
-                      "index": 4,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "PyArgumentListInspection",
                 "shortDescription": {
                   "text": "Incorrect call arguments"
@@ -3249,6 +3217,38 @@
                     "target": {
                       "id": "Python",
                       "index": 2,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "Query_bound_parameters",
+                "shortDescription": {
+                  "text": "Query does not have required bound parameters"
+                },
+                "fullDescription": {
+                  "text": "Reports GQL queries with bound parameters that don't have the necessary parameters passed to the query method call.",
+                  "markdown": "Reports GQL queries with bound parameters that don't have the necessary\nparameters passed to the query method call."
+                },
+                "defaultConfiguration": {
+                  "enabled": true,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "Google App Engine (Python)",
+                      "index": 4,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -3740,38 +3740,6 @@
                 ]
               },
               {
-                "id": "PyStubPackagesCompatibilityInspection",
-                "shortDescription": {
-                  "text": "Incompatible stub packages"
-                },
-                "fullDescription": {
-                  "text": "Reports stub packages that do not support the version of the corresponding runtime package. A stub package contains type information for some runtime package.",
-                  "markdown": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
-                },
-                "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "Python",
-                      "index": 2,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "DjangoCloseTagInspection",
                 "shortDescription": {
                   "text": "Mismatched opening and closing tags"
@@ -3793,6 +3761,38 @@
                     "target": {
                       "id": "Django",
                       "index": 15,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "PyStubPackagesCompatibilityInspection",
+                "shortDescription": {
+                  "text": "Incompatible stub packages"
+                },
+                "fullDescription": {
+                  "text": "Reports stub packages that do not support the version of the corresponding runtime package. A stub package contains type information for some runtime package.",
+                  "markdown": "Reports stub packages that do not support the version of the corresponding runtime package.\n\nA [stub package](https://www.python.org/dev/peps/pep-0561/) contains type information for some runtime package."
+                },
+                "defaultConfiguration": {
+                  "enabled": true,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "Python",
+                      "index": 2,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -4616,38 +4616,6 @@
                 ]
               },
               {
-                "id": "MongoJSSideEffectsInspection",
-                "shortDescription": {
-                  "text": "Statement with side effects"
-                },
-                "fullDescription": {
-                  "text": "Reports statements that can cause side effects while the data source is in read-only mode. For more information about enabling read-only mode, see Enable read-only mode for a connection in the IDE documentation. The Disable read-only mode quick-fix turns off the read-only mode for the respective data source. Example: 'db.my_collection.insertOne()'",
-                  "markdown": "Reports statements that can cause side effects while the data source is in read-only mode.\n\nFor more information about enabling read-only mode, see\n[Enable\nread-only mode for a connection in the IDE documentation](https://www.jetbrains.com/help/datagrip/configuring-database-connections.html#enable-read-only-mode-for-a-connection).\n\nThe **Disable read-only mode** quick-fix turns off the read-only mode for the respective data source.\n\nExample:\n\n\n    db.my_collection.insertOne()\n"
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "MongoJS",
-                      "index": 10,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "SqlInsertIntoGeneratedColumnInspection",
                 "shortDescription": {
                   "text": "Insertion into generated columns"
@@ -4669,6 +4637,38 @@
                     "target": {
                       "id": "SQL",
                       "index": 5,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "MongoJSSideEffectsInspection",
+                "shortDescription": {
+                  "text": "Statement with side effects"
+                },
+                "fullDescription": {
+                  "text": "Reports statements that can cause side effects while the data source is in read-only mode. For more information about enabling read-only mode, see Enable read-only mode for a connection in the IDE documentation. The Disable read-only mode quick-fix turns off the read-only mode for the respective data source. Example: 'db.my_collection.insertOne()'",
+                  "markdown": "Reports statements that can cause side effects while the data source is in read-only mode.\n\nFor more information about enabling read-only mode, see\n[Enable\nread-only mode for a connection in the IDE documentation](https://www.jetbrains.com/help/datagrip/configuring-database-connections.html#enable-read-only-mode-for-a-connection).\n\nThe **Disable read-only mode** quick-fix turns off the read-only mode for the respective data source.\n\nExample:\n\n\n    db.my_collection.insertOne()\n"
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "MongoJS",
+                      "index": 10,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -4968,13 +4968,13 @@
                 ]
               },
               {
-                "id": "SqlMultipleLimitClausesInspection",
+                "id": "SqlNamedArgumentsInspection",
                 "shortDescription": {
-                  "text": "Multiple row limiting/offset clauses in queries"
+                  "text": "Named arguments should be used"
                 },
                 "fullDescription": {
-                  "text": "Reports usages of multiple row limiting clauses in a single query. Example (Microsoft SQL Server): 'create table foo(a int);\nselect top 1 * from foo order by a offset 10 rows fetch next 20 rows only;' The SELECT TOP clause is used to specify that only 1 record must be returned. The FETCH clause specifies the number of rows to return after the OFFSET clause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant.",
-                  "markdown": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
+                  "text": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled. For more information about the difference between named and unnamed parameters, see Binding Parameters by Name (Named Parameters) at docs.microsoft.com . Example (Microsoft SQL Server): 'CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\nBEGIN\n    RETURN n + m;\nEND;\n\nCREATE PROCEDURE test AS\nBEGIN\n    foo n = 1, m = 2;\n\n--- The following call misses parameter names and will be highlighted\n    foo 1, 2;\nEND;' Parameters '1, 2' in the 'foo 1, 2;' call are highlighted because they miss names.",
+                  "markdown": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5000,13 +5000,13 @@
                 ]
               },
               {
-                "id": "SqlNamedArgumentsInspection",
+                "id": "SqlMultipleLimitClausesInspection",
                 "shortDescription": {
-                  "text": "Named arguments should be used"
+                  "text": "Multiple row limiting/offset clauses in queries"
                 },
                 "fullDescription": {
-                  "text": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled. For more information about the difference between named and unnamed parameters, see Binding Parameters by Name (Named Parameters) at docs.microsoft.com . Example (Microsoft SQL Server): 'CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\nBEGIN\n    RETURN n + m;\nEND;\n\nCREATE PROCEDURE test AS\nBEGIN\n    foo n = 1, m = 2;\n\n--- The following call misses parameter names and will be highlighted\n    foo 1, 2;\nEND;' Parameters '1, 2' in the 'foo 1, 2;' call are highlighted because they miss names.",
-                  "markdown": "Reports arguments that are used without names in routine calls. By default, this inspection is disabled.\n\nFor more information about the difference between named and unnamed parameters, see [Binding Parameters by Name (Named Parameters) at docs.microsoft.com](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/binding-parameters-by-name-named-parameters).\n\nExample (Microsoft SQL Server):\n\n    CREATE FUNCTION foo(n INT, m INT) RETURNS INT AS\n    BEGIN\n        RETURN n + m;\n    END;\n\n    CREATE PROCEDURE test AS\n    BEGIN\n        foo n = 1, m = 2;\n\n    --- The following call misses parameter names and will be highlighted\n        foo 1, 2;\n    END;\n\nParameters `1, 2` in the `foo 1, 2;` call are highlighted because they miss names."
+                  "text": "Reports usages of multiple row limiting clauses in a single query. Example (Microsoft SQL Server): 'create table foo(a int);\nselect top 1 * from foo order by a offset 10 rows fetch next 20 rows only;' The SELECT TOP clause is used to specify that only 1 record must be returned. The FETCH clause specifies the number of rows to return after the OFFSET clause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant.",
+                  "markdown": "Reports usages of multiple row limiting clauses in a single query.\n\nExample (Microsoft SQL Server):\n\n    create table foo(a int);\n    select top 1 * from foo order by a offset 10 rows fetch next 20 rows only;\n\nThe SELECT TOP clause is used to specify that only 1 record must be\nreturned. The FETCH clause specifies the number of rows to return after the OFFSET\nclause has been processed. But as we already have the SELECT TOP limiting clause, the FETCH clause might be redundant."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5128,13 +5128,13 @@
                 ]
               },
               {
-                "id": "SqlAutoIncrementDuplicateInspection",
+                "id": "SqlRedundantAliasInspection",
                 "shortDescription": {
-                  "text": "Auto-increment duplicate"
+                  "text": "Redundant alias expressions"
                 },
                 "fullDescription": {
-                  "text": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key. Example (MySQL): 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT,\n    c2 INT AUTO_INCREMENT,\n);' The AUTO_INCREMENT constraint for 'c2' will be highlighted as 'c1' already has this constraint. To fix the warning, you can make 'id' a primary key and delete AUTO_INCREMENT for 'c2'. 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    c2 INT,\n);'",
-                  "markdown": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
+                  "text": "Reports alias expressions that duplicate names of columns in tables and might be redundant. Example (PostgreSQL): 'CREATE TABLE foo(a INT, b INT);\n\nSELECT * FROM foo foo(a, b);\nSELECT * FROM foo foo(a);\nSELECT * FROM foo foo(x);\nSELECT * FROM foo foo(x, y);' The first two aliases use the same column names as in the 'foo' table. They are considered redundant because they column names are identical.",
+                  "markdown": "Reports alias expressions that duplicate names of columns in tables and might be redundant.\n\nExample (PostgreSQL):\n\n    CREATE TABLE foo(a INT, b INT);\n\n    SELECT * FROM foo foo(a, b);\n    SELECT * FROM foo foo(a);\n    SELECT * FROM foo foo(x);\n    SELECT * FROM foo foo(x, y);\n\nThe first two aliases use the same column names as in the `foo` table. They are considered redundant because they\ncolumn names are identical."
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5160,13 +5160,13 @@
                 ]
               },
               {
-                "id": "SqlRedundantAliasInspection",
+                "id": "SqlAutoIncrementDuplicateInspection",
                 "shortDescription": {
-                  "text": "Redundant alias expressions"
+                  "text": "Auto-increment duplicate"
                 },
                 "fullDescription": {
-                  "text": "Reports alias expressions that duplicate names of columns in tables and might be redundant. Example (PostgreSQL): 'CREATE TABLE foo(a INT, b INT);\n\nSELECT * FROM foo foo(a, b);\nSELECT * FROM foo foo(a);\nSELECT * FROM foo foo(x);\nSELECT * FROM foo foo(x, y);' The first two aliases use the same column names as in the 'foo' table. They are considered redundant because they column names are identical.",
-                  "markdown": "Reports alias expressions that duplicate names of columns in tables and might be redundant.\n\nExample (PostgreSQL):\n\n    CREATE TABLE foo(a INT, b INT);\n\n    SELECT * FROM foo foo(a, b);\n    SELECT * FROM foo foo(a);\n    SELECT * FROM foo foo(x);\n    SELECT * FROM foo foo(x, y);\n\nThe first two aliases use the same column names as in the `foo` table. They are considered redundant because they\ncolumn names are identical."
+                  "text": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key. Example (MySQL): 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT,\n    c2 INT AUTO_INCREMENT,\n);' The AUTO_INCREMENT constraint for 'c2' will be highlighted as 'c1' already has this constraint. To fix the warning, you can make 'id' a primary key and delete AUTO_INCREMENT for 'c2'. 'CREATE TABLE my_table\n(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    c2 INT,\n);'",
+                  "markdown": "Reports tables that contain two columns with an automatic increment. In MySQL, Microsoft SQL Server, and Db2 dialects, a table can have only one field with a auto-increment option, and this field must be a key.\n\nExample (MySQL):\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT,\n        c2 INT AUTO_INCREMENT,\n    );\n\nThe AUTO_INCREMENT constraint for `c2` will be highlighted as `c1` already has this constraint. To fix the warning,\nyou can make `id` a primary key and delete AUTO_INCREMENT for `c2`.\n\n    CREATE TABLE my_table\n    (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        c2 INT,\n    );\n"
                 },
                 "defaultConfiguration": {
                   "enabled": false,
@@ -5832,38 +5832,6 @@
                 ]
               },
               {
-                "id": "MysqlParsingInspection",
-                "shortDescription": {
-                  "text": "Unsupported syntax in pre-8.0 versions"
-                },
-                "fullDescription": {
-                  "text": "Reports invalid usages of UNION in queries. The inspection works in MySQL versions that are earlier than 8.0. Example (MySQL): 'SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;'",
-                  "markdown": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "MySQL",
-                      "index": 12,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "SqlCallNotationInspection",
                 "shortDescription": {
                   "text": "Using of named and positional arguments"
@@ -5885,6 +5853,38 @@
                     "target": {
                       "id": "SQL",
                       "index": 5,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "MysqlParsingInspection",
+                "shortDescription": {
+                  "text": "Unsupported syntax in pre-8.0 versions"
+                },
+                "fullDescription": {
+                  "text": "Reports invalid usages of UNION in queries. The inspection works in MySQL versions that are earlier than 8.0. Example (MySQL): 'SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;'",
+                  "markdown": "Reports invalid usages of UNION in queries.\n\nThe inspection works in MySQL versions that are earlier than 8.0.\n\nExample (MySQL):\n\n\n    SELECT * FROM (SELECT 1 UNION (SELECT 1 UNION SELECT 2)) a;\n"
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "MySQL",
+                      "index": 12,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -6880,38 +6880,6 @@
                 ]
               },
               {
-                "id": "DuplicatedCode",
-                "shortDescription": {
-                  "text": "Duplicated code fragment"
-                },
-                "fullDescription": {
-                  "text": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in File | Settings | Editor | Duplicates.",
-                  "markdown": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in [File \\| Settings \\| Editor \\| Duplicates](settings://duplicates.index)."
-                },
-                "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "note",
-                  "parameters": {
-                    "ideaSeverity": "WEAK WARNING",
-                    "qodanaSeverity": "Moderate"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "General",
-                      "index": 18,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "RequiredAttributes",
                 "shortDescription": {
                   "text": "Missing required attribute"
@@ -6933,6 +6901,38 @@
                     "target": {
                       "id": "HTML",
                       "index": 16,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "DuplicatedCode",
+                "shortDescription": {
+                  "text": "Duplicated code fragment"
+                },
+                "fullDescription": {
+                  "text": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in File | Settings | Editor | Duplicates.",
+                  "markdown": "Reports duplicated blocks of code from the selected scope: the same file or the entire project. The inspection features quick-fixes that help you to set the size of detected duplicates, navigate to repetitive code fragments, and compare them in a tool window. The inspection options allow you to select the scope of the reported duplicated fragments and set the initial size for the duplicated language constructs. You can also configure the constructs that you want to anonymize in [File \\| Settings \\| Editor \\| Duplicates](settings://duplicates.index)."
+                },
+                "defaultConfiguration": {
+                  "enabled": true,
+                  "level": "note",
+                  "parameters": {
+                    "ideaSeverity": "WEAK WARNING",
+                    "qodanaSeverity": "Moderate"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "General",
+                      "index": 18,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -7840,38 +7840,6 @@
                 ]
               },
               {
-                "id": "RegExpRedundantNestedCharacterClass",
-                "shortDescription": {
-                  "text": "Redundant nested character class"
-                },
-                "fullDescription": {
-                  "text": "Reports unnecessary nested character classes. Example: '[a-c[x-z]]' After the quick-fix is applied: '[a-cx-z]' New in 2020.2",
-                  "markdown": "Reports unnecessary nested character classes.\n\n**Example:**\n\n\n      [a-c[x-z]]\n\nAfter the quick-fix is applied:\n\n\n      [a-cx-z]\n\nNew in 2020.2"
-                },
-                "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "warning",
-                  "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "RegExp",
-                      "index": 11,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "XmlDeprecatedElement",
                 "shortDescription": {
                   "text": "Deprecated symbol"
@@ -7893,6 +7861,38 @@
                     "target": {
                       "id": "XML",
                       "index": 7,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "RegExpRedundantNestedCharacterClass",
+                "shortDescription": {
+                  "text": "Redundant nested character class"
+                },
+                "fullDescription": {
+                  "text": "Reports unnecessary nested character classes. Example: '[a-c[x-z]]' After the quick-fix is applied: '[a-cx-z]' New in 2020.2",
+                  "markdown": "Reports unnecessary nested character classes.\n\n**Example:**\n\n\n      [a-c[x-z]]\n\nAfter the quick-fix is applied:\n\n\n      [a-cx-z]\n\nNew in 2020.2"
+                },
+                "defaultConfiguration": {
+                  "enabled": true,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "RegExp",
+                      "index": 11,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -8032,38 +8032,6 @@
                 ]
               },
               {
-                "id": "RegExpOctalEscape",
-                "shortDescription": {
-                  "text": "Octal escape"
-                },
-                "fullDescription": {
-                  "text": "Reports octal escapes, which are easily confused with back references. Use hexadecimal escapes to avoid confusion. Example: '\\07' After the quick-fix is applied: '\\x07' New in 2017.1",
-                  "markdown": "Reports octal escapes, which are easily confused with back references. Use hexadecimal escapes to avoid confusion.\n\n**Example:**\n\n\n      \\07\n\nAfter the quick-fix is applied:\n\n\n      \\x07\n\nNew in 2017.1"
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "note",
-                  "parameters": {
-                    "ideaSeverity": "INFORMATION",
-                    "qodanaSeverity": "Info"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "RegExp",
-                      "index": 11,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "HtmlExtraClosingTag",
                 "shortDescription": {
                   "text": "Redundant closing tag"
@@ -8085,6 +8053,38 @@
                     "target": {
                       "id": "HTML",
                       "index": 16,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "RegExpOctalEscape",
+                "shortDescription": {
+                  "text": "Octal escape"
+                },
+                "fullDescription": {
+                  "text": "Reports octal escapes, which are easily confused with back references. Use hexadecimal escapes to avoid confusion. Example: '\\07' After the quick-fix is applied: '\\x07' New in 2017.1",
+                  "markdown": "Reports octal escapes, which are easily confused with back references. Use hexadecimal escapes to avoid confusion.\n\n**Example:**\n\n\n      \\07\n\nAfter the quick-fix is applied:\n\n\n      \\x07\n\nNew in 2017.1"
+                },
+                "defaultConfiguration": {
+                  "enabled": false,
+                  "level": "note",
+                  "parameters": {
+                    "ideaSeverity": "INFORMATION",
+                    "qodanaSeverity": "Info"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "RegExp",
+                      "index": 11,
                       "toolComponent": {
                         "name": "QDPY"
                       }
@@ -8448,38 +8448,6 @@
                 ]
               },
               {
-                "id": "RegExpEscapedMetaCharacter",
-                "shortDescription": {
-                  "text": "Escaped meta character"
-                },
-                "fullDescription": {
-                  "text": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character '[', ']' and '^', because those would need additional escaping inside a character class. Example: '\\d+\\.\\d+' After the quick-fix is applied: '\\d+[.]\\d+' New in 2017.1",
-                  "markdown": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character `[`, `]` and `^`, because those would need additional escaping inside a character class.\n\n**Example:**\n\n\n      \\d+\\.\\d+\n\nAfter the quick-fix is applied:\n\n\n      \\d+[.]\\d+\n\nNew in 2017.1"
-                },
-                "defaultConfiguration": {
-                  "enabled": false,
-                  "level": "note",
-                  "parameters": {
-                    "ideaSeverity": "INFORMATION",
-                    "qodanaSeverity": "Info"
-                  }
-                },
-                "relationships": [
-                  {
-                    "target": {
-                      "id": "RegExp",
-                      "index": 11,
-                      "toolComponent": {
-                        "name": "QDPY"
-                      }
-                    },
-                    "kinds": [
-                      "superset"
-                    ]
-                  }
-                ]
-              },
-              {
                 "id": "LossyEncoding",
                 "shortDescription": {
                   "text": "Lossy encoding"
@@ -8512,20 +8480,20 @@
                 ]
               },
               {
-                "id": "RegExpRepeatedSpace",
+                "id": "RegExpEscapedMetaCharacter",
                 "shortDescription": {
-                  "text": "Consecutive spaces"
+                  "text": "Escaped meta character"
                 },
                 "fullDescription": {
-                  "text": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier. Example: '(     )' After the quick-fix is applied: '( {5})' New in 2017.1",
-                  "markdown": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
+                  "text": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character '[', ']' and '^', because those would need additional escaping inside a character class. Example: '\\d+\\.\\d+' After the quick-fix is applied: '\\d+[.]\\d+' New in 2017.1",
+                  "markdown": "Reports escaped meta characters. Some RegExp coding styles specify that meta characters should be placed inside a character class, to make the regular expression easier to understand. This inspection does not warn about the meta character `[`, `]` and `^`, because those would need additional escaping inside a character class.\n\n**Example:**\n\n\n      \\d+\\.\\d+\n\nAfter the quick-fix is applied:\n\n\n      \\d+[.]\\d+\n\nNew in 2017.1"
                 },
                 "defaultConfiguration": {
-                  "enabled": true,
-                  "level": "warning",
+                  "enabled": false,
+                  "level": "note",
                   "parameters": {
-                    "ideaSeverity": "WARNING",
-                    "qodanaSeverity": "High"
+                    "ideaSeverity": "INFORMATION",
+                    "qodanaSeverity": "Info"
                   }
                 },
                 "relationships": [
@@ -8551,6 +8519,38 @@
                 "fullDescription": {
                   "text": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression. Example: '(alpha|bravo|charlie|alpha)' After the quick-fix is applied: '(alpha|bravo|charlie)' New in 2017.1",
                   "markdown": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression.\n\n**Example:**\n\n\n      (alpha|bravo|charlie|alpha)\n\nAfter the quick-fix is applied:\n\n\n      (alpha|bravo|charlie)\n\nNew in 2017.1"
+                },
+                "defaultConfiguration": {
+                  "enabled": true,
+                  "level": "warning",
+                  "parameters": {
+                    "ideaSeverity": "WARNING",
+                    "qodanaSeverity": "High"
+                  }
+                },
+                "relationships": [
+                  {
+                    "target": {
+                      "id": "RegExp",
+                      "index": 11,
+                      "toolComponent": {
+                        "name": "QDPY"
+                      }
+                    },
+                    "kinds": [
+                      "superset"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "RegExpRepeatedSpace",
+                "shortDescription": {
+                  "text": "Consecutive spaces"
+                },
+                "fullDescription": {
+                  "text": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier. Example: '(     )' After the quick-fix is applied: '( {5})' New in 2017.1",
+                  "markdown": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
                 },
                 "defaultConfiguration": {
                   "enabled": true,
@@ -10663,7 +10663,7 @@
       "versionControlProvenance": [
         {
           "repositoryUri": "https://github.com/HES-XPLAIN/mlxplain.git",
-          "revisionId": "4dcd147da05dcb7c95b79192c8c910fac8f2d98a",
+          "revisionId": "9d8b144c3167231093007993fca08479c676b3b7",
           "branch": "main",
           "properties": {
             "repoUrl": "https://github.com/HES-XPLAIN/mlxplain.git",
@@ -10675,10 +10675,10 @@
       ],
       "results": [],
       "automationDetails": {
-        "id": "project/qodana/2023-05-30",
-        "guid": "9030a39c-8609-41fc-9c8b-f642af3af6e1",
+        "id": "project/qodana/2023-05-31",
+        "guid": "e8cf25d0-d302-4e3c-9fa6-b10d7b79fc55",
         "properties": {
-          "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/5120642592"
+          "jobUrl": "https://github.com/HES-XPLAIN/mlxplain/actions/runs/5129454275"
         }
       },
       "newlineSequences": [
