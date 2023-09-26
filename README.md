@@ -2,7 +2,6 @@
 An open platform for accelerating the development of eXplainable AI systems
 
 * [Documentation](https://hes-xplain.github.io/mlxplain/docs/)
-* [Static analysis](https://hes-xplain.github.io/mlxplain/qodana/)
 * [Coverage](https://hes-xplain.github.io/mlxplain/cov/)
 
 ## Contribution
