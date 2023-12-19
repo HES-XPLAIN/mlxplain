@@ -1,42 +1,38 @@
-[tool.poetry]
+[project]
 name = "mlxplain"
 version = "0.0.0"
 description = "An open platform for accelerating the development of eXplainable AI systems"
-authors = ["Arthur Babey <arthur.babey@heig-vd.ch>", "Jean-Marc Boutay <jean-marc.boutay@heige.ch>", "Rémy Marquis <remy.marquis@heig-vd.ch>"]
-license = "3-Clause BSD License"
-readme = "README.md"
-homepage = "https://hes-xplain.github.io/"
-repository = "https://github.com/HES-XPLAIN/mlxplain"
-keywords = ["machine learning", "xai"]
-classifiers=[
-    'Operating System :: Microsoft :: Windows',
-    'Operating System :: POSIX',
-    'Operating System :: Unix',
-    'Operating System :: MacOS',
-    'Intended Audience :: Developers',
-    'Intended Audience :: Education',
-    'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: BSD License',
-    'Topic :: Scientific/Engineering',
-    'Topic :: Scientific/Engineering :: Mathematics',
-    'Topic :: Scientific/Engineering :: Artificial Intelligence',
-    'Programming Language :: Python :: 3',
+license = {text = "3-Clause BSD License" }
+authors = [
+    { name = "Arthur Babey", email = "arthur.babey@heig-vd.ch" },
+    { name = "Jean-Marc Boutay", email = "jean-marc.boutay@heige.ch" },
+    { name = "Rémy Marquis", email = "remy.marquis@heig-vd.ch" }
 ]
-packages = [{include = "mlxplain"}]
+dependencies = []
+readme = "README.md"
+requires-python = ">= 3.8.1"
 
-[tool.poetry.dependencies]
-python = "^3.8.1"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.group.dev.dependencies]
-flake8 = "^6.0.0"
-pre-commit = "^3.2.2"
-black = "^23.3.0"
-coverage = "^7.2.3"
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "flake8>=6.1.0",
+    "pre-commit>=3.4.0",
+    "black>=23.9.1",
+    "coverage>=7.3.1",
+    "sphinx>=6.3.1",
+    "sphinx-rtd-theme>=1.3.0",
+    "sphinx-autodoc-typehints>=1.22",
+]
 
-[tool.poetry.group.doc.dependencies]
-sphinx = "^6.1.3"
-sphinx-rtd-theme = "^1.2.0"
-sphinx-autodoc-typehints = "^1.22"
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["mlxplain"]
 
 [tool.black]
 line-length = 88
@@ -50,7 +46,3 @@ exclude = '''
 profile = "black"
 line_length = 88
 multi_line_output = 3
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
