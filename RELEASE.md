@@ -7,10 +7,10 @@ Instructions for the release process and publication on PyPI.
 Update the `version` string in `pyproject.toml` to the release version on a branch.
 
 ```
-poetry version <version>
+rye version <version>
 ```
 Beside an explicit version string, a bump rule such as `patch`, `minor`, `major`
-can be passed.
+can be passed with `--bump` or `-b`.
 
 ## Commit
 
