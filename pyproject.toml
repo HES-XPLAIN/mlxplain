@@ -8,7 +8,9 @@ authors = [
     { name = "Jean-Marc Boutay", email = "jean-marc.boutay@heige.ch" },
     { name = "Rémy Marquis", email = "remy.marquis@heig-vd.ch" }
 ]
-dependencies = []
+dependencies = [
+    "build>=1.0.3",
+]
 readme = "README.md"
 requires-python = ">= 3.8.1"
 
