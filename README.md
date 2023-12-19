@@ -6,25 +6,34 @@ An open platform for accelerating the development of eXplainable AI systems
 
 ## Contribution
 
-### Install Python and Poetry
+### Install dependencies
 
-* Install [Python](https://www.python.org/).
-* Install [poetry](https://python-poetry.org/docs/#installation) and add it to your PATH.
+#### Using pip
 
-Ensure `python` and `poetry` are accessible in the `$PATH` environment variable.
+```shell
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.lock
+```
+
+#### Using Rye
+
+- Install [Rye](https://rye-up.com/) and [add shims](https://rye-up.com/guide/installation/) to your PATH.
+
+Ensure `rye` is accessible in the `$PATH` environment variable.
+Rye will automatically download the suitable Python toolchain as needed.
 
 To check the installation, check the following commands return an output:
 
 ```shell
-python --version
-poetry --version
+rye --version
 ```
 
 Install python dependencies and activate the virtualenv:
 
 ```shell
-poetry install
-poetry shell
+rye sync
+rye shell
 ```
 
 ### Install Pre-commit hooks
