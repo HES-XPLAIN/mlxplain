@@ -41,18 +41,25 @@ source .venv/bin/activate
 pip install .
 ```
 
-To leave the virtualenv, use `deactivate`.
+> [!NOTE]
+> On Windows, use `.venv\Scripts\activate` instead.
 
 #### Using Rye
 
-Install python dependencies and activate the virtualenv:
+Install python dependencies and create a virtualenv in `.venv`:
 
 ```shell
 rye sync
-rye shell
 ```
 
-To leave the virtualenv, use `exit`.
+### Work with virtualenv
+
+To activate the virtualenv, use the standard methods:
+
+* Unix: `source .venv/bin/activate`
+* Windows: `.venv\Scripts\activate`
+
+To leave the virtualenv, use `deactivate`.
 
 ### Install Pre-commit hooks
 
