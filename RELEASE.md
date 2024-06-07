@@ -7,10 +7,8 @@ Instructions for the release process and publication on PyPI.
 Update the `version` string in `pyproject.toml` to the release version on a branch.
 
 ```
-rye version <version>
+sed -i 's/version = ".*"/version = "X.Y.Z"/' pyproject.toml
 ```
-Beside an explicit version string, a bump rule such as `patch`, `minor`, `major`
-can be passed with `--bump` or `-b`.
 
 ## Commit
 
