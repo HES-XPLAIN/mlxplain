@@ -21,6 +21,7 @@ dependencies = [
     "dash>=2.17.1",
     "jupyter-dash>=0.4.2",
     "dash-bootstrap-components>=1.6.0",
+    "xgboost>=2.1.0",
 ]
 readme = "README.md"
 homepage = "https://hes-xplain.github.io/"
