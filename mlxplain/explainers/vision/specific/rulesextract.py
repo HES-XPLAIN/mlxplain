@@ -12,8 +12,10 @@ from typing import Callable
 # TODO: clean up
 import torch
 import torch.nn as nn
+from mlxplain.explanations.images.rules import RuleImportance
 from omnixai.data.image import Image
 from omnixai.explainers.base import ExplainerBase
+from omnixai.explanations.image.plain import PlainExplanation
 from omnixai.utils.misc import is_tf_available, is_torch_available
 from rules_extraction.rules import EnsembleRule, RuleRanker
 from rules_extraction.utils import (
@@ -53,6 +55,7 @@ class RulesExtractImage(ExplainerBase):
             into the inputs of ``model``.
         :param mode: The task type, e.g., `classification` or `regression`.
         """
+        # todo: doc
         super().__init__()
         self.model = model
         self.mode = mode
@@ -61,7 +64,6 @@ class RulesExtractImage(ExplainerBase):
         self.target_class = target_class
         self.top_rules = top_rules
 
-        _class = None
         if not is_torch_available():
             # import torch.nn as nn
             raise EnvironmentError("Torch cannot be found.")
@@ -97,7 +99,11 @@ class RulesExtractImage(ExplainerBase):
             X_train, y_train, n_estimators=200, max_depth=2, random_state=1
         )
 
-        explanations = RuleRanker(all_rules, X_train, y_train).rank_rules(
+
+
+        rules = RuleRanker(all_rules, X_train, y_train).rank_rules(
             N=self.top_rules
         )
+        explanations = RuleImportance(explanations=rules)
+        print(explanations)
         return explanations

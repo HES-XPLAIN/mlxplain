@@ -133,3 +133,8 @@ dmypy.json
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+
+data/
+data1/
+models_weight/
+features_map.csv
