@@ -10,7 +10,19 @@ from omnixai.explanations.base import ExplanationBase
 
 class DimlpfidexExplanation(ExplanationBase):
 
-    def __init__(self, mode) -> None:
+    def __init__(self, mode, explanations: dict = {}) -> None:
         super().__init__()
         self.mode = mode
-        self.explanations = {}
+        self.explanations = explanations
+
+    def get_explanations(self):
+        return self.explanations
+
+    def plot(self, **kwargs):
+        pass  # TODO
+
+    def plotly_plot(self, **kwargs):
+        pass  # TODO
+
+    def ipython_plot(self, **kwargs):
+        pass  # TODO
