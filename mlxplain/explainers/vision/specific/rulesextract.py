@@ -35,7 +35,7 @@ class RulesExtractImage(ExplainerBase):
         self,
         model,
         dataloader,
-        idx_to_names,
+        class_names,
         target_class: str,
         top_rules: int,
         mode: str = "classification",
@@ -43,19 +43,19 @@ class RulesExtractImage(ExplainerBase):
     ):
         """
         :param model: The model to explain, whose type can be `torch.nn.Module`.
-        :param target_layer: The target layer for explanation, which can be `torch.nn.Module`.
-        :param preprocess_function: The preprocessing function that converts the raw data
-            into the inputs of ``model``.
+        :param dataloader: The torch dataloader.
+        :param class_names: The list of available classes
+        :param target_class: The target class to extract rules for.
+        :param top_rules: The number of rules to extract.
         :param mode: The task type, e.g., `classification` or `regression`.
         """
-        # todo: doc
         super().__init__()
         self.model = model
-        self.mode = mode
         self.dataloader = dataloader
-        self.idx_to_names = idx_to_names
+        self.class_names = class_names
         self.target_class = target_class
         self.top_rules = top_rules
+        self.mode = mode
 
         if not is_torch_available():
             # import torch.nn as nn
@@ -76,8 +76,11 @@ class RulesExtractImage(ExplainerBase):
         device = (
             torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         )
+        index_to_classes = {
+            str(index): name for index, name in enumerate(self.class_names)
+        }
         train_features = compute_avg_features(
-            self.model, self.dataloader, self.idx_to_names, device
+            self.model, self.dataloader, index_to_classes, device
         )
 
         df_train = make_target_df(train_features, self.target_class)
