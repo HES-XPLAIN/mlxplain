@@ -5,7 +5,6 @@
 # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 #
 
-
 import pathlib as pl
 
 import pandas as pd
@@ -24,6 +23,7 @@ if __name__ == "__main__":
     # ensure path exists
     output_path = pl.Path("/tmp/explainer/")
 
+    # dummy datas for testing purposes
     train_data = Tabular(
         data=pd.DataFrame(
             data=[[1, 2, 3, 1, 0], [4, 5, 6, 0, 1]],
@@ -43,8 +43,7 @@ if __name__ == "__main__":
     model = DimlpBTModel(output_path, train_data, test_data, 3, 2)
     algorithm = FidexAlgorithm(model)
     explainer = DimlpfidexExplainer(train_data, model, algorithm)
-    result = explainer.explain()
+    local_explanations = explainer.explain()
 
-    print(result)
-
-    db = Dashboard(instances=test_data, local_explanations=result)
+    db = Dashboard(instances=test_data, local_explanations=local_explanations)
+    db.show()
