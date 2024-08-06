@@ -73,8 +73,8 @@ class DimlpBTModel(DimlpfidexModel):
         testing_data: Tabular,
         nb_attributes,
         nb_classes,
+        nb_dimlp_nets=25,
     ):
-        # TODO: check if path is writable
         self.output_path = output_path
         self.training_data = training_data
         self.testing_data = testing_data
@@ -82,6 +82,7 @@ class DimlpBTModel(DimlpfidexModel):
         self.test_data_filename = "test_data.txt"
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
+        self.nb_dimlp_nets = nb_dimlp_nets
         self.preprocess_function = None
 
         # values to be known for further output manipulation
@@ -95,7 +96,6 @@ class DimlpBTModel(DimlpfidexModel):
         self.preprocess_function = preprocess_function
 
     def _preprocess(self):
-        print(self.preprocess_function)
         if self.preprocess_function is not None:
             self.preprocess_function(self.training_data)
             self.preprocess_function(self.testing_data)
@@ -117,6 +117,7 @@ class DimlpBTModel(DimlpfidexModel):
                 --test_data_file {self.test_data_filename}
                 --nb_attributes {self.nb_attributes}
                 --nb_classes {self.nb_classes}
+                --nb_dimlp_nets {self.nb_dimlp_nets}
                 """
         )
 
