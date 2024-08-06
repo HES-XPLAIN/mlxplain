@@ -7,36 +7,30 @@
 """
 The Rules Extraction methods for vision tasks.
 """
-from typing import Callable
-
-# TODO: clean up
 import torch
 import torch.nn as nn
-from mlxplain.explanations.images.rules import RuleImportance
-from omnixai.data.image import Image
 from omnixai.explainers.base import ExplainerBase
-from omnixai.explanations.image.plain import PlainExplanation
-from omnixai.utils.misc import is_tf_available, is_torch_available
-from rules_extraction.rules import EnsembleRule, RuleRanker
+from omnixai.utils.misc import is_torch_available
+from rules_extraction.rules import RuleRanker
 from rules_extraction.utils import (
     compute_avg_features,
     extract_all_rules,
     make_target_df,
 )
 
+from mlxplain.explanations.images.rules import RuleImportance
+
 
 class RulesExtractImage(ExplainerBase):
     """
     The Rules Extraction method for generating visual explanations.
-    @TODO
-    If using this explainer, please cite `Grad-CAM: Visual Explanations from Deep Networks
+    If using this explainer, please cite `Improving neural network interpretability via rule extraction`
     https://doi.org/10.1007/978-3-030-01418-6
     """
 
     explanation_type = "global"
     alias = ["rulesextract"]
 
-    # todo: compute_avg_features(model, test_filtered_dataloader, idx_to_names, device)
     def __init__(
         self,
         model,
@@ -48,9 +42,8 @@ class RulesExtractImage(ExplainerBase):
         **kwargs,
     ):
         """
-        :param model: The model to explain, whose type can be `tf.keras.Model` or `torch.nn.Module`.
-        :param target_layer: The target layer for explanation, which can be
-            `tf.keras.layers.Layer` or `torch.nn.Module`.
+        :param model: The model to explain, whose type can be `torch.nn.Module`.
+        :param target_layer: The target layer for explanation, which can be `torch.nn.Module`.
         :param preprocess_function: The preprocessing function that converts the raw data
             into the inputs of ``model``.
         :param mode: The task type, e.g., `classification` or `regression`.
@@ -77,13 +70,8 @@ class RulesExtractImage(ExplainerBase):
         """
         Generates the explanations for the input instances.
 
-        :param X: A batch of input instances.
-        :param y: A batch of labels to explain. For regression, ``y`` is ignored.
-            For classification, the top predicted label of each input instance will be explained
-            when `y = None`.
-        :param kwargs: Additional parameters.
-        :return: The explanations for all the instances, e.g., pixel importance scores.
-        :rtype: PixelImportance
+        :return: The tuples explanations for all the instances, e.g., rules and their associated classes.
+        :rtype: RuleImportance
         """
         device = (
             torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -99,11 +87,7 @@ class RulesExtractImage(ExplainerBase):
             X_train, y_train, n_estimators=200, max_depth=2, random_state=1
         )
 
-
-
-        rules = RuleRanker(all_rules, X_train, y_train).rank_rules(
+        explanations = RuleRanker(all_rules, X_train, y_train).rank_rules(
             N=self.top_rules
         )
-        explanations = RuleImportance(explanations=rules)
-        print(explanations)
-        return explanations
+        return RuleImportance(explanations=explanations)
