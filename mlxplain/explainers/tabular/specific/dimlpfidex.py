@@ -16,6 +16,8 @@ from dimlpfidex.fidex import fidex
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.base import ExplainerBase
 
+from ....explanations.tabular.dimlpfidex import DimlpfidexExplanation
+
 
 def tabular_to_csv(data: Tabular, path: pl.Path) -> str:
     data.to_pd().to_csv(path, index=False, header=False)
@@ -185,7 +187,8 @@ class DimlpfidexExplainer(ExplainerBase):
 
         self.model._set_preprocess_function(self.preprocess_function)
 
-    def explain(self) -> dict:
+    def explain(self) -> DimlpfidexExplanation:
         self.model.train()
+        result = self.explainer.execute()
 
-        return self.explainer.execute()
+        return DimlpfidexExplanation(self.mode, result)
