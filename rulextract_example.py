@@ -78,7 +78,6 @@ image_data = OmniImage(
     data=imgs,
     batched=True,
 )
-# print(image_data)
 
 np.random.seed(1)
 # transformer = TabularTransform().fit(tabular_data)
@@ -117,7 +116,7 @@ print("Test data shape:     {}".format(test.shape))
 # explainer = RulesExtractImage(
 #     model=model,
 #     dataloader=train_filtered_dataloader,
-#     idx_to_names=idx_to_names,
+#     class_names=class_names,
 #     target_class="air hockey",
 #     top_rules=30,
 #     mode="classification",
@@ -134,7 +133,7 @@ print("Test data shape:     {}".format(test.shape))
 
 # Initialize a TabularExplainer
 explainers = VisionExplainer(
-    explainers=[ "rulesextract" ],  # The explainers to apply # "lime", "shap", "gradcam",
+    explainers=["rulesextract"],  # The explainers to apply # "lime", "shap", "gradcam",
     mode="classification",  # The task type
     model=model,  # The ML model to explain
     # todo: check image transformer
@@ -144,11 +143,11 @@ explainers = VisionExplainer(
     params={
         "rulesextract": {
             "dataloader": train_filtered_dataloader,
-            "idx_to_names": idx_to_names,
+            "class_names": class_names,
             "target_class": "air hockey",
             "top_rules": 30,
         },
-    }
+    },
 )
 
 # Generate explanations
