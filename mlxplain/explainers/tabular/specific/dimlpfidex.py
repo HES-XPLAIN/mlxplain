@@ -19,9 +19,8 @@ from omnixai.explainers.base import ExplainerBase
 from ....explanations.tabular.dimlpfidex import DimlpfidexExplanation
 
 
-def tabular_to_csv(data: Tabular, path: pl.Path) -> str:
+def tabular_to_csv(data: Tabular, path: pl.Path) -> None:
     data.to_pd().to_csv(path, index=False, header=False)
-    return path
 
 
 def csv_to_tabular(path: str) -> Tabular:
@@ -29,35 +28,41 @@ def csv_to_tabular(path: str) -> Tabular:
 
 
 class DimlpfidexModel(metaclass=ABCMeta):
+    """
+    Abstract class giving a template to follow when implementing a model that can be used by the DimlpfidexExplainer.
+    """
 
     def __init__(self) -> None:
         super.__init__()
 
     @abstractmethod
     def _set_preprocess_function(self, preprocess_function: Callable = None):
-        raise NotImplementedError
+        raise NotImplementedError("_set_preprocess_function() method not implemented.")
 
     @abstractmethod
     def _preprocess(self):
-        raise NotImplementedError
+        raise NotImplementedError("_preprocess() method not implemented.")
 
     @abstractmethod
     def train(self):
-        raise NotImplementedError
+        raise NotImplementedError("train() method not implemented.")
 
 
 class DimlpfidexAlgorithm(metaclass=ABCMeta):
+    """
+    Abstract class giving a template to follow when implementing an explaining algorithm that can be used by the DimlpfidexExplainer.
+    """
 
     def __init__(self) -> None:
         super.__init__()
 
     @abstractmethod
     def _postprocess(self) -> dict:
-        raise NotImplementedError
+        raise NotImplementedError("_postprocess() method not implemented.")
 
     @abstractmethod
     def execute(self) -> dict:
-        raise NotImplementedError
+        raise NotImplementedError("execute() method not implemented.")
 
 
 class DimlpBTModel(DimlpfidexModel):
