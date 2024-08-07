@@ -9,13 +9,10 @@ import pathlib as pl
 
 import pandas as pd
 from omnixai.data.tabular import Tabular
+from omnixai.explainers.tabular.auto import TabularExplainer
 from omnixai.visualization.dashboard import Dashboard
 
-from mlxplain.explainers.tabular.specific.dimlpfidex import (
-    DimlpBTModel,
-    DimlpfidexExplainer,
-    FidexAlgorithm,
-)
+from mlxplain.explainers.tabular.specific.dimlpfidex import DimlpBTModel, FidexAlgorithm
 
 if __name__ == "__main__":
     # do stuff with data
@@ -42,8 +39,16 @@ if __name__ == "__main__":
 
     model = DimlpBTModel(output_path, train_data, test_data, 3, 2)
     algorithm = FidexAlgorithm(model)
-    explainer = DimlpfidexExplainer(train_data, model, algorithm)
-    local_explanations = explainer.explain()
 
-    db = Dashboard(instances=test_data, local_explanations=local_explanations)
+    explainer = TabularExplainer(
+        explainers=["dimlpfidex"],
+        data=train_data,
+        mode="classification",
+        model=model,
+        params={"dimlpfidex": {"explainer": algorithm}},
+    )
+
+    explainations = explainer.explain(test_data, run_predict=False)
+
+    db = Dashboard(local_explanations=explainations)
     db.show()
