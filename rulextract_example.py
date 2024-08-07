@@ -34,7 +34,7 @@ checkpoint = torch.load(load_path, map_location=device)
 model.load_state_dict(checkpoint["model_state_dict"])
 
 # get loaders  using function define in scripts for this notebook
-train_loader, test_loader = get_dataloaders(batch_size=1)  # todo: check valid_loader
+train_loader, test_loader = get_dataloaders()  # todo: check valid_loader
 
 # get a dictionary that links class names to integers, making it easier for us as we proceed in the notebook
 with open("./data/idx_to_names.json", "r") as file:
