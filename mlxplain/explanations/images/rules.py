@@ -47,11 +47,34 @@ class RuleImportance(ExplanationBase):
 
 
 
-    def ipython_plot(self, **kwargs):
+    def ipython_plot(self, class_names=None, **kwargs):
         """
         Plots figures in IPython.
         """
-        raise NotImplementedError
+        import plotly
+        
+        # Determine the number of rules to include
+        num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
+        
+        # Prepare lists to store conditions and labels
+        conditions_list = []
+        labels_list = []
+
+        # Loop through the explanations and unpack the conditions and labels
+        for i in range(num_rules):
+            conditions, label = self.explanations[i]
+            conditions_list.append(conditions)
+            labels_list.append(label)
+
+        # Create a DataFrame from the conditions and labels lists
+        query_df = pd.DataFrame({"conditions": conditions_list, "label": labels_list})
+
+        # If class_names is provided, map the labels to class names
+        if class_names is not None:
+            query_df["label"] = query_df["label"].map(lambda x: class_names[x])
+
+        # Create and display the table using Plotly
+        return plotly.offline.iplot(ff.create_table(query_df))
     
 
     def plotly_plot(self, class_names=None, **kwargs):
@@ -64,20 +87,29 @@ class RuleImportance(ExplanationBase):
         :return: A plotly dash figure showing the counterfactual examples.
         """
 
-        # todo: display more than one rules (add params?)
-        # Assuming self.explanations is now a list of tuples as provided in the input
-        exp = self.explanations[0]
-        conditions, label = exp  # Unpack the tuple
+        # Determine the number of rules to include
+        num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
+        
+        # Prepare lists to store conditions and labels
+        conditions_list = []
+        labels_list = []
 
-        # Create a DataFrame for the conditions and label
-        query_df = pd.DataFrame({"conditions": [conditions], "label": [label]})
+        # Loop through the explanations and unpack the conditions and labels
+        for i in range(num_rules):
+            conditions, label = self.explanations[i]
+            conditions_list.append(conditions)
+            labels_list.append(label)
+
+        # Create a DataFrame from the conditions and labels lists
+        query_df = pd.DataFrame({"conditions": conditions_list, "label": labels_list})
 
         # If class_names is provided, map the labels to class names
-        if class_names is not None:
+        if (class_names is not None):
             query_df["label"] = query_df["label"].map(lambda x: class_names[x])
 
         # Create a DashFigure to display the DataFrame
         return DashFigure(self._plotly_table(query_df, None))
+
 
     @staticmethod
     def _plotly_table(query, context):

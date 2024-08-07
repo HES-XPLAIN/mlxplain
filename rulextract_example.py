@@ -4,6 +4,8 @@ import json
 import numpy as np
 import sklearn
 import torch
+
+from torchvision import models, transforms
 from omnixai.data.image import Image as OmniImage
 from omnixai.explainers.vision import VisionExplainer
 from omnixai.visualization.dashboard import Dashboard
@@ -78,11 +80,26 @@ print("Training data shape: {}".format(train.shape))
 print("Test data shape:     {}".format(test.shape))
 
 
+# The preprocessing function
+transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+preprocess = lambda ims: torch.stack([transform(im.to_pil()) for im in ims]).to(device)
+
+# The postprocessing function
+postprocess = lambda logits: torch.nn.functional.softmax(logits, dim=1)
+
+
 # Initialize a TabularExplainer
 explainers = VisionExplainer(
-    explainers=["rulesextract"],  # The explainers to apply # "lime", "shap", "gradcam",
+    explainers=["rulesextract", "lime"],  # The explainers to apply # "lime", "shap", "gradcam",
     mode="classification",  # The task type
     model=model,  # The ML model to explain
+    preprocess=preprocess,
+    postprocess=postprocess,
     # todo: check image transformer
     # preprocess=lambda z: transformer.transform(
     #     z
@@ -96,23 +113,16 @@ explainers = VisionExplainer(
         },
     },
 )
-
-# local_explanations = explainers.explain(X=test_instances)
+test_instances = test[:2]
+print(test_instances.shape)
+local_explanations = explainers.explain(X=test_instances)
 global_explanations = explainers.explain_global()
 
 # Launch a dashboard for visualization
 dashboard = Dashboard(
-    instances=None,  # The instances to explain
-    local_explanations=None,  # Set the generated local explanations
+    instances=test_instances,  # The instances to explain
+    local_explanations=local_explanations,  # Set the generated local explanations
     global_explanations=global_explanations,  # Set the generated global explanations
     class_names=class_names,  # Set class names
-    # params={
-    #     "rulesextract": {
-    #         "dataloader": train_filtered_dataloader,
-    #         "idx_to_names": idx_to_names,
-    #         "target_class": "air hockey",
-    #         "top_rules": 30,
-    #     },
-    # }
 )
 dashboard.show()  # Launch the dashboard
