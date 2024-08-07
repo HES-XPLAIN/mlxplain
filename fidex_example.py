@@ -37,7 +37,9 @@ if __name__ == "__main__":
         categorical_columns=["male", "female"],
     )
 
-    model = DimlpBTModel(output_path, train_data, test_data, 3, 2)
+    model = DimlpBTModel(
+        output_path, train_data, test_data, 3, 2, hidden_layers=[12, 2]
+    )
     algorithm = FidexAlgorithm(model)
 
     explainer = TabularExplainer(
