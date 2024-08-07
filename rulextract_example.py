@@ -1,27 +1,19 @@
 # global imports
 import json
-import os
-import sys
 
 import numpy as np
-import pandas as pd
 import sklearn
 import torch
-import torch.nn as nn
-import torchvision
 from omnixai.data.image import Image as OmniImage
 from omnixai.explainers.vision import VisionExplainer
 from omnixai.visualization.dashboard import Dashboard
-from requests.packages import target
-from rules_extraction.plot import plot_accuracy, plot_frontier
-from rules_extraction.rules import EnsembleRule, Rule, RuleRanker
-from rules_extraction.utils import *
-from sklearn.model_selection import train_test_split
-from torch.utils.data import DataLoader, Dataset, Subset
+from rules_extraction.utils import filter_dataset
+from torch.utils.data import DataLoader, Subset
 
-from mlxplain.explainers.vision.specific.rulesextract import RulesExtractImage
-from scripts.custom_dataset import CustomDataset
-from scripts.helpers import *
+from mlxplain.explainers.vision.specific.rulesextract import (  # noqa: F401
+    RulesExtractImage,
+)
+from scripts.helpers import get_dataloaders, load_images_to_ndarray
 from scripts.models import FineTunedVGG
 
 if torch.cuda.is_available():
@@ -42,7 +34,7 @@ checkpoint = torch.load(load_path, map_location=device)
 model.load_state_dict(checkpoint["model_state_dict"])
 
 # get loaders  using function define in scripts for this notebook
-train_loader, test_loader = get_dataloaders()  # todo: check valid_loader
+train_loader, test_loader = get_dataloaders(batch_size=1)  # todo: check valid_loader
 
 # get a dictionary that links class names to integers, making it easier for us as we proceed in the notebook
 with open("./data/idx_to_names.json", "r") as file:
@@ -70,10 +62,8 @@ train_filtered_dataloader = DataLoader(
     dataset=train_filtered_dataset, batch_size=train_loader.batch_size, shuffle=False
 )
 
-### data transformation (image)
-imgs = load_images_to_ndarray(
-    "data"
-)  # todo: use 'data', this is only a small subset for dev
+# data transformation (image)
+imgs = load_images_to_ndarray("data")
 image_data = OmniImage(
     data=imgs,
     batched=True,
@@ -89,29 +79,6 @@ train, test, labels_train, labels_test = sklearn.model_selection.train_test_spli
 )
 print("Training data shape: {}".format(train.shape))
 print("Test data shape:     {}".format(test.shape))
-
-### data transformation (tabular)
-
-# data = np.genfromtxt(os.path.join("./data", "adult.data"), delimiter=", ", dtype=str)
-# tabular_data = Tabular(
-#     data,
-#     feature_columns=feature_names,
-#     categorical_columns=[feature_names[i] for i in [1, 3, 5, 6, 7, 8, 9, 13]],
-#     target_column="label",
-# )
-# print(tabular_data)
-
-# np.random.seed(1)
-# transformer = TabularTransform().fit(tabular_data)
-# class_names = transformer.class_names
-# x = transformer.transform(tabular_data)
-# train, test, labels_train, labels_test = sklearn.model_selection.train_test_split(
-#     x[:, :-1], x[:, -1], train_size=0.80
-# )
-# print("Training data shape: {}".format(train.shape))
-# print("Test data shape:     {}".format(test.shape))
-## data transformation end
-
 
 # explainer = RulesExtractImage(
 #     model=model,
