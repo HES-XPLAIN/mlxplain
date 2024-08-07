@@ -44,8 +44,8 @@ class DimlpfidexModel(metaclass=ABCMeta):
         raise NotImplementedError("_preprocess() method not implemented.")
 
     @abstractmethod
-    def train(self):
-        raise NotImplementedError("train() method not implemented.")
+    def __call__(self):
+        raise NotImplementedError("__call__() method not implemented.")
 
 
 class DimlpfidexAlgorithm(metaclass=ABCMeta):
@@ -112,7 +112,8 @@ class DimlpBTModel(DimlpfidexModel):
             self.testing_data, self.output_path.joinpath(self.test_data_filename)
         )
 
-    def train(self) -> int:
+    def __call__(self, data) -> int:
+        _ = data  # data is ignored because all needed data is already given at model initialization
         self._preprocess()
 
         status = dimlpBT(
@@ -168,17 +169,18 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         return self._postprocess()
 
 
+# !all optional parameters must be specified inside KWARGS:
 class DimlpfidexExplainer(ExplainerBase):
+    # - An explainer algorithm must be instanciated (see DimlpfidexAlgorithms based classes) and specified
     # - preprocess_function must have train_data as only parameter
     explanation_type = "local"
-    alias = ["fidex"]
+    alias = ["dimlpfidex"]
     mode = "classification"
 
     def __init__(
         self,
         training_data: Tabular,
         model: DimlpfidexModel,
-        explainer: DimlpfidexAlgorithm,
         preprocess_function: Callable = None,
         **kwargs,
     ):
@@ -186,15 +188,24 @@ class DimlpfidexExplainer(ExplainerBase):
         self.model = model
         self.training_data = training_data
         self.preprocess_function = preprocess_function
-        self.explainer = explainer
+
+        if "explainer" not in kwargs:
+            raise ValueError(
+                "Dimlpfidex explainer error: you must add an 'explainer' algorithm inside the kwargs"
+            )
+        else:
+            self.explainer = kwargs["explainer"]
 
         if not isinstance(self.model, DimlpfidexModel):
             raise ValueError("Model must an instance of DimlpfidexModel based classes.")
 
         self.model._set_preprocess_function(self.preprocess_function)
 
-    def explain(self) -> DimlpfidexExplanation:
-        self.model.train()
+    def explain(self, X) -> DimlpfidexExplanation:
+        _ = X  # X is ignored because all needed data is already given at model initialization
+        status = self.model(None)  # ? Not sure if this is the way to do it
+        if status != 0:
+            print("Warning: something went wrong with the model execution...")
         result = self.explainer.execute()
 
         return DimlpfidexExplanation(self.mode, result)
