@@ -36,15 +36,54 @@ class RuleImportance(ExplanationBase):
         """
         return self.explanations if len(self.explanations) > 1 else self.explanations[0]
 
-
     @staticmethod
-    def _plot(plt, index, query, cfs, context=None, font_size=10, bar_width=0.4):
-        raise NotImplementedError
+    def _plot(data, font_size=10):
 
+        import matplotlib.pyplot as plt
+        # Create a figure and an axis
+        fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the size as needed
+        
+        # Create a table from the data
+        table = ax.table(cellText=data.values,
+                         colLabels=data.columns,
+                         cellLoc='center',
+                         loc='center',
+                         fontsize=font_size)
+        
+        # Hide axes
+        ax.axis('off')
 
-    def plot(self, index=None, class_names=None, font_size=10, **kwargs):
-        raise NotImplementedError
+        # show the plot
+        plt.show()
 
+        return fig, ax
+
+    def plot(self, class_names=None, font_size=10, **kwargs):
+        # Determine the number of rules to include
+        num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
+        
+        # Prepare lists to store rules and labels
+        rules_list = []
+        labels_list = []
+
+        # Extract rules and labels
+        for i in range(num_rules):
+            rules, label = self.explanations[i]
+            rules_list.append(rules)
+            labels_list.append(label)
+
+        # Create a DataFrame from the rules and labels
+        data_df = pd.DataFrame({"rules": rules_list, "labels": labels_list})
+
+        # If class_names is provided, map the labels to class names
+        if class_names is not None:
+            data_df["labels"] = data_df["labels"].map(lambda x: class_names[x])
+
+        # Call _plot to generate the table and get the figure and axes
+        fig, ax = self._plot(data_df, font_size, **kwargs)
+
+        # Return the figure and axes
+        return fig, ax
 
 
     def ipython_plot(self, class_names=None, **kwargs):
@@ -52,22 +91,23 @@ class RuleImportance(ExplanationBase):
         Plots figures in IPython.
         """
         import plotly
-        
+        import plotly.figure_factory as ff
+
         # Determine the number of rules to include
         num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
         
-        # Prepare lists to store conditions and labels
-        conditions_list = []
+        # Prepare lists to store rules and labels
+        rules_list = []
         labels_list = []
 
-        # Loop through the explanations and unpack the conditions and labels
+        # Loop through the explanations and unpack the rules and labels
         for i in range(num_rules):
-            conditions, label = self.explanations[i]
-            conditions_list.append(conditions)
+            rules, label = self.explanations[i]
+            rules_list.append(rules)
             labels_list.append(label)
 
-        # Create a DataFrame from the conditions and labels lists
-        query_df = pd.DataFrame({"conditions": conditions_list, "label": labels_list})
+        # Create a DataFrame from the rules and labels lists
+        query_df = pd.DataFrame({"rules": rules_list, "label": labels_list})
 
         # If class_names is provided, map the labels to class names
         if class_names is not None:
@@ -90,18 +130,18 @@ class RuleImportance(ExplanationBase):
         # Determine the number of rules to include
         num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
         
-        # Prepare lists to store conditions and labels
-        conditions_list = []
+        # Prepare lists to store rules and labels
+        rules_list = []
         labels_list = []
 
-        # Loop through the explanations and unpack the conditions and labels
+        # Loop through the explanations and unpack the rules and labels
         for i in range(num_rules):
-            conditions, label = self.explanations[i]
-            conditions_list.append(conditions)
+            rules, label = self.explanations[i]
+            rules_list.append(rules)
             labels_list.append(label)
 
-        # Create a DataFrame from the conditions and labels lists
-        query_df = pd.DataFrame({"conditions": conditions_list, "label": labels_list})
+        # Create a DataFrame from the rules and labels lists
+        query_df = pd.DataFrame({"rules": rules_list, "label": labels_list})
 
         # If class_names is provided, map the labels to class names
         if (class_names is not None):
