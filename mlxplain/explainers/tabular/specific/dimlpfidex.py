@@ -71,14 +71,20 @@ class DimlpBTModel(DimlpfidexModel):
     # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data must contain attributes and classes altogether
 
+    # attributes_file? (pas besoin de mettre les stats car on a un nom par défaut)
+    # Créer un mode verbose général pour les console file?
+    # hidden layers (formater les listes)
+
     def __init__(
         self,
         output_path: pl.Path,
         training_data: Tabular,
         testing_data: Tabular,
-        nb_attributes,
-        nb_classes,
+        nb_attributes: int,
+        nb_classes: int,
         nb_dimlp_nets=25,
+        first_hidden_layer=None,
+        hidden_layers=None,
     ):
         self.output_path = output_path
         self.training_data = training_data
@@ -88,6 +94,10 @@ class DimlpBTModel(DimlpfidexModel):
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
         self.nb_dimlp_nets = nb_dimlp_nets
+        self.first_hidden_layer = first_hidden_layer
+        if self.first_hidden_layer is None:
+            self.first_hidden_layer = self.nb_attributes
+        self.hidden_layers = hidden_layers
         self.preprocess_function = None
 
         # values to be known for further output manipulation
@@ -116,16 +126,20 @@ class DimlpBTModel(DimlpfidexModel):
         _ = data  # data is ignored because all needed data is already given at model initialization
         self._preprocess()
 
-        status = dimlpBT(
-            f"""
-                --root_folder {self.output_path}
-                --train_data_file {self.train_data_filename}
-                --test_data_file {self.test_data_filename}
-                --nb_attributes {self.nb_attributes}
-                --nb_classes {self.nb_classes}
-                --nb_dimlp_nets {self.nb_dimlp_nets}
-                """
-        )
+        command = f"""
+                    --root_folder {self.output_path}
+                    --train_data_file {self.train_data_filename}
+                    --test_data_file {self.test_data_filename}
+                    --nb_attributes {self.nb_attributes}
+                    --nb_classes {self.nb_classes}
+                    --nb_dimlp_nets {self.nb_dimlp_nets}
+                    """
+        if self.first_hidden_layer is not None:
+            command += f" --first_hidden_layer {self.first_hidden_layer}"
+        if self.hidden_layers is not None:
+            command += f" --hidden_layers {self.hidden_layers}"
+        print(command)
+        status = dimlpBT(command)
 
         return status
 
@@ -205,7 +219,7 @@ class DimlpfidexExplainer(ExplainerBase):
         _ = X  # X is ignored because all needed data is already given at model initialization
         status = self.model(None)  # ? Not sure if this is the way to do it
         if status != 0:
-            print("Warning: something went wrong with the model execution...")
+            raise ValueError("Something went wrong with the model execution...")
         result = self.explainer.execute()
 
         return DimlpfidexExplanation(self.mode, result)
