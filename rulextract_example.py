@@ -29,7 +29,7 @@ model = model.to(device)
 model.eval()
 
 # Specify the map_location argument when loading the model
-load_path = "models_weight/VGGSportsImageClassification.pth"
+load_path = "models_weight/VGGFineTuned.pth"
 checkpoint = torch.load(load_path, map_location=device)
 model.load_state_dict(checkpoint["model_state_dict"])
 
@@ -70,9 +70,6 @@ image_data = OmniImage(
 )
 
 np.random.seed(1)
-# transformer = TabularTransform().fit(tabular_data)
-# class_names = transformer.class_names
-# x = transformer.transform(tabular_data)
 x = image_data
 train, test, labels_train, labels_test = sklearn.model_selection.train_test_split(
     x[:, :-1], x[:, -1], train_size=0.80
@@ -80,23 +77,6 @@ train, test, labels_train, labels_test = sklearn.model_selection.train_test_spli
 print("Training data shape: {}".format(train.shape))
 print("Test data shape:     {}".format(test.shape))
 
-# explainer = RulesExtractImage(
-#     model=model,
-#     dataloader=train_filtered_dataloader,
-#     class_names=class_names,
-#     target_class="air hockey",
-#     top_rules=30,
-#     mode="classification",
-# )
-
-# Apply an inverse transform, i.e., converting the numpy array back to `Tabular`
-# test_instances = transformer.invert(test)
-# test_x = test_instances[1653:1655]
-
-# todo: is this necessary for images?
-# Convert the transformed data back to Tabular instances
-# train_data = transformer.invert(train)
-# test_data = transformer.invert(test)
 
 # Initialize a TabularExplainer
 explainers = VisionExplainer(
@@ -117,11 +97,7 @@ explainers = VisionExplainer(
     },
 )
 
-# Generate explanations
-# test_instances = test_data[:5] # todo: is this necessary for images (see above)?
-test_instances = test[:5]
 # local_explanations = explainers.explain(X=test_instances)
-# global_explanations = explainer.explain()
 global_explanations = explainers.explain_global()
 
 # Launch a dashboard for visualization
