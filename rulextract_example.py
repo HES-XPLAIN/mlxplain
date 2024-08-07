@@ -87,9 +87,9 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
-preprocess = lambda ims: torch.stack([transform(im.to_pil()) for im in ims]).to(device)
 
-# The postprocessing function
+# Pre and pro: probably only useful for local explanation
+preprocess = lambda ims: torch.stack([transform(im.to_pil()) for im in ims]).to(device)
 postprocess = lambda logits: torch.nn.functional.softmax(logits, dim=1)
 
 
@@ -100,10 +100,6 @@ explainers = VisionExplainer(
     model=model,  # The ML model to explain
     preprocess=preprocess,
     postprocess=postprocess,
-    # todo: check image transformer
-    # preprocess=lambda z: transformer.transform(
-    #     z
-    # ),  # Converts raw features into the model inputs
     params={
         "rulesextract": {
             "dataloader": train_filtered_dataloader,
