@@ -12,8 +12,8 @@ from omnixai.data.tabular import Tabular
 from omnixai.explainers.tabular.auto import TabularExplainer
 from omnixai.visualization.dashboard import Dashboard
 
-from mlxplain.explainers.tabular.specific.dimlpfidex import (  # DimlpBTModel,; GradBoostModel,; RandomForestModel,; SVMModel,
-    FidexAlgorithm,
+from mlxplain.explainers.tabular.specific.dimlpfidex import (  # DimlpBTModel,; GradBoostModel,; RandomForestModel,; SVMModel,; FidexAlgorithm,
+    FidexGloRulesAlgorithm,
     MLPModel,
 )
 
@@ -161,7 +161,49 @@ if __name__ == "__main__":
         max_fun=2,
     )
 
-    algorithm = FidexAlgorithm(model, seed=1)
+    # algorithm = FidexAlgorithm(
+    #     model,
+    #     seed=1,
+    #     attributes_file = "attributes.txt",
+    #     max_iterations = 8,
+    #     min_covering = 3,
+    #     covering_strategy = False,
+    #     max_failed_attempts = 35,
+    #     min_fidelity = 0.4,
+    #     lowest_min_fidelity = 0.4,
+    #     dropout_dim = 0.5,
+    #     dropout_hyp = 0.5,
+    #     decision_threshold = 0.2,
+    #     positive_class_index = 0,
+    #     nb_quant_levels = 45,
+    #     # normalization_file = "normalization.txt",
+    #     mus = [1,3],
+    #     sigmas = [2,3],
+    #     normalization_indices = [0,2]
+    #     )
+
+    algorithm = FidexGloRulesAlgorithm(
+        model,
+        heuristic=1,
+        seed=1,
+        attributes_file="attributes.txt",
+        max_iterations=8,
+        min_covering=3,
+        covering_strategy=False,
+        max_failed_attempts=35,
+        min_fidelity=0.4,
+        lowest_min_fidelity=0.4,
+        dropout_dim=0.5,
+        dropout_hyp=0.5,
+        decision_threshold=0.2,
+        positive_class_index=0,
+        nb_quant_levels=45,
+        # normalization_file = "normalization.txt",
+        mus=[1, 3],
+        sigmas=[2, 3],
+        normalization_indices=[0, 2],
+        nb_threads=4,
+    )
 
     explainer = TabularExplainer(
         explainers=["dimlpfidex"],
@@ -171,7 +213,7 @@ if __name__ == "__main__":
         params={"dimlpfidex": {"explainer": algorithm, "verbose": True}},
     )
 
-    explainations = explainer.explain(test_data, run_predict=False)
+    explanations = explainer.explain(test_data, run_predict=False)
 
-    db = Dashboard(local_explanations=explainations)
+    db = Dashboard(local_explanations=explanations)
     db.show()
