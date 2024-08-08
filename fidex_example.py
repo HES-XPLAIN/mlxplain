@@ -44,16 +44,15 @@ if __name__ == "__main__":
         3,
         2,
         seed=1,
-        normalization_file="normalization.txt",
     )
-    algorithm = FidexAlgorithm(model)
+    algorithm = FidexAlgorithm(model, seed=1)
 
     explainer = TabularExplainer(
         explainers=["dimlpfidex"],
         data=train_data,
         mode="classification",
         model=model,
-        params={"dimlpfidex": {"explainer": algorithm, "verbose": False}},
+        params={"dimlpfidex": {"explainer": algorithm, "verbose": True}},
     )
 
     explainations = explainer.explain(test_data, run_predict=False)
