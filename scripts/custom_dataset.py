@@ -1,5 +1,6 @@
-from torch.utils.data import Dataset
 from PIL import Image
+from torch.utils.data import Dataset
+
 
 class CustomDataset(Dataset):
     def __init__(self, df, transform):
@@ -37,7 +38,7 @@ class CustomDataset(Dataset):
         image_path = self.image_paths[index]
         label = self.labels[index]
 
-        image = Image.open(image_path).convert('RGB')
+        image = Image.open(image_path).convert("RGB")
         image = self.transform(image)
 
         return image, label, image_path

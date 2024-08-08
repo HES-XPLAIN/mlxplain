@@ -8,7 +8,6 @@
 Rules Extraction explanations for vision tasks.
 """
 
-import numpy as np
 import pandas as pd
 from omnixai.explanations.base import DashFigure, ExplanationBase
 
@@ -40,18 +39,21 @@ class RuleImportance(ExplanationBase):
     def _plot(data, font_size=10):
 
         import matplotlib.pyplot as plt
+
         # Create a figure and an axis
         fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the size as needed
-        
+
         # Create a table from the data
-        table = ax.table(cellText=data.values,
-                         colLabels=data.columns,
-                         cellLoc='center',
-                         loc='center',
-                         fontsize=font_size)
-        
+        ax.table(
+            cellText=data.values,
+            colLabels=data.columns,
+            cellLoc="center",
+            loc="center",
+            fontsize=font_size,
+        )
+
         # Hide axes
-        ax.axis('off')
+        ax.axis("off")
 
         # show the plot
         plt.show()
@@ -61,7 +63,7 @@ class RuleImportance(ExplanationBase):
     def plot(self, class_names=None, font_size=10, **kwargs):
         # Determine the number of rules to include
         num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
-        
+
         # Prepare lists to store rules and labels
         rules_list = []
         labels_list = []
@@ -85,7 +87,6 @@ class RuleImportance(ExplanationBase):
         # Return the figure and axes
         return fig, ax
 
-
     def ipython_plot(self, class_names=None, **kwargs):
         """
         Plots figures in IPython.
@@ -95,7 +96,7 @@ class RuleImportance(ExplanationBase):
 
         # Determine the number of rules to include
         num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
-        
+
         # Prepare lists to store rules and labels
         rules_list = []
         labels_list = []
@@ -115,7 +116,6 @@ class RuleImportance(ExplanationBase):
 
         # Create and display the table using Plotly
         return plotly.offline.iplot(ff.create_table(query_df))
-    
 
     def plotly_plot(self, class_names=None, **kwargs):
         """
@@ -129,7 +129,7 @@ class RuleImportance(ExplanationBase):
 
         # Determine the number of rules to include
         num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
-        
+
         # Prepare lists to store rules and labels
         rules_list = []
         labels_list = []
@@ -144,17 +144,16 @@ class RuleImportance(ExplanationBase):
         query_df = pd.DataFrame({"rules": rules_list, "label": labels_list})
 
         # If class_names is provided, map the labels to class names
-        if (class_names is not None):
+        if class_names is not None:
             query_df["label"] = query_df["label"].map(lambda x: class_names[x])
 
         # Create a DashFigure to display the DataFrame
         return DashFigure(self._plotly_table(query_df, None))
 
-
     @staticmethod
     def _plotly_table(query, context):
         """
-        Plots a table showing the generated rules. 
+        Plots a table showing the generated rules.
         """
         from dash import dash_table
 
