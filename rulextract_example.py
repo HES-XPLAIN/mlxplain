@@ -4,13 +4,12 @@ import json
 import numpy as np
 import sklearn
 import torch
-
-from torchvision import models, transforms
 from omnixai.data.image import Image as OmniImage
 from omnixai.explainers.vision import VisionExplainer
 from omnixai.visualization.dashboard import Dashboard
 from rules_extraction.utils import filter_dataset
 from torch.utils.data import DataLoader, Subset
+from torchvision import transforms
 
 from mlxplain.explainers.vision.specific.rulesextract import (  # noqa: F401
     RulesExtractImage,
@@ -81,21 +80,28 @@ print("Test data shape:     {}".format(test.shape))
 
 
 # The preprocessing function
-transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
+transform = transforms.Compose(
+    [
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ]
+)
 
 # Pre and pro: probably only useful for local explanation
-preprocess = lambda ims: torch.stack([transform(im.to_pil()) for im in ims]).to(device)
-postprocess = lambda logits: torch.nn.functional.softmax(logits, dim=1)
+preprocess = lambda ims: torch.stack(  # noqa: E731
+    [transform(im.to_pil()) for im in ims]
+).to(device)
+postprocess = lambda logits: torch.nn.functional.softmax(logits, dim=1)  # noqa: E731
 
 
 # Initialize a TabularExplainer
 explainers = VisionExplainer(
-    explainers=["rulesextract", "lime"],  # The explainers to apply # "lime", "shap", "gradcam",
+    explainers=[
+        "rulesextract",
+        "lime",
+    ],  # The explainers to apply # "lime", "shap", "gradcam",
     mode="classification",  # The task type
     model=model,  # The ML model to explain
     preprocess=preprocess,
