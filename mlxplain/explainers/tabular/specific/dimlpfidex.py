@@ -181,6 +181,8 @@ class DimlpBTModel(DimlpfidexModel):
                     """
         if self.attributes_file is not None:
             command += f" --attributes_file {self.attributes_file}"
+        if not verbose:
+            command += " --console_file dimlpBTResult.txt"
         if self.first_hidden_layer is not None:
             command += f" --first_hidden_layer {self.first_hidden_layer}"
         if self.hidden_layers is not None:
@@ -201,11 +203,8 @@ class DimlpBTModel(DimlpfidexModel):
             command += (
                 f" --normalization_indices {sanatizeList(self.normalization_indices)}"
             )
-        if not verbose:
-            command += " --console_file dimlpBTResult.txt"
 
         status = dimlpBT(command)
-
         return status
 
 
@@ -217,11 +216,51 @@ class RFModel(DimlpfidexModel):
 class FidexAlgorithm(DimlpfidexAlgorithm):
     # - test_data must contain attributes and classes altogether
 
-    def __init__(self, model: DimlpfidexModel):
+    def __init__(
+        self,
+        model: DimlpfidexModel,
+        attributes_file: str = None,
+        max_iterations: int = 10,
+        min_covering: int = 2,
+        covering_strategy: bool = True,
+        max_failed_attempts: int = 30,
+        min_fidelity: float = 1.0,
+        lowest_min_fidelity: float = 0.75,
+        dropout_dim: float = 0.0,
+        dropout_hyp: float = 0.0,
+        decision_threshold: float = None,
+        positive_class_index: int = None,
+        nb_quant_levels: int = 50,
+        normalization_file: str = None,
+        mus: list[float] = None,
+        sigmas: list[float] = None,
+        normalization_indices: list[int] = None,
+        seed: int = 0,
+    ):
         self.model = model
         self.nb_attributes = model.nb_attributes
         self.nb_classes = model.nb_classes
         self.rules_outfile = "fidex_output_rules.json"
+        self.attributes_file = attributes_file
+        self.stats_file = "statsFidex.txt"
+        self.max_iterations = max_iterations
+        self.min_covering = min_covering
+        self.covering_strategy = covering_strategy
+        self.max_failed_attempts = max_failed_attempts
+        self.min_fidelity = min_fidelity
+        self.lowest_min_fidelity = lowest_min_fidelity
+        self.dropout_dim = dropout_dim
+        self.dropout_hyp = dropout_hyp
+        self.decision_threshold = decision_threshold
+        self.positive_class_index = positive_class_index
+        self.nb_quant_levels = nb_quant_levels
+        self.normalization_file = normalization_file
+        self.mus = mus
+        self.sigmas = sigmas
+        self.normalization_indices = normalization_indices
+        if self.normalization_indices is None:
+            self.normalization_indices = list(range(self.nb_attributes))
+        self.seed = seed
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.output_path.joinpath(self.rules_outfile)
@@ -250,10 +289,37 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
                 --rules_outfile {self.rules_outfile}
                 --nb_attributes {self.nb_attributes}
                 --nb_classes {self.nb_classes}
+                --stats_file {self.stats_file}
+                --max_iterations {self.max_iterations}
+                --min_covering {self.min_covering}
+                --covering_strategy {self.covering_strategy}
+                --max_failed_attempts {self.max_failed_attempts}
+                --min_fidelity {self.min_fidelity}
+                --lowest_min_fidelity {self.lowest_min_fidelity}
+                --dropout_dim {self.dropout_dim}
+                --dropout_hyp {self.dropout_hyp}
+                --nb_quant_levels {self.nb_quant_levels}
+                --seed {self.seed}
                 """
 
+        if self.attributes_file is not None:
+            command += f" --attributes_file {self.attributes_file}"
         if not verbose:
             command += " --console_file fidexResult.txt"
+        if self.decision_threshold is not None:
+            command += f" --decision_threshold {self.decision_threshold}"
+        if self.positive_class_index is not None:
+            command += f" --positive_class_index {self.positive_class_index}"
+        if self.normalization_file is not None:
+            command += f" --normalization_file {self.normalization_file}"
+        if self.mus is not None:
+            command += f" --mus {sanatizeList(self.mus)}"
+        if self.sigmas is not None:
+            command += f" --sigmas {sanatizeList(self.sigmas)}"
+        if self.normalization_indices is not None and self.normalization_file is None:
+            command += (
+                f" --normalization_indices {sanatizeList(self.normalization_indices)}"
+            )
 
         status = fidex(command)
         if status != 0:
