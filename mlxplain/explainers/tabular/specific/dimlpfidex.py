@@ -15,6 +15,10 @@ from dimlpfidex.dimlp import dimlpBT
 from dimlpfidex.fidex import fidex
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.base import ExplainerBase
+from trainings.gradBoostTrn import gradBoostTrn
+from trainings.mlpTrn import mlpTrn
+from trainings.randForestsTrn import randForestsTrn
+from trainings.svmTrn import svmTrn
 
 from ....explanations.tabular.dimlpfidex import DimlpfidexExplanation
 
@@ -73,9 +77,10 @@ class DimlpBTModel(DimlpfidexModel):
     # to put in the doc:
     # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
     # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
-    # - train_data must contain attributes and classes altogether
+    # - train_data and test_data must contain attributes and classes altogether
 
-    # Déplacer output_path comme verbose?
+    # TODO
+    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
     # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
 
     def __init__(
@@ -159,7 +164,7 @@ class DimlpBTModel(DimlpfidexModel):
             self.testing_data, self.output_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, verbose) -> int:
+    def __call__(self, verbose_console) -> int:
         self._preprocess()
 
         command = f"""
@@ -181,7 +186,7 @@ class DimlpBTModel(DimlpfidexModel):
                     """
         if self.attributes_file is not None:
             command += f" --attributes_file {self.attributes_file}"
-        if not verbose:
+        if not verbose_console:
             command += " --console_file dimlpBTResult.txt"
         if self.first_hidden_layer is not None:
             command += f" --first_hidden_layer {self.first_hidden_layer}"
@@ -208,9 +213,535 @@ class DimlpBTModel(DimlpfidexModel):
         return status
 
 
-class RFModel(DimlpfidexModel):
-    def __init__(self):
-        pass
+class GradBoostModel(DimlpfidexModel):
+    # to put in the doc:
+    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
+    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - train_data and test_data must contain attributes and classes altogether
+
+    # TODO
+    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
+    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
+    # Problèmes:
+    # Si on met un n_iter_no_change, on a l'erreur : The test_size = 1 should be greater or equal to the number of classes = 2
+    # Si on met tous les params, on a une règle FileContentError: Error : in file /tmp/explainer/GB_rules.rls, the rule Rule 1:  -> value [-1.] is not in a good format. Maybe an attribute or class id is wrong or you forgot to add the attribute file.
+    # Pourtant ça ne devrait pas planter...
+    def __init__(
+        self,
+        output_path: pl.Path,
+        training_data: Tabular,
+        testing_data: Tabular,
+        nb_attributes: int,
+        nb_classes: int,
+        n_estimators: int = 100,
+        loss: str = "log_loss",
+        learning_rate: float = 0.1,
+        subsample: float = 1.0,
+        criterion: str = "friedman_mse",
+        max_depth=3,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf: float = 0.0,
+        max_features="sqrt",
+        max_leaf_nodes: int = None,
+        min_impurity_decrease: float = 0.0,
+        init: str = None,
+        seed: int = None,
+        verbose: int = 0,
+        warm_start: bool = False,
+        validation_fraction: float = 0.1,
+        n_iter_no_change: int = None,
+        tol: float = 0.0001,
+        ccp_alpha: float = 0.0,
+    ):
+        self.output_path = output_path
+        self.training_data = training_data
+        self.testing_data = testing_data
+        self.train_data_filename = "train_data.txt"
+        self.test_data_filename = "test_data.txt"
+        self.nb_attributes = nb_attributes
+        self.nb_classes = nb_classes
+        self.seed = seed
+        self.n_estimators = n_estimators
+        self.loss = loss
+        self.learning_rate = learning_rate
+        self.subsample = subsample
+        self.criterion = criterion
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
+        self.max_features = max_features
+        self.max_leaf_nodes = max_leaf_nodes
+        self.min_impurity_decrease = min_impurity_decrease
+        self.init = init
+        self.seed = seed
+        self.verbose = verbose
+        self.warm_start = warm_start
+        self.validation_fraction = validation_fraction
+        self.n_iter_no_change = n_iter_no_change
+        self.tol = tol
+        self.ccp_alpha = ccp_alpha
+        self.preprocess_function = None
+
+        # values to be known for further output manipulation
+        self._outputs = {
+            "train_pred_outfile": "predTrain.out",
+            "test_pred_outfile": "predTest.out",
+            "rules_outfile": "GB_rules.rls",
+        }
+
+    def _set_preprocess_function(self, preprocess_function: Callable):
+        self.preprocess_function = preprocess_function
+
+    def _preprocess(self):
+        if self.preprocess_function is not None:
+            self.preprocess_function(self.training_data)
+            self.preprocess_function(self.testing_data)
+
+        tabular_to_csv(
+            self.training_data, self.output_path.joinpath(self.train_data_filename)
+        )
+        tabular_to_csv(
+            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+        )
+
+    def __call__(self, verbose_console) -> int:
+        self._preprocess()
+
+        command = f"""
+                    --root_folder {self.output_path}
+                    --train_data_file {self.train_data_filename}
+                    --test_data_file {self.test_data_filename}
+                    --nb_attributes {self.nb_attributes}
+                    --nb_classes {self.nb_classes}
+                    --n_estimators {self.n_estimators}
+                    --loss {self.loss}
+                    --learning_rate {self.learning_rate}
+                    --subsample {self.subsample}
+                    --criterion {self.criterion}
+                    --max_depth {self.max_depth}
+                    --min_samples_leaf {self.min_samples_leaf}
+                    --min_samples_split {self.min_samples_split}
+                    --min_weight_fraction_leaf {self.min_weight_fraction_leaf}
+                    --max_features {self.max_features}
+                    --min_impurity_decrease {self.min_impurity_decrease}
+                    --verbose {self.verbose}
+                    --warm_start {self.warm_start}
+                    --validation_fraction {self.validation_fraction}
+                    --tol {self.tol}
+                    --ccp_alpha {self.ccp_alpha}
+                    """
+        if not verbose_console:
+            command += " --console_file GBResult.txt"
+        if self.max_leaf_nodes is not None:
+            command += f" --max_leaf_nodes {self.max_leaf_nodes}"
+        if self.init is not None:
+            command += f" --init {self.init}"
+        if self.seed is not None:
+            command += f" --seed {self.seed}"
+        if self.n_iter_no_change is not None:
+            command += f" --n_iter_no_change {sanatizeList(self.n_iter_no_change)}"
+
+        status = gradBoostTrn(command)
+        return status
+
+
+class RandomForestModel(DimlpfidexModel):
+    # to put in the doc:
+    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
+    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - train_data and test_data must contain attributes and classes altogether
+
+    # TODO
+    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
+    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
+    def __init__(
+        self,
+        output_path: pl.Path,
+        training_data: Tabular,
+        testing_data: Tabular,
+        nb_attributes: int,
+        nb_classes: int,
+        n_estimators: int = 100,
+        criterion: str = "gini",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf: float = 0.0,
+        max_features="sqrt",
+        max_leaf_nodes: int = None,
+        min_impurity_decrease: float = 0.0,
+        bootstrap: bool = True,
+        oob_score: bool = False,
+        n_jobs: int = 1,
+        seed: int = None,
+        verbose: int = 0,
+        warm_start: bool = False,
+        class_weight=None,
+        ccp_alpha: float = 0.0,
+        max_samples=None,
+    ):
+        self.output_path = output_path
+        self.training_data = training_data
+        self.testing_data = testing_data
+        self.train_data_filename = "train_data.txt"
+        self.test_data_filename = "test_data.txt"
+        self.nb_attributes = nb_attributes
+        self.nb_classes = nb_classes
+        self.seed = seed
+        self.n_estimators = n_estimators
+        self.criterion = criterion
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
+        self.max_features = max_features
+        self.max_leaf_nodes = max_leaf_nodes
+        self.min_impurity_decrease = min_impurity_decrease
+        self.bootstrap = bootstrap
+        self.oob_score = oob_score
+        self.n_jobs = n_jobs
+        self.seed = seed
+        self.verbose = verbose
+        self.warm_start = warm_start
+        self.class_weight = class_weight
+        self.ccp_alpha = ccp_alpha
+        self.max_samples = max_samples
+        self.preprocess_function = None
+
+        # values to be known for further output manipulation
+        self._outputs = {
+            "train_pred_outfile": "predTrain.out",
+            "test_pred_outfile": "predTest.out",
+            "rules_outfile": "RF_rules.rls",
+        }
+
+    def _set_preprocess_function(self, preprocess_function: Callable):
+        self.preprocess_function = preprocess_function
+
+    def _preprocess(self):
+        if self.preprocess_function is not None:
+            self.preprocess_function(self.training_data)
+            self.preprocess_function(self.testing_data)
+
+        tabular_to_csv(
+            self.training_data, self.output_path.joinpath(self.train_data_filename)
+        )
+        tabular_to_csv(
+            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+        )
+
+    def __call__(self, verbose_console) -> int:
+        self._preprocess()
+
+        command = f"""
+                    --root_folder {self.output_path}
+                    --train_data_file {self.train_data_filename}
+                    --test_data_file {self.test_data_filename}
+                    --nb_attributes {self.nb_attributes}
+                    --nb_classes {self.nb_classes}
+                    --n_estimators {self.n_estimators}
+                    --criterion {self.criterion}
+                    --min_samples_leaf {self.min_samples_leaf}
+                    --min_samples_split {self.min_samples_split}
+                    --min_weight_fraction_leaf {self.min_weight_fraction_leaf}
+                    --max_features {self.max_features}
+                    --min_impurity_decrease {self.min_impurity_decrease}
+                    --bootstrap {self.bootstrap}
+                    --oob_score {self.oob_score}
+                    --n_jobs {self.n_jobs}
+                    --verbose {self.verbose}
+                    --warm_start {self.warm_start}
+                    --ccp_alpha {self.ccp_alpha}
+                    """
+        if not verbose_console:
+            command += " --console_file RFResult.txt"
+        if self.max_depth is not None:
+            command += f" --max_depth {self.max_depth}"
+        if self.max_leaf_nodes is not None:
+            command += f" --max_leaf_nodes {self.max_leaf_nodes}"
+        if self.seed is not None:
+            command += f" --seed {self.seed}"
+        if self.class_weight is not None:
+            if isinstance(self.class_weight, dict):
+                self.class_weight = sanatizeList(self.class_weight)
+            command += f" --class_weight {self.class_weight}"
+        if self.max_samples is not None:
+            command += f" --max_samples {self.max_samples}"
+
+        status = randForestsTrn(command)
+        return status
+
+
+class SVMModel(DimlpfidexModel):
+    # to put in the doc:
+    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
+    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - train_data and test_data must contain attributes and classes altogether
+
+    # TODO
+    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
+    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
+    # Problèmes :
+    # Si je ne mets pas le positive_class_index, il ne calcul juste pas la roc et ne dit rien
+    # Si je le mets, j'ai une erreur ...
+    def __init__(
+        self,
+        output_path: pl.Path,
+        training_data: Tabular,
+        testing_data: Tabular,
+        nb_attributes: int,
+        nb_classes: int,
+        return_roc: bool = False,
+        positive_class_index: int = None,
+        nb_quant_levels: int = 50,
+        K: float = 1.0,
+        C: float = 1.0,
+        kernel: str = "rbf",
+        degree: int = 3,
+        gamma="scale",
+        coef0: float = 0.0,
+        shrinking: bool = True,
+        tol: float = 0.001,
+        cache_size: float = 200,
+        class_weight=None,
+        verbose: bool = False,
+        max_iterations: int = -1,
+        decision_function_shape: str = "ovr",
+        break_ties: bool = False,
+    ):
+        self.output_path = output_path
+        self.training_data = training_data
+        self.testing_data = testing_data
+        self.train_data_filename = "train_data.txt"
+        self.test_data_filename = "test_data.txt"
+        self.nb_attributes = nb_attributes
+        self.nb_classes = nb_classes
+        self.return_roc = return_roc
+        self.positive_class_index = positive_class_index
+        self.nb_quant_levels = nb_quant_levels
+        self.K = K
+        self.C = C
+        self.kernel = kernel
+        self.degree = degree
+        self.gamma = gamma
+        self.coef0 = coef0
+        self.shrinking = shrinking
+        self.tol = tol
+        self.cache_size = cache_size
+        self.class_weight = class_weight
+        self.verbose = verbose
+        self.max_iterations = max_iterations
+        self.decision_function_shape = decision_function_shape
+        self.break_ties = break_ties
+
+        # values to be known for further output manipulation
+        self._outputs = {
+            "train_pred_outfile": "predTrain.out",
+            "test_pred_outfile": "predTest.out",
+            "weights_outfile": "weights.wts",
+        }
+
+    def _set_preprocess_function(self, preprocess_function: Callable):
+        self.preprocess_function = preprocess_function
+
+    def _preprocess(self):
+        if self.preprocess_function is not None:
+            self.preprocess_function(self.training_data)
+            self.preprocess_function(self.testing_data)
+
+        tabular_to_csv(
+            self.training_data, self.output_path.joinpath(self.train_data_filename)
+        )
+        tabular_to_csv(
+            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+        )
+
+    def __call__(self, verbose_console) -> int:
+        self._preprocess()
+
+        command = f"""
+                    --root_folder {self.output_path}
+                    --train_data_file {self.train_data_filename}
+                    --test_data_file {self.test_data_filename}
+                    --nb_attributes {self.nb_attributes}
+                    --nb_classes {self.nb_classes}
+                    --return_roc {self.return_roc}
+                    --nb_quant_levels {self.nb_quant_levels}
+                    --K {self.K}
+                    --C {self.C}
+                    --kernel {self.kernel}
+                    --degree {self.degree}
+                    --gamma {self.gamma}
+                    --coef0 {self.coef0}
+                    --shrinking {self.shrinking}
+                    --tol {self.tol}
+                    --cache_size {self.cache_size}
+                    --verbose {self.verbose}
+                    --max_iterations {self.max_iterations}
+                    --decision_function_shape {self.decision_function_shape}
+                    --break_ties {self.break_ties}
+                    """
+
+        if not verbose_console:
+            command += " --console_file SVMResult.txt"
+        if self.positive_class_index is not None:
+            command += f" --positive_class_index {self.positive_class_index}"
+        if self.class_weight is not None:
+            if isinstance(self.class_weight, dict):
+                self.class_weight = sanatizeList(self.class_weight)
+            command += f" --class_weight {self.class_weight}"
+
+        status = svmTrn(command)
+        return status
+
+
+class MLPModel(DimlpfidexModel):
+    # to put in the doc:
+    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
+    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - train_data and test_data must contain attributes and classes altogether
+
+    # TODO
+    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
+    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
+    # Problème :
+    # Erreur si on enable le early_stopping : The test_size = 1 should be greater or equal to the number of classes = 2
+
+    def __init__(
+        self,
+        output_path: pl.Path,
+        training_data: Tabular,
+        testing_data: Tabular,
+        nb_attributes: int,
+        nb_classes: int,
+        nb_quant_levels: int = 50,
+        K: float = 1.0,
+        hidden_layer_sizes: list[int] = [100],
+        activation: str = "relu",
+        solver: str = "adam",
+        alpha: float = 0.0001,
+        batch_size="auto",
+        learning_rate: str = "constant",
+        learning_rate_init: float = 0.001,
+        power_t: float = 0.5,
+        max_iterations: int = 200,
+        shuffle: bool = True,
+        seed: int = None,
+        tol: float = 0.0001,
+        verbose: bool = False,
+        warm_start: bool = False,
+        momentum: float = 0.9,
+        nesterovs_momentum: bool = True,
+        early_stopping: bool = False,
+        validation_fraction: float = 0.1,
+        beta_1: float = 0.9,
+        beta_2: float = 0.999,
+        epsilon: float = 1e-08,
+        n_iter_no_change: int = 10,
+        max_fun: int = 15000,
+    ):
+        self.output_path = output_path
+        self.training_data = training_data
+        self.testing_data = testing_data
+        self.train_data_filename = "train_data.txt"
+        self.test_data_filename = "test_data.txt"
+        self.nb_attributes = nb_attributes
+        self.nb_classes = nb_classes
+        self.nb_quant_levels = nb_quant_levels
+        self.K = K
+        self.hidden_layer_sizes = hidden_layer_sizes
+        self.activation = activation
+        self.solver = solver
+        self.alpha = alpha
+        self.batch_size = batch_size
+        self.learning_rate = learning_rate
+        self.learning_rate_init = learning_rate_init
+        self.power_t = power_t
+        self.max_iterations = max_iterations
+        self.shuffle = shuffle
+        self.seed = seed
+        self.tol = tol
+        self.verbose = verbose
+        self.warm_start = warm_start
+        self.momentum = momentum
+        self.nesterovs_momentum = nesterovs_momentum
+        self.early_stopping = early_stopping
+        self.validation_fraction = validation_fraction
+        self.beta_1 = beta_1
+        self.beta_2 = beta_2
+        self.epsilon = epsilon
+        self.n_iter_no_change = n_iter_no_change
+        self.max_fun = max_fun
+
+        # values to be known for further output manipulation
+        self._outputs = {
+            "train_pred_outfile": "predTrain.out",
+            "test_pred_outfile": "predTest.out",
+            "weights_outfile": "weights.wts",
+        }
+
+    def _set_preprocess_function(self, preprocess_function: Callable):
+        self.preprocess_function = preprocess_function
+
+    def _preprocess(self):
+        if self.preprocess_function is not None:
+            self.preprocess_function(self.training_data)
+            self.preprocess_function(self.testing_data)
+
+        tabular_to_csv(
+            self.training_data, self.output_path.joinpath(self.train_data_filename)
+        )
+        tabular_to_csv(
+            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+        )
+
+    def __call__(self, verbose_console) -> int:
+        self._preprocess()
+
+        command = f"""
+                    --root_folder {self.output_path}
+                    --train_data_file {self.train_data_filename}
+                    --test_data_file {self.test_data_filename}
+                    --nb_attributes {self.nb_attributes}
+                    --nb_classes {self.nb_classes}
+                    --nb_quant_levels {self.nb_quant_levels}
+                    --K {self.K}
+                    --hidden_layer_sizes {sanatizeList(self.hidden_layer_sizes)}
+                    --activation {self.activation}
+                    --solver {self.solver}
+                    --alpha {self.alpha}
+                    --batch_size {self.batch_size}
+                    --learning_rate {self.learning_rate}
+                    --learning_rate_init {self.learning_rate_init}
+                    --power_t {self.power_t}
+                    --max_iterations {self.max_iterations}
+                    --shuffle {self.shuffle}
+                    --tol {self.tol}
+                    --verbose {self.verbose}
+                    --warm_start {self.warm_start}
+                    --momentum {self.momentum}
+                    --nesterovs_momentum {self.nesterovs_momentum}
+                    --early_stopping {self.early_stopping}
+                    --validation_fraction {self.validation_fraction}
+                    --beta_1 {self.beta_1}
+                    --beta_2 {self.beta_2}
+                    --epsilon {self.epsilon}
+                    --n_iter_no_change {self.n_iter_no_change}
+                    --max_fun {self.max_fun}
+                    """
+
+        if not verbose_console:
+            command += " --console_file SVMResult.txt"
+        if self.seed is not None:
+            command += f" --seed {self.seed}"
+
+        status = mlpTrn(command)
+        return status
+
+
+# TODO Ajouter le CNN ? Données tabulaires ?
 
 
 class FidexAlgorithm(DimlpfidexAlgorithm):
@@ -278,14 +809,12 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
             return {}
 
     def execute(self, verbose=True) -> dict:
-        # TODO: weight file or rule file if model is RF
         command = f"""
                 --root_folder {self.model.output_path}
                 --train_data_file {self.model.train_data_filename}
                 --train_pred_file {self.model._outputs["train_pred_outfile"]}
                 --test_data_file {self.model.test_data_filename}
                 --test_pred_file {self.model._outputs["test_pred_outfile"]}
-                --weights_file {self.model._outputs["weights_outfile"]}
                 --rules_outfile {self.rules_outfile}
                 --nb_attributes {self.nb_attributes}
                 --nb_classes {self.nb_classes}
@@ -301,7 +830,10 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
                 --nb_quant_levels {self.nb_quant_levels}
                 --seed {self.seed}
                 """
-
+        if "weights_outfile" in self.model._outputs:
+            command += f" --weights_file {self.model._outputs['weights_outfile']}"
+        else:
+            command += f" --rules_file {self.model._outputs['rules_outfile']}"
         if self.attributes_file is not None:
             command += f" --attributes_file {self.attributes_file}"
         if not verbose:
