@@ -38,7 +38,13 @@ if __name__ == "__main__":
     )
 
     model = DimlpBTModel(
-        output_path, train_data, test_data, 3, 2, hidden_layers=[12, 2]
+        output_path,
+        train_data,
+        test_data,
+        3,
+        2,
+        seed=1,
+        normalization_file="normalization.txt",
     )
     algorithm = FidexAlgorithm(model)
 
@@ -47,7 +53,7 @@ if __name__ == "__main__":
         data=train_data,
         mode="classification",
         model=model,
-        params={"dimlpfidex": {"explainer": algorithm}},
+        params={"dimlpfidex": {"explainer": algorithm, "verbose": False}},
     )
 
     explainations = explainer.explain(test_data, run_predict=False)

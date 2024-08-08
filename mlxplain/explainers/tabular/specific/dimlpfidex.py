@@ -27,6 +27,10 @@ def csv_to_tabular(path: str) -> Tabular:
     return Tabular(pd.read_csv(path))
 
 
+def sanatizeList(data: list) -> str:
+    return str(data).replace(" ", "")
+
+
 class DimlpfidexModel(metaclass=ABCMeta):
     """
     Abstract class giving a template to follow when implementing a model that can be used by the DimlpfidexExplainer.
@@ -71,9 +75,8 @@ class DimlpBTModel(DimlpfidexModel):
     # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data must contain attributes and classes altogether
 
-    # attributes_file? (pas besoin de mettre les stats car on a un nom par défaut)
-    # Créer un mode verbose général pour les console file?
-    # hidden layers (formater les listes)
+    # Déplacer output_path comme verbose?
+    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
 
     def __init__(
         self,
@@ -82,9 +85,25 @@ class DimlpBTModel(DimlpfidexModel):
         testing_data: Tabular,
         nb_attributes: int,
         nb_classes: int,
-        nb_dimlp_nets=25,
-        first_hidden_layer=None,
-        hidden_layers=None,
+        nb_dimlp_nets: int = 25,
+        attributes_file: str = None,
+        first_hidden_layer: int = None,
+        hidden_layers: list[int] = None,
+        with_rule_extraction: bool = False,
+        momentum: float = 0.6,
+        flat: float = 0.01,
+        error_thresh: float = None,
+        acc_thresh: float = None,
+        abs_error_thresh: float = 0,
+        nb_epochs: int = 1500,
+        nb_epochs_error: int = 10,
+        nb_ex_per_net: int = 0,
+        nb_quant_levels: int = 50,
+        normalization_file: str = None,
+        mus: list[float] = None,
+        sigmas: list[float] = None,
+        normalization_indices: list[int] = None,
+        seed: int = 0,
     ):
         self.output_path = output_path
         self.training_data = training_data
@@ -94,10 +113,28 @@ class DimlpBTModel(DimlpfidexModel):
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
         self.nb_dimlp_nets = nb_dimlp_nets
+        self.attributes_file = attributes_file
         self.first_hidden_layer = first_hidden_layer
         if self.first_hidden_layer is None:
             self.first_hidden_layer = self.nb_attributes
         self.hidden_layers = hidden_layers
+        self.with_rule_extraction = with_rule_extraction
+        self.momentum = momentum
+        self.flat = flat
+        self.error_thresh = error_thresh
+        self.acc_thresh = acc_thresh
+        self.abs_error_thresh = abs_error_thresh
+        self.nb_epochs = nb_epochs
+        self.nb_epochs_error = nb_epochs_error
+        self.nb_ex_per_net = nb_ex_per_net
+        self.nb_quant_levels = nb_quant_levels
+        self.normalization_file = normalization_file
+        self.mus = mus
+        self.sigmas = sigmas
+        self.normalization_indices = normalization_indices
+        if self.normalization_indices is None:
+            self.normalization_indices = list(range(nb_attributes))
+        self.seed = seed
         self.preprocess_function = None
 
         # values to be known for further output manipulation
@@ -122,8 +159,7 @@ class DimlpBTModel(DimlpfidexModel):
             self.testing_data, self.output_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, data) -> int:
-        _ = data  # data is ignored because all needed data is already given at model initialization
+    def __call__(self, verbose) -> int:
         self._preprocess()
 
         command = f"""
@@ -133,12 +169,41 @@ class DimlpBTModel(DimlpfidexModel):
                     --nb_attributes {self.nb_attributes}
                     --nb_classes {self.nb_classes}
                     --nb_dimlp_nets {self.nb_dimlp_nets}
+                    --with_rule_extraction {self.with_rule_extraction}
+                    --momentum {self.momentum}
+                    --flat {self.flat}
+                    --abs_error_thresh {self.abs_error_thresh}
+                    --nb_epochs {self.nb_epochs}
+                    --nb_epochs_error {self.nb_epochs_error}
+                    --nb_ex_per_net {self.nb_ex_per_net}
+                    --nb_quant_levels {self.nb_quant_levels}
+                    --seed {self.seed}
                     """
+        if self.attributes_file is not None:
+            command += f" --attributes_file {self.attributes_file}"
         if self.first_hidden_layer is not None:
             command += f" --first_hidden_layer {self.first_hidden_layer}"
         if self.hidden_layers is not None:
-            command += f" --hidden_layers {self.hidden_layers}"
-        print(command)
+            command += f" --hidden_layers {sanatizeList(self.hidden_layers)}"
+        if self.with_rule_extraction:
+            command += " --global_rules_outfile dimlpBTRules.rls"
+        if self.error_thresh is not None:
+            command += f" --error_thresh {self.error_thresh}"
+        if self.acc_thresh is not None:
+            command += f" --acc_thresh {self.acc_thresh}"
+        if self.normalization_file is not None:
+            command += f" --normalization_file {self.normalization_file}"
+        if self.mus is not None:
+            command += f" --mus {sanatizeList(self.mus)}"
+        if self.sigmas is not None:
+            command += f" --sigmas {sanatizeList(self.sigmas)}"
+        if self.normalization_indices is not None and self.normalization_file is None:
+            command += (
+                f" --normalization_indices {sanatizeList(self.normalization_indices)}"
+            )
+        if not verbose:
+            command += " --console_file dimlpBTResult.txt"
+
         status = dimlpBT(command)
 
         return status
@@ -160,25 +225,41 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.output_path.joinpath(self.rules_outfile)
-        # TODO try catch this
-        with open(absolute_path) as file:
-            return json.load(file)
+        try:
+            with open(absolute_path) as file:
+                return json.load(file)
+        except FileNotFoundError:
+            print(f"Error: The file at {absolute_path} was not found.")
+            return {}
+        except json.JSONDecodeError:
+            print(f"Error: The file at {absolute_path} is not a valid JSON.")
+            return {}
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return {}
 
-    def execute(self) -> dict:
+    def execute(self, verbose=True) -> dict:
         # TODO: weight file or rule file if model is RF
-        fidex(
-            f"""
-            --root_folder {self.model.output_path}
-            --train_data_file {self.model.train_data_filename}
-            --train_pred_file {self.model._outputs["train_pred_outfile"]}
-            --test_data_file {self.model.test_data_filename}
-            --test_pred_file {self.model._outputs["test_pred_outfile"]}
-            --weights_file {self.model._outputs["weights_outfile"]}
-            --rules_outfile {self.rules_outfile}
-            --nb_attributes {self.nb_attributes}
-            --nb_classes {self.nb_classes}
-        """
-        )
+        command = f"""
+                --root_folder {self.model.output_path}
+                --train_data_file {self.model.train_data_filename}
+                --train_pred_file {self.model._outputs["train_pred_outfile"]}
+                --test_data_file {self.model.test_data_filename}
+                --test_pred_file {self.model._outputs["test_pred_outfile"]}
+                --weights_file {self.model._outputs["weights_outfile"]}
+                --rules_outfile {self.rules_outfile}
+                --nb_attributes {self.nb_attributes}
+                --nb_classes {self.nb_classes}
+                """
+
+        if not verbose:
+            command += " --console_file fidexResult.txt"
+
+        status = fidex(command)
+        if status != 0:
+            raise ValueError(
+                "Something went wrong with the Fidex explainer execution..."
+            )
 
         return self._postprocess()
 
@@ -186,6 +267,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
 # !all optional parameters must be specified inside KWARGS:
 class DimlpfidexExplainer(ExplainerBase):
     # - An explainer algorithm must be instanciated (see DimlpfidexAlgorithms based classes) and specified
+    # - Optional argument verbose
     # - preprocess_function must have train_data as only parameter
     explanation_type = "local"
     alias = ["dimlpfidex"]
@@ -202,6 +284,7 @@ class DimlpfidexExplainer(ExplainerBase):
         self.model = model
         self.training_data = training_data
         self.preprocess_function = preprocess_function
+        self.verbose = True
 
         if "explainer" not in kwargs:
             raise ValueError(
@@ -213,13 +296,17 @@ class DimlpfidexExplainer(ExplainerBase):
         if not isinstance(self.model, DimlpfidexModel):
             raise ValueError("Model must an instance of DimlpfidexModel based classes.")
 
+        if "verbose" in kwargs:
+            if not kwargs["verbose"]:
+                self.verbose = False
+
         self.model._set_preprocess_function(self.preprocess_function)
 
     def explain(self, X) -> DimlpfidexExplanation:
         _ = X  # X is ignored because all needed data is already given at model initialization
-        status = self.model(None)  # ? Not sure if this is the way to do it
+        status = self.model(self.verbose)  # ? Not sure if this is the way to do it
         if status != 0:
             raise ValueError("Something went wrong with the model execution...")
-        result = self.explainer.execute()
+        result = self.explainer.execute(self.verbose)
 
         return DimlpfidexExplanation(self.mode, result)
