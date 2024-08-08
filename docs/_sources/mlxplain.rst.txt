@@ -1,6 +1,14 @@
 mlxplain package
 ================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mlxplain.explanations
+
 Submodules
 ----------
 

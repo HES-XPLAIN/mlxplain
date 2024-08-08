@@ -1,0 +1,7 @@
+rulextract\_example module
+==========================
+
+.. automodule:: rulextract_example
+   :members:
+   :undoc-members:
+   :show-inheritance:

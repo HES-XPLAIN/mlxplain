@@ -5,4 +5,5 @@ mlxplain
    :maxdepth: 4
 
    mlxplain
+   rulextract_example
    tests
