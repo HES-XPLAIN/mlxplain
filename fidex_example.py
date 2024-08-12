@@ -81,6 +81,26 @@ def load_data():
     return train, test, nattributes, nclasses
 
 
+def load_dummy_data():
+    train_data = Tabular(
+        data=pd.DataFrame(
+            data=[[1, 2, 3, 1, 0], [4, 5, 6, 0, 1]],
+            columns=["a", "b", "c", "male", "female"],
+        ),
+        feature_columns=["a", "b", "c", "male", "female"],
+    )
+
+    test_data = Tabular(
+        data=pd.DataFrame(
+            data=[[3, 1, 4, 1, 0], [7, 6, 4, 0, 1]],
+            columns=["a", "b", "c", "male", "female"],
+        ),
+        feature_columns=["a", "b", "c", "male", "female"],
+    )
+
+    return train_data, test_data, 3, 2
+
+
 if __name__ == "__main__":
 
     # ensure path exists
@@ -89,7 +109,7 @@ if __name__ == "__main__":
     test_data_file = "test_data.txt"
 
     # do load data
-    train_data, test_data, nattributes, nclasses = load_data()
+    train_data, test_data, nattributes, nclasses = load_dummy_data()
 
     # model = DimlpBTModel(
     #     output_path,
@@ -218,7 +238,7 @@ if __name__ == "__main__":
         seed=1,
         # attributes_file = "attributes.txt",
         max_iterations=10,
-        min_covering=3,
+        min_covering=2,
         # covering_strategy = False,
         max_failed_attempts=35,
         min_fidelity=0.9,
@@ -236,7 +256,7 @@ if __name__ == "__main__":
 
     fidexGloRules = FidexGloRulesAlgorithm(
         model,
-        heuristic=1,
+        heuristic=2,
         seed=1,
         # max_iterations=10,
         # min_covering=3,
