@@ -243,7 +243,7 @@ class GradBoostModel(DimlpfidexModel):
         min_impurity_decrease: float = 0.0,
         init: str = None,
         seed: int = None,
-        verbose: int = 0,
+        verbose_scikit: int = 0,
         warm_start: bool = False,
         validation_fraction: float = 0.1,
         n_iter_no_change: int = None,
@@ -273,7 +273,7 @@ class GradBoostModel(DimlpfidexModel):
         self.min_impurity_decrease = min_impurity_decrease
         self.init = init
         self.seed = seed
-        self.verbose = verbose
+        self.verbose_scikit = verbose_scikit
         self.warm_start = warm_start
         self.validation_fraction = validation_fraction
         self.n_iter_no_change = n_iter_no_change
@@ -323,7 +323,7 @@ class GradBoostModel(DimlpfidexModel):
                     --min_weight_fraction_leaf {self.min_weight_fraction_leaf}
                     --max_features {self.max_features}
                     --min_impurity_decrease {self.min_impurity_decrease}
-                    --verbose {self.verbose}
+                    --verbose {self.verbose_scikit}
                     --warm_start {self.warm_start}
                     --validation_fraction {self.validation_fraction}
                     --tol {self.tol}
@@ -489,6 +489,7 @@ class SVMModel(DimlpfidexModel):
         nb_classes: int,
         verbose_console: bool = False,
         return_roc: bool = False,
+        output_roc: str | None = None,
         positive_class_index: int = None,
         nb_quant_levels: int = 50,
         K: float = 1.0,
@@ -515,6 +516,7 @@ class SVMModel(DimlpfidexModel):
         self.nb_classes = nb_classes
         self.verbose_console = verbose_console
         self.return_roc = return_roc
+        self.output_roc = output_roc
         self.positive_class_index = positive_class_index
         self.nb_quant_levels = nb_quant_levels
         self.K = K
@@ -588,6 +590,8 @@ class SVMModel(DimlpfidexModel):
             if isinstance(self.class_weight, dict):
                 self.class_weight = sanatizeList(self.class_weight)
             command += f" --class_weight {self.class_weight}"
+        if self.output_roc is not None:
+            command += f" --output_roc {self.output_roc}"
 
         status = svmTrn(command)
         return status
@@ -786,6 +790,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         if self.normalization_indices is None:
             self.normalization_indices = list(range(self.nb_attributes))
         self.seed = seed
+        self.explanation_type = "local"
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.root_path.joinpath(self.rules_outfile)
@@ -909,6 +914,7 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
             self.normalization_indices = list(range(self.nb_attributes))
         self.nb_threads = nb_threads
         self.seed = seed
+        self.explanation_type = "global"
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.root_path.joinpath(self.global_rules_outfile)
@@ -983,7 +989,6 @@ class DimlpfidexExplainer(ExplainerBase):
     # - An explainer algorithm must be instanciated (see DimlpfidexAlgorithms based classes) and specified
     # - Optional argument verbose
     # - preprocess_function must have train_data as only parameter
-    explanation_type = "local"
     alias = ["dimlpfidex"]
     mode = "classification"
 
@@ -1012,6 +1017,10 @@ class DimlpfidexExplainer(ExplainerBase):
 
         self.model._set_preprocess_function(self.preprocess_function)
 
+    @property
+    def explanation_type(self):
+        return self.explainer.explanation_type
+
     def explain(self, X) -> DimlpfidexExplanation:
         _ = X  # X is ignored because all needed data is already given at model initialization
         status = self.model(None)  # ? Not sure if this is the way to do it
@@ -1020,3 +1029,9 @@ class DimlpfidexExplainer(ExplainerBase):
         result = self.explainer.execute()
 
         return DimlpfidexExplanation(self.mode, result)
+
+    def explain_global(self):
+        pass  # TODO ?
+
+    def predict(self):
+        pass  # TODO ?
