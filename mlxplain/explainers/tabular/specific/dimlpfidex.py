@@ -76,20 +76,17 @@ class DimlpfidexAlgorithm(metaclass=ABCMeta):
 class DimlpBTModel(DimlpfidexModel):
     # to put in the doc:
     # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data and test_data must contain attributes and classes altogether
-
-    # TODO
-    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
-    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
 
     def __init__(
         self,
-        output_path: pl.Path,
+        root_path: pl.Path,
         training_data: Tabular,
         testing_data: Tabular,
         nb_attributes: int,
         nb_classes: int,
+        verbose_console: bool = False,
         nb_dimlp_nets: int = 25,
         attributes_file: str = None,
         first_hidden_layer: int = None,
@@ -110,13 +107,14 @@ class DimlpBTModel(DimlpfidexModel):
         normalization_indices: list[int] = None,
         seed: int = 0,
     ):
-        self.output_path = output_path
+        self.root_path = root_path
         self.training_data = training_data
         self.testing_data = testing_data
         self.train_data_filename = "train_data.txt"
         self.test_data_filename = "test_data.txt"
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
+        self.verbose_console = verbose_console
         self.nb_dimlp_nets = nb_dimlp_nets
         self.attributes_file = attributes_file
         self.first_hidden_layer = first_hidden_layer
@@ -158,17 +156,17 @@ class DimlpBTModel(DimlpfidexModel):
             self.preprocess_function(self.testing_data)
 
         tabular_to_csv(
-            self.training_data, self.output_path.joinpath(self.train_data_filename)
+            self.training_data, self.root_path.joinpath(self.train_data_filename)
         )
         tabular_to_csv(
-            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+            self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, verbose_console) -> int:
+    def __call__(self, data) -> int:
         self._preprocess()
 
         command = f"""
-                    --root_folder {self.output_path}
+                    --root_folder {self.root_path}
                     --train_data_file {self.train_data_filename}
                     --test_data_file {self.test_data_filename}
                     --nb_attributes {self.nb_attributes}
@@ -186,7 +184,7 @@ class DimlpBTModel(DimlpfidexModel):
                     """
         if self.attributes_file is not None:
             command += f" --attributes_file {self.attributes_file}"
-        if not verbose_console:
+        if not self.verbose_console:
             command += " --console_file dimlpBTResult.txt"
         if self.first_hidden_layer is not None:
             command += f" --first_hidden_layer {self.first_hidden_layer}"
@@ -216,23 +214,21 @@ class DimlpBTModel(DimlpfidexModel):
 class GradBoostModel(DimlpfidexModel):
     # to put in the doc:
     # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data and test_data must contain attributes and classes altogether
 
     # TODO
-    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
-    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
     # Problèmes:
-    # Si on met un n_iter_no_change, on a l'erreur : The test_size = 1 should be greater or equal to the number of classes = 2
     # Si on met tous les params, on a une règle FileContentError: Error : in file /tmp/explainer/GB_rules.rls, the rule Rule 1:  -> value [-1.] is not in a good format. Maybe an attribute or class id is wrong or you forgot to add the attribute file.
     # Pourtant ça ne devrait pas planter...
     def __init__(
         self,
-        output_path: pl.Path,
+        root_path: pl.Path,
         training_data: Tabular,
         testing_data: Tabular,
         nb_attributes: int,
         nb_classes: int,
+        verbose_console: bool = False,
         n_estimators: int = 100,
         loss: str = "log_loss",
         learning_rate: float = 0.1,
@@ -254,13 +250,14 @@ class GradBoostModel(DimlpfidexModel):
         tol: float = 0.0001,
         ccp_alpha: float = 0.0,
     ):
-        self.output_path = output_path
+        self.root_path = root_path
         self.training_data = training_data
         self.testing_data = testing_data
         self.train_data_filename = "train_data.txt"
         self.test_data_filename = "test_data.txt"
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
+        self.verbose_console = verbose_console
         self.seed = seed
         self.n_estimators = n_estimators
         self.loss = loss
@@ -300,17 +297,17 @@ class GradBoostModel(DimlpfidexModel):
             self.preprocess_function(self.testing_data)
 
         tabular_to_csv(
-            self.training_data, self.output_path.joinpath(self.train_data_filename)
+            self.training_data, self.root_path.joinpath(self.train_data_filename)
         )
         tabular_to_csv(
-            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+            self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, verbose_console) -> int:
+    def __call__(self, data) -> int:
         self._preprocess()
 
         command = f"""
-                    --root_folder {self.output_path}
+                    --root_folder {self.root_path}
                     --train_data_file {self.train_data_filename}
                     --test_data_file {self.test_data_filename}
                     --nb_attributes {self.nb_attributes}
@@ -332,7 +329,7 @@ class GradBoostModel(DimlpfidexModel):
                     --tol {self.tol}
                     --ccp_alpha {self.ccp_alpha}
                     """
-        if not verbose_console:
+        if not self.verbose_console:
             command += " --console_file GBResult.txt"
         if self.max_leaf_nodes is not None:
             command += f" --max_leaf_nodes {self.max_leaf_nodes}"
@@ -350,19 +347,17 @@ class GradBoostModel(DimlpfidexModel):
 class RandomForestModel(DimlpfidexModel):
     # to put in the doc:
     # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data and test_data must contain attributes and classes altogether
 
-    # TODO
-    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
-    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
     def __init__(
         self,
-        output_path: pl.Path,
+        root_path: pl.Path,
         training_data: Tabular,
         testing_data: Tabular,
         nb_attributes: int,
         nb_classes: int,
+        verbose_console: bool = False,
         n_estimators: int = 100,
         criterion: str = "gini",
         max_depth=None,
@@ -382,13 +377,14 @@ class RandomForestModel(DimlpfidexModel):
         ccp_alpha: float = 0.0,
         max_samples=None,
     ):
-        self.output_path = output_path
+        self.root_path = root_path
         self.training_data = training_data
         self.testing_data = testing_data
         self.train_data_filename = "train_data.txt"
         self.test_data_filename = "test_data.txt"
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
+        self.verbose_console = verbose_console
         self.seed = seed
         self.n_estimators = n_estimators
         self.criterion = criterion
@@ -426,17 +422,17 @@ class RandomForestModel(DimlpfidexModel):
             self.preprocess_function(self.testing_data)
 
         tabular_to_csv(
-            self.training_data, self.output_path.joinpath(self.train_data_filename)
+            self.training_data, self.root_path.joinpath(self.train_data_filename)
         )
         tabular_to_csv(
-            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+            self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, verbose_console) -> int:
+    def __call__(self, data) -> int:
         self._preprocess()
 
         command = f"""
-                    --root_folder {self.output_path}
+                    --root_folder {self.root_path}
                     --train_data_file {self.train_data_filename}
                     --test_data_file {self.test_data_filename}
                     --nb_attributes {self.nb_attributes}
@@ -455,7 +451,7 @@ class RandomForestModel(DimlpfidexModel):
                     --warm_start {self.warm_start}
                     --ccp_alpha {self.ccp_alpha}
                     """
-        if not verbose_console:
+        if not self.verbose_console:
             command += " --console_file RFResult.txt"
         if self.max_depth is not None:
             command += f" --max_depth {self.max_depth}"
@@ -477,22 +473,21 @@ class RandomForestModel(DimlpfidexModel):
 class SVMModel(DimlpfidexModel):
     # to put in the doc:
     # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data and test_data must contain attributes and classes altogether
 
     # TODO
-    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
-    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
     # Problèmes :
     # Si je ne mets pas le positive_class_index, il ne calcul juste pas la roc et ne dit rien
     # Si je le mets, j'ai une erreur ...
     def __init__(
         self,
-        output_path: pl.Path,
+        root_path: pl.Path,
         training_data: Tabular,
         testing_data: Tabular,
         nb_attributes: int,
         nb_classes: int,
+        verbose_console: bool = False,
         return_roc: bool = False,
         positive_class_index: int = None,
         nb_quant_levels: int = 50,
@@ -511,13 +506,14 @@ class SVMModel(DimlpfidexModel):
         decision_function_shape: str = "ovr",
         break_ties: bool = False,
     ):
-        self.output_path = output_path
+        self.root_path = root_path
         self.training_data = training_data
         self.testing_data = testing_data
         self.train_data_filename = "train_data.txt"
         self.test_data_filename = "test_data.txt"
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
+        self.verbose_console = verbose_console
         self.return_roc = return_roc
         self.positive_class_index = positive_class_index
         self.nb_quant_levels = nb_quant_levels
@@ -552,17 +548,17 @@ class SVMModel(DimlpfidexModel):
             self.preprocess_function(self.testing_data)
 
         tabular_to_csv(
-            self.training_data, self.output_path.joinpath(self.train_data_filename)
+            self.training_data, self.root_path.joinpath(self.train_data_filename)
         )
         tabular_to_csv(
-            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+            self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, verbose_console) -> int:
+    def __call__(self, data) -> int:
         self._preprocess()
 
         command = f"""
-                    --root_folder {self.output_path}
+                    --root_folder {self.root_path}
                     --train_data_file {self.train_data_filename}
                     --test_data_file {self.test_data_filename}
                     --nb_attributes {self.nb_attributes}
@@ -584,7 +580,7 @@ class SVMModel(DimlpfidexModel):
                     --break_ties {self.break_ties}
                     """
 
-        if not verbose_console:
+        if not self.verbose_console:
             command += " --console_file SVMResult.txt"
         if self.positive_class_index is not None:
             command += f" --positive_class_index {self.positive_class_index}"
@@ -600,22 +596,17 @@ class SVMModel(DimlpfidexModel):
 class MLPModel(DimlpfidexModel):
     # to put in the doc:
     # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - output_path is directory where temporary files and output files will be generated, it must be a low permission directory
+    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data and test_data must contain attributes and classes altogether
-
-    # TODO
-    # Déplacer output_path comme verbose? On pourrait aussi faire un setter pour le verbose
-    # le output_path devrait peut-être s'appeler root_path si on veut pouvoir définir un path pour les attributes_file et normalization_file -> change la manière dont on avait imaginé le tout. À voir
-    # Problème :
-    # Erreur si on enable le early_stopping : The test_size = 1 should be greater or equal to the number of classes = 2
 
     def __init__(
         self,
-        output_path: pl.Path,
+        root_path: pl.Path,
         training_data: Tabular,
         testing_data: Tabular,
         nb_attributes: int,
         nb_classes: int,
+        verbose_console: bool = False,
         nb_quant_levels: int = 50,
         K: float = 1.0,
         hidden_layer_sizes: list[int] = [100],
@@ -642,13 +633,14 @@ class MLPModel(DimlpfidexModel):
         n_iter_no_change: int = 10,
         max_fun: int = 15000,
     ):
-        self.output_path = output_path
+        self.root_path = root_path
         self.training_data = training_data
         self.testing_data = testing_data
         self.train_data_filename = "train_data.txt"
         self.test_data_filename = "test_data.txt"
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
+        self.verbose_console = verbose_console
         self.nb_quant_levels = nb_quant_levels
         self.K = K
         self.hidden_layer_sizes = hidden_layer_sizes
@@ -691,17 +683,17 @@ class MLPModel(DimlpfidexModel):
             self.preprocess_function(self.testing_data)
 
         tabular_to_csv(
-            self.training_data, self.output_path.joinpath(self.train_data_filename)
+            self.training_data, self.root_path.joinpath(self.train_data_filename)
         )
         tabular_to_csv(
-            self.testing_data, self.output_path.joinpath(self.test_data_filename)
+            self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, verbose_console) -> int:
+    def __call__(self, data) -> int:
         self._preprocess()
 
         command = f"""
-                    --root_folder {self.output_path}
+                    --root_folder {self.root_path}
                     --train_data_file {self.train_data_filename}
                     --test_data_file {self.test_data_filename}
                     --nb_attributes {self.nb_attributes}
@@ -732,7 +724,7 @@ class MLPModel(DimlpfidexModel):
                     --max_fun {self.max_fun}
                     """
 
-        if not verbose_console:
+        if not self.verbose_console:
             command += " --console_file MLPResult.txt"
         if self.seed is not None:
             command += f" --seed {self.seed}"
@@ -750,6 +742,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
     def __init__(
         self,
         model: DimlpfidexModel,
+        verbose_console: bool = False,
         attributes_file: str = None,
         max_iterations: int = 10,
         min_covering: int = 2,
@@ -769,6 +762,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         seed: int = 0,
     ):
         self.model = model
+        self.verbose_console = verbose_console
         self.nb_attributes = model.nb_attributes
         self.nb_classes = model.nb_classes
         self.rules_outfile = "fidex_output_rules.json"
@@ -794,7 +788,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         self.seed = seed
 
     def _postprocess(self) -> dict:
-        absolute_path = self.model.output_path.joinpath(self.rules_outfile)
+        absolute_path = self.model.root_path.joinpath(self.rules_outfile)
         try:
             with open(absolute_path) as file:
                 return json.load(file)
@@ -808,9 +802,9 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
             print(f"An unexpected error occurred: {e}")
             return {}
 
-    def execute(self, verbose=True) -> dict:
+    def execute(self) -> dict:
         command = f"""
-                --root_folder {self.model.output_path}
+                --root_folder {self.model.root_path}
                 --train_data_file {self.model.train_data_filename}
                 --train_pred_file {self.model._outputs["train_pred_outfile"]}
                 --test_data_file {self.model.test_data_filename}
@@ -836,7 +830,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
             command += f" --rules_file {self.model._outputs['rules_outfile']}"
         if self.attributes_file is not None:
             command += f" --attributes_file {self.attributes_file}"
-        if not verbose:
+        if not self.verbose_console:
             command += " --console_file fidexResult.txt"
         if self.decision_threshold is not None:
             command += f" --decision_threshold {self.decision_threshold}"
@@ -869,6 +863,7 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         self,
         model: DimlpfidexModel,
         heuristic: int,
+        verbose_console: bool = False,
         attributes_file: str = None,
         max_iterations: int = 10,
         min_covering: int = 2,
@@ -893,6 +888,7 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         self.nb_attributes = model.nb_attributes
         self.nb_classes = model.nb_classes
         self.global_rules_outfile = "fidexGloRules_output_rules.json"
+        self.verbose_console = verbose_console
         self.attributes_file = attributes_file
         self.max_iterations = max_iterations
         self.min_covering = min_covering
@@ -915,7 +911,7 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         self.seed = seed
 
     def _postprocess(self) -> dict:
-        absolute_path = self.model.output_path.joinpath(self.global_rules_outfile)
+        absolute_path = self.model.root_path.joinpath(self.global_rules_outfile)
         try:
             with open(absolute_path) as file:
                 return json.load(file)
@@ -929,9 +925,9 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
             print(f"An unexpected error occurred: {e}")
             return {}
 
-    def execute(self, verbose=True) -> dict:
+    def execute(self) -> dict:
         command = f"""
-                --root_folder {self.model.output_path}
+                --root_folder {self.model.root_path}
                 --train_data_file {self.model.train_data_filename}
                 --train_pred_file {self.model._outputs["train_pred_outfile"]}
                 --global_rules_outfile {self.global_rules_outfile}
@@ -956,7 +952,7 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
             command += f" --rules_file {self.model._outputs['rules_outfile']}"
         if self.attributes_file is not None:
             command += f" --attributes_file {self.attributes_file}"
-        if not verbose:
+        if not self.verbose_console:
             command += " --console_file fidexGloRulesResult.txt"
         if self.decision_threshold is not None:
             command += f" --decision_threshold {self.decision_threshold}"
@@ -1014,17 +1010,13 @@ class DimlpfidexExplainer(ExplainerBase):
         if not isinstance(self.model, DimlpfidexModel):
             raise ValueError("Model must an instance of DimlpfidexModel based classes.")
 
-        if "verbose" in kwargs:
-            if not kwargs["verbose"]:
-                self.verbose = False
-
         self.model._set_preprocess_function(self.preprocess_function)
 
     def explain(self, X) -> DimlpfidexExplanation:
         _ = X  # X is ignored because all needed data is already given at model initialization
-        status = self.model(self.verbose)  # ? Not sure if this is the way to do it
+        status = self.model(None)  # ? Not sure if this is the way to do it
         if status != 0:
             raise ValueError("Something went wrong with the model execution...")
-        result = self.explainer.execute(self.verbose)
+        result = self.explainer.execute()
 
         return DimlpfidexExplanation(self.mode, result)
