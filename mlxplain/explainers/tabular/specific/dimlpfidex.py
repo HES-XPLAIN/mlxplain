@@ -217,10 +217,6 @@ class GradBoostModel(DimlpfidexModel):
     # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data and test_data must contain attributes and classes altogether
 
-    # TODO
-    # Problèmes:
-    # Si on met tous les params, on a une règle FileContentError: Error : in file /tmp/explainer/GB_rules.rls, the rule Rule 1:  -> value [-1.] is not in a good format. Maybe an attribute or class id is wrong or you forgot to add the attribute file.
-    # Pourtant ça ne devrait pas planter...
     def __init__(
         self,
         root_path: pl.Path,
@@ -476,10 +472,6 @@ class SVMModel(DimlpfidexModel):
     # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
     # - train_data and test_data must contain attributes and classes altogether
 
-    # TODO
-    # Problèmes :
-    # Si je ne mets pas le positive_class_index, il ne calcul juste pas la roc et ne dit rien
-    # Si je le mets, j'ai une erreur ...
     def __init__(
         self,
         root_path: pl.Path,
@@ -488,7 +480,6 @@ class SVMModel(DimlpfidexModel):
         nb_attributes: int,
         nb_classes: int,
         verbose_console: bool = False,
-        return_roc: bool = False,
         output_roc: str | None = None,
         positive_class_index: int = None,
         nb_quant_levels: int = 50,
@@ -515,7 +506,6 @@ class SVMModel(DimlpfidexModel):
         self.nb_attributes = nb_attributes
         self.nb_classes = nb_classes
         self.verbose_console = verbose_console
-        self.return_roc = return_roc
         self.output_roc = output_roc
         self.positive_class_index = positive_class_index
         self.nb_quant_levels = nb_quant_levels
@@ -565,7 +555,6 @@ class SVMModel(DimlpfidexModel):
                     --test_data_file {self.test_data_filename}
                     --nb_attributes {self.nb_attributes}
                     --nb_classes {self.nb_classes}
-                    --return_roc {self.return_roc}
                     --nb_quant_levels {self.nb_quant_levels}
                     --K {self.K}
                     --C {self.C}
@@ -735,9 +724,6 @@ class MLPModel(DimlpfidexModel):
 
         status = mlpTrn(command)
         return status
-
-
-# TODO Ajouter le CNN ? Données tabulaires ?
 
 
 class FidexAlgorithm(DimlpfidexAlgorithm):
