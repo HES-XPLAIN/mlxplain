@@ -12,7 +12,7 @@ from omnixai.data.tabular import Tabular
 from omnixai.explainers.tabular.auto import TabularExplainer
 from omnixai.visualization.dashboard import Dashboard
 
-from mlxplain.explainers.tabular.specific.dimlpfidex import (  # DimlpBTModel,; GradBoostModel,; RandomForestModel,; SVMModel,; FidexAlgorithm,; SVMModel,; GradBoostModel,; RandomForestModel,; DimlpBTModel
+from mlxplain.explainers.tabular.specific.dimlpfidex import (  # DimlpBTModel,; GradBoostModel,; RandomForestModel,; SVMModel,; FidexAlgorithm,; SVMModel,; GradBoostModel,; RandomForestModel,; DimlpBTModel; MLPModel,; SVMModel,
     FidexAlgorithm,
     FidexGloRulesAlgorithm,
     SVMModel,
@@ -84,18 +84,20 @@ def load_data():
 def load_dummy_data():
     train_data = Tabular(
         data=pd.DataFrame(
-            data=[[1, 2, 3, 1, 0], [4, 5, 6, 0, 1]],
+            data=[[1, 2, 3, 1, 0], [4, 5, 6, 0, 1], [1, 2, 3, 1, 0], [4, 5, 6, 0, 1]],
             columns=["a", "b", "c", "male", "female"],
         ),
-        feature_columns=["a", "b", "c", "male", "female"],
+        # feature_columns=["a", "b", "c", "male", "female"],
+        categorical_columns=["male", "female"],
     )
 
     test_data = Tabular(
         data=pd.DataFrame(
-            data=[[3, 1, 4, 1, 0], [7, 6, 4, 0, 1]],
+            data=[[3, 1, 4, 1, 0], [7, 6, 4, 0, 1], [3, 1, 4, 1, 0], [7, 6, 4, 0, 1]],
             columns=["a", "b", "c", "male", "female"],
         ),
-        feature_columns=["a", "b", "c", "male", "female"],
+        # feature_columns=["a", "b", "c", "male", "female"],
+        categorical_columns=["male", "female"],
     )
 
     return train_data, test_data, 3, 2
@@ -109,7 +111,7 @@ if __name__ == "__main__":
     test_data_file = "test_data.txt"
 
     # do load data
-    train_data, test_data, nattributes, nclasses = load_dummy_data()
+    train_data, test_data, nattributes, nclasses = load_data()
 
     # model = DimlpBTModel(
     #     output_path,
