@@ -12,7 +12,7 @@ from typing import Callable
 
 import pandas as pd
 from dimlpfidex.dimlp import dimlpBT
-from dimlpfidex.fidex import fidex, fidexGloRules
+from dimlpfidex.fidex import fidex, fidexGloRules, fidexGloStats
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.base import ExplainerBase
 from trainings.gradBoostTrn import gradBoostTrn
@@ -371,7 +371,7 @@ class RandomForestModel(DimlpfidexModel):
         oob_score: bool = False,
         n_jobs: int = 1,
         seed: int = None,
-        verbose: int = 0,
+        verbose_scikit: int = 0,
         warm_start: bool = False,
         class_weight=None,
         ccp_alpha: float = 0.0,
@@ -399,7 +399,7 @@ class RandomForestModel(DimlpfidexModel):
         self.oob_score = oob_score
         self.n_jobs = n_jobs
         self.seed = seed
-        self.verbose = verbose
+        self.verbose_scikit = verbose_scikit
         self.warm_start = warm_start
         self.class_weight = class_weight
         self.ccp_alpha = ccp_alpha
@@ -447,7 +447,7 @@ class RandomForestModel(DimlpfidexModel):
                     --bootstrap {self.bootstrap}
                     --oob_score {self.oob_score}
                     --n_jobs {self.n_jobs}
-                    --verbose {self.verbose}
+                    --verbose {self.verbose_scikit}
                     --warm_start {self.warm_start}
                     --ccp_alpha {self.ccp_alpha}
                     """
@@ -502,7 +502,7 @@ class SVMModel(DimlpfidexModel):
         tol: float = 0.001,
         cache_size: float = 200,
         class_weight=None,
-        verbose: bool = False,
+        verbose_scikit: bool = False,
         max_iterations: int = -1,
         decision_function_shape: str = "ovr",
         break_ties: bool = False,
@@ -529,7 +529,7 @@ class SVMModel(DimlpfidexModel):
         self.tol = tol
         self.cache_size = cache_size
         self.class_weight = class_weight
-        self.verbose = verbose
+        self.verbose_scikit = verbose_scikit
         self.max_iterations = max_iterations
         self.decision_function_shape = decision_function_shape
         self.break_ties = break_ties
@@ -576,7 +576,7 @@ class SVMModel(DimlpfidexModel):
                     --shrinking {self.shrinking}
                     --tol {self.tol}
                     --cache_size {self.cache_size}
-                    --verbose {self.verbose}
+                    --verbose {self.verbose_scikit}
                     --max_iterations {self.max_iterations}
                     --decision_function_shape {self.decision_function_shape}
                     --break_ties {self.break_ties}
@@ -625,7 +625,7 @@ class MLPModel(DimlpfidexModel):
         shuffle: bool = True,
         seed: int = None,
         tol: float = 0.0001,
-        verbose: bool = False,
+        verbose_scikit: bool = False,
         warm_start: bool = False,
         momentum: float = 0.9,
         nesterovs_momentum: bool = True,
@@ -659,7 +659,7 @@ class MLPModel(DimlpfidexModel):
         self.shuffle = shuffle
         self.seed = seed
         self.tol = tol
-        self.verbose = verbose
+        self.verbose_scikit = verbose_scikit
         self.warm_start = warm_start
         self.momentum = momentum
         self.nesterovs_momentum = nesterovs_momentum
@@ -715,7 +715,7 @@ class MLPModel(DimlpfidexModel):
                     --max_iterations {self.max_iterations}
                     --shuffle {self.shuffle}
                     --tol {self.tol}
-                    --verbose {self.verbose}
+                    --verbose {self.verbose_scikit}
                     --warm_start {self.warm_start}
                     --momentum {self.momentum}
                     --nesterovs_momentum {self.nesterovs_momentum}
@@ -914,7 +914,7 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
             self.normalization_indices = list(range(self.nb_attributes))
         self.nb_threads = nb_threads
         self.seed = seed
-        self.explanation_type = "global"
+        self.explanation_type = "local"
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.root_path.joinpath(self.global_rules_outfile)
@@ -981,7 +981,63 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
                 "Something went wrong with the FidexGloRules explainer execution..."
             )
 
+        stats = FidexGloStatsAlgorithm(
+            model=self.model,
+            verbose_console=self.verbose_console,
+            attributes_file=self.attributes_file,
+            positive_class_index=self.positive_class_index,
+        )
+        stats.execute()
+
         return self._postprocess()
+
+
+class FidexGloStatsAlgorithm(DimlpfidexAlgorithm):
+    # - test_data must contain attributes and classes altogether
+
+    def __init__(
+        self,
+        model: DimlpfidexModel,
+        verbose_console: bool = False,
+        attributes_file: str = None,
+        positive_class_index: int = None,
+    ):
+        self.model = model
+        self.verbose_console = verbose_console
+        self.nb_attributes = model.nb_attributes
+        self.nb_classes = model.nb_classes
+        self.global_rules_file = "fidexGloRules_output_rules.json"
+        self.attributes_file = attributes_file
+        self.stats_file = "statsFidexGloRules.txt"
+        self.positive_class_index = positive_class_index
+
+    def _postprocess(self):
+        pass
+
+    def execute(self):
+        command = f"""
+                --root_folder {self.model.root_path}
+                --test_data_file {self.model.test_data_filename}
+                --test_pred_file {self.model._outputs["test_pred_outfile"]}
+                --global_rules_file {self.global_rules_file}
+                --nb_attributes {self.nb_attributes}
+                --nb_classes {self.nb_classes}
+                --stats_file {self.stats_file}
+                """
+        if self.attributes_file is not None:
+            command += f" --attributes_file {self.attributes_file}"
+        if not self.verbose_console:
+            command += " --console_file fidexGloStatsResult.txt"
+        if self.positive_class_index is not None:
+            command += f" --positive_class_index {self.positive_class_index}"
+
+        status = fidexGloStats(command)
+        if status != 0:
+            raise ValueError(
+                "Something went wrong with the Fidex explainer execution..."
+            )
+
+        return None
 
 
 # !all optional parameters must be specified inside KWARGS:
@@ -1003,7 +1059,6 @@ class DimlpfidexExplainer(ExplainerBase):
         self.model = model
         self.training_data = training_data
         self.preprocess_function = preprocess_function
-        self.verbose = True
 
         if "explainer" not in kwargs:
             raise ValueError(
