@@ -24,20 +24,37 @@ from ....explanations.tabular.dimlpfidex import DimlpfidexExplanation
 
 
 def tabular_to_csv(data: Tabular, path: pl.Path) -> None:
+    """
+    Converts a Tabular object to a CSV file.
+
+    :param data: The Tabular object containing the data.
+    :param path: The path where the CSV file will be saved.
+    """
     data.to_pd().to_csv(path, index=False, header=False)
 
 
 def csv_to_tabular(path: str) -> Tabular:
+    """
+    Loads a CSV file and converts it into a Tabular object.
+
+    :param path: The path to the CSV file to load.
+    :return: The Tabular object corresponding to the data in the CSV file.
+    """
     return Tabular(pd.read_csv(path))
 
 
 def sanatizeList(data: list) -> str:
+    """
+    Converts a list into a string of a list without spaces.
+    :param data: The list to convert.
+    :return: The string corresponding to the list with spaces removed.
+    """
     return str(data).replace(" ", "")
 
 
 class DimlpfidexModel(metaclass=ABCMeta):
     """
-    Abstract class giving a template to follow when implementing a model that can be used by the DimlpfidexExplainer.
+    Abstract class providing a template for implementing a model that can be used by the DimlpfidexExplainer.
     """
 
     def __init__(self) -> None:
@@ -58,7 +75,7 @@ class DimlpfidexModel(metaclass=ABCMeta):
 
 class DimlpfidexAlgorithm(metaclass=ABCMeta):
     """
-    Abstract class giving a template to follow when implementing an explaining algorithm that can be used by the DimlpfidexExplainer.
+    Abstract class providing a template for implementing an explanation algorithm that can be used by the DimlpfidexExplainer.
     """
 
     def __init__(self) -> None:
@@ -74,10 +91,42 @@ class DimlpfidexAlgorithm(metaclass=ABCMeta):
 
 
 class DimlpBTModel(DimlpfidexModel):
-    # to put in the doc:
-    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
-    # - train_data and test_data must contain attributes and classes altogether
+    """
+    A model class for the DimlpBT model, implementing the DimlpfidexModel interface.
+    This model uses the DIMLP neural network with optional Dimlp rule extraction.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/dimlp/dimlpbt/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this model may differ from this use case. Please use it with caution.
+    - `training_data` and `testing_data` must contain both attributes and classes.
+
+    :param root_path: Directory where input files are located and output files will be generated.
+    :param training_data: Tabular data containing attributes and classes for training.
+    :param testing_data: Tabular data containing attributes and classes for testing.
+    :param nb_attributes: Number of attributes in the data.
+    :param nb_classes: Number of classes in the data.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param nb_dimlp_nets: Number of DIMLP networks to train with bagging.
+    :param attributes_file: Optional file specifying attribute and class names.
+    :param first_hidden_layer: Number of neurons in the first hidden layer.
+    :param hidden_layers: List of integers specifying the number of neurons in each hidden layer, from the second to the last.
+    :param with_rule_extraction: If True, rule extraction will be performed.
+    :param momentum: Momentum parameter for training.
+    :param flat: Flatness parameter for training.
+    :param error_thresh: Error threshold to stop training.
+    :param acc_thresh: Accuracy threshold to stop training.
+    :param abs_error_thresh: Absolute error threshold for training.
+    :param nb_epochs: Number of training epochs.
+    :param nb_epochs_error: Number of epochs abefore showing error.
+    :param nb_ex_per_net: Number of examples per network.
+    :param nb_quant_levels: Number of "stairs" in the staircase function.
+    :param normalization_file: File containing the mean and standard deviation for specified attributes that have been normalized.
+    :param mus: Mean or median of each attribute index to denormalize in the rules.
+    :param sigmas: Standard deviation of each attribute index to denormalize in the rules.
+    :param normalization_indices: Indices of attributes to be denormalized in the rules.
+    :param seed: Random seed for reproducibility.
+    """
 
     def __init__(
         self,
@@ -229,10 +278,42 @@ class DimlpBTModel(DimlpfidexModel):
 
 
 class GradBoostModel(DimlpfidexModel):
-    # to put in the doc:
-    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
-    # - train_data and test_data must contain attributes and classes altogether
+    """
+    A model class for Gradient Boosting, implementing the DimlpfidexModel interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/training-methods/gradboosttrn/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this model may differ from this use case. Please use it with caution.
+    - `training_data` and `testing_data` must contain both attributes and classes.
+
+    :param root_path: Directory where input files are located and output files will be generated.
+    :param training_data: Tabular data containing attributes and classes for training.
+    :param testing_data: Tabular data containing attributes and classes for testing.
+    :param nb_attributes: Number of attributes in the data.
+    :param nb_classes: Number of classes in the data.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param n_estimators: Number of generated trees in the forest.
+    :param loss: Loss function to optimize.
+    :param learning_rate: Learning rate shrinks the contribution of each tree.
+    :param subsample: The fraction of samples to use for fitting the individual base learners.
+    :param criterion: The function to measure the quality of a split.
+    :param max_depth: Maximum depth of the individual estimators.
+    :param min_samples_split: Minimum number of samples required to split an internal node.
+    :param min_samples_leaf: Minimum number of samples required to be at a leaf node.
+    :param min_weight_fraction_leaf: Minimum weighted fraction of the input samples required to be at a leaf node.
+    :param max_features: The number of features to consider when looking for the best split.
+    :param max_leaf_nodes: Maximum number of leaf nodes.
+    :param min_impurity_decrease: A node will be split if this split induces a decrease in the impurity greater than or equal to this value.
+    :param init: An estimator object that is used to compute the initial predictions.
+    :param seed: Random seed for reproducibility.
+    :param verbose_scikit: Controls the verbosity when fitting and predicting.
+    :param warm_start: Reuse the solution of the previous call to fit and add more estimators to the ensemble.
+    :param validation_fraction: The proportion of training data to set aside as validation set for early stopping.
+    :param n_iter_no_change: Number of iterations with no improvement to stop fitting.
+    :param tol: Tolerance for stopping criterion.
+    :param ccp_alpha: Complexity parameter used for Minimal Cost-Complexity Pruning.
+    """
 
     def __init__(
         self,
@@ -361,10 +442,40 @@ class GradBoostModel(DimlpfidexModel):
 
 
 class RandomForestModel(DimlpfidexModel):
-    # to put in the doc:
-    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
-    # - train_data and test_data must contain attributes and classes altogether
+    """
+    A model class for Random Forest, implementing the DimlpfidexModel interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/training-methods/randforeststrn/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this model may differ from this use case. Please use it with caution.
+    - `training_data` and `testing_data` must contain both attributes and classes.
+
+    :param root_path: Directory where input files are located and output files will be generated.
+    :param training_data: Tabular data containing attributes and classes for training.
+    :param testing_data: Tabular data containing attributes and classes for testing.
+    :param nb_attributes: Number of attributes in the data.
+    :param nb_classes: Number of classes in the data.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param n_estimators: Number of trees in the forest.
+    :param criterion: Function to measure the quality of a split.
+    :param max_depth: Maximum depth of the tree.
+    :param min_samples_split: Minimum number of samples required to split an internal node.
+    :param min_samples_leaf: Minimum number of samples required to be at a leaf node.
+    :param min_weight_fraction_leaf: Minimum weighted fraction of the input samples required to be at a leaf node.
+    :param max_features: Number of features to consider when looking for the best split.
+    :param max_leaf_nodes: Maximum number of leaf nodes.
+    :param min_impurity_decrease: A node will be split if this split induces a decrease in the impurity.
+    :param bootstrap: Whether bootstrap samples are used when building trees.
+    :param oob_score: Whether to use out-of-bag samples to estimate the generalization accuracy.
+    :param n_jobs: Number of jobs to run in parallel.
+    :param seed: Random seed for reproducibility.
+    :param verbose_scikit: Controls the verbosity when fitting and predicting.
+    :param warm_start: Reuse the solution of the previous call to fit and add more estimators to the ensemble.
+    :param class_weight: Weights associated with classes.
+    :param ccp_alpha: Complexity parameter used for Minimal Cost-Complexity Pruning.
+    :param max_samples: If bootstrap is True, the number of samples to draw from X to train each base estimator.
+    """
 
     def __init__(
         self,
@@ -490,10 +601,39 @@ class RandomForestModel(DimlpfidexModel):
 
 
 class SVMModel(DimlpfidexModel):
-    # to put in the doc:
-    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
-    # - train_data and test_data must contain attributes and classes altogether
+    """
+    A model class for Support Vector Machines (SVM), implementing the DimlpfidexModel interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/training-methods/svmtrn/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this model may differ from this use case. Please use it with caution.
+    - `training_data` and `testing_data` must contain both attributes and classes.
+
+    :param root_path: Directory where input files are located and output files will be generated.
+    :param training_data: Tabular data containing attributes and classes for training.
+    :param testing_data: Tabular data containing attributes and classes for testing.
+    :param nb_attributes: Number of attributes in the data.
+    :param nb_classes: Number of classes in the data.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param output_roc: Path to the file where the ROC curve will be saved.
+    :param positive_class_index: Index of the positive class for ROC calculation.
+    :param nb_quant_levels: Number of "stairs" in the staircase function.
+    :param K: Parameter to improve dynamics by normalizing input data.
+    :param C: Regularization parameter.
+    :param kernel: Specifies the kernel type to be used in the algorithm.
+    :param degree: Degree of the polynomial kernel function (‘poly’).
+    :param gamma: Kernel coefficient for ‘rbf’, ‘poly’, and ‘sigmoid’.
+    :param coef0: Independent term in kernel function.
+    :param shrinking: Whether to use the shrinking heuristic.
+    :param tol: Tolerance for stopping criterion.
+    :param cache_size: Specify the size of the kernel cache.
+    :param class_weight: Class balance.
+    :param verbose_scikit: Controls the verbosity when fitting and predicting.
+    :param max_iterations: Hard limit on iterations within solver.
+    :param decision_function_shape: Decision function shape.
+    :param break_ties: Whether to break tie decision for one-vs-rest decision function shape with more than 2 classes.
+    """
 
     def __init__(
         self,
@@ -613,10 +753,47 @@ class SVMModel(DimlpfidexModel):
 
 
 class MLPModel(DimlpfidexModel):
-    # to put in the doc:
-    # - beware, HES-XPLAIN documentation concerning this model differs from this use case. Please, follow it with precaution.
-    # - root_path is directory where temporary files and output files will be generated, it must be a low permission directory
-    # - train_data and test_data must contain attributes and classes altogether
+    """
+    A model class for Multilayer Perceptron (MLP), implementing the DimlpfidexModel interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/training-methods/mlptrn/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this model may differ from this use case. Please use it with caution.
+    - `training_data` and `testing_data` must contain both attributes and classes.
+
+    :param root_path: Directory where input files are located and output files will be generated.
+    :param training_data: Tabular data containing attributes and classes for training.
+    :param testing_data: Tabular data containing attributes and classes for testing.
+    :param nb_attributes: Number of attributes in the data.
+    :param nb_classes: Number of classes in the data.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param nb_quant_levels: Number of "stairs" in the staircase function.
+    :param K: Parameter to improve dynamics by normalizing input data.
+    :param hidden_layer_sizes: The ith element represents the number of neurons in the ith hidden layer.
+    :param activation: Activation function for the hidden layer.
+    :param solver: The solver for weight optimization.
+    :param alpha: L2 penalty (regularization term) parameter.
+    :param batch_size: Size of minibatches for stochastic optimizers.
+    :param learning_rate: Learning rate schedule for weight updates.
+    :param learning_rate_init: Initial learning rate used.
+    :param power_t: The exponent for inverse scaling learning rate.
+    :param max_iterations: Maximum number of iterations.
+    :param shuffle: Whether to shuffle samples in each iteration.
+    :param seed: Random seed for reproducibility.
+    :param tol: Tolerance for the optimization.
+    :param verbose_scikit: Controls the verbosity when fitting and predicting.
+    :param warm_start: Reuse the solution of the previous call to fit and add more iterations to the model.
+    :param momentum: Momentum for gradient descent update.
+    :param nesterovs_momentum: Whether to use Nesterov’s momentum.
+    :param early_stopping: Whether to use early stopping to terminate training when validation score is not improving.
+    :param validation_fraction: Proportion of training data to set aside as validation set for early stopping.
+    :param beta_1: Exponential decay rate for estimates of first moment vector in Adam.
+    :param beta_2: Exponential decay rate for estimates of second moment vector in Adam.
+    :param epsilon: Value for numerical stability in Adam.
+    :param n_iter_no_change: Maximum number of epochs to not meet tol improvement.
+    :param max_fun: Maximum number of loss function calls.
+    """
 
     def __init__(
         self,
@@ -756,7 +933,35 @@ class MLPModel(DimlpfidexModel):
 
 
 class FidexAlgorithm(DimlpfidexAlgorithm):
-    # - train_data and test_data must contain attributes and classes altogether
+    """
+    An algorithm class for the Fidex explanation method, implementing the DimlpfidexAlgorithm interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/fidex/fidex/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this explanation algorithm may differ from this use case. Please use it with caution.
+    - The `training_data` and `testing_data` must contain both attributes and classes altogether.
+
+    :param model: The model to explain, which should be a subclass of DimlpfidexModel.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param attributes_file: Optional file specifying attribute and class names.
+    :param max_iterations: Maximum number of iterations to generate a rule.
+    :param min_covering: Minimum number of examples a rule must cover.
+    :param covering_strategy: Whether or not the algorithm uses a dichotomic strategy to compute a rule.
+    :param max_failed_attempts: Maximum number of failed attempts to generate a rule.
+    :param min_fidelity: Lowest fidelity score allowed for a rule.
+    :param lowest_min_fidelity: Lowest fidelity score to which we agree to go down when a rule must be generated.
+    :param dropout_dim: Percentage of dimensions that are ignored during an iteration.
+    :param dropout_hyp: Percentage of hyperplanes that are ignored during an iteration.
+    :param decision_threshold: Threshold for predictions to be considered as correct.
+    :param positive_class_index: Index of the positive class for the usage of decision threshold.
+    :param nb_quant_levels: Number of "stairs" in the staircase function.
+    :param normalization_file: File containing the mean and standard deviation for specified attributes that have been normalized.
+    :param mus: Mean or median of each attribute index to denormalize in the rules.
+    :param sigmas: Standard deviation of each attribute index to denormalize in the rules.
+    :param normalization_indices: Indices of attributes to be denormalized in the rules.
+    :param seed: Random seed for reproducibility.
+    """
 
     def __init__(
         self,
@@ -892,6 +1097,44 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
 
 
 class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
+    """
+    An algorithm class for the FidexGloRules explanation method, implementing the DimlpfidexAlgorithm interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/fidex/fidexglorules/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this explanation algorithm may differ from this use case. Please use it with caution.
+    - The `training_data` must contain both attributes and classes altogether.
+    - The algorithm can execute the FidexGlo if the `with_fidexGlo` parameter is True. The documentation for fidexGlo can be found here :
+    https://hes-xplain.github.io/documentation/algorithms/fidex/fidexglo/
+    - Parameters `with_minimal_version` and `nb_fidex_rules` are only used with FidexGlo.
+
+    :param model: The model to explain, which should be a subclass of DimlpfidexModel.
+    :param heuristic: The heuristic to use for rule generation.
+    :param with_fidexGlo: If True, FidexGlo will also be executed.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param attributes_file: Optional file specifying attribute and class names.
+    :param max_iterations: Maximum number of iterations to generate a rule.
+    :param min_covering: Minimum number of examples a rule must cover.
+    :param covering_strategy: Whether or not the algorithm uses a dichotomic strategy to compute a rule.
+    :param max_failed_attempts: Maximum number of failed attempts to generate a rule.
+    :param min_fidelity: Lowest fidelity score allowed for a rule.
+    :param lowest_min_fidelity: Lowest fidelity score to which we agree to go down when a rule must be generated.
+    :param dropout_dim: Percentage of dimensions that are ignored during an iteration.
+    :param dropout_hyp: Percentage of hyperplanes that are ignored during an iteration.
+    :param decision_threshold: Threshold for predictions to be considered as correct.
+    :param positive_class_index: Index of the positive class for the usage of decision threshold.
+    :param nb_quant_levels: Number of "stairs" in the staircase function.
+    :param normalization_file: File containing the mean and standard deviation for specified attributes that have been normalized.
+    :param mus: Mean or median of each attribute index to denormalize in the rules.
+    :param sigmas: Standard deviation of each attribute index to denormalize in the rules.
+    :param normalization_indices: Indices of attributes to be denormalized in the rules.
+    :param nb_threads: Number of threads to use for processing.
+    :param seed: Random seed for reproducibility.
+    :param with_minimal_version: Whether to use the minimal version, which only gets correct activated rules.
+    :param nb_fidex_rules: Number of Fidex rules to compute per sample when launching the Fidex algorithm.
+    """
+
     # - train_data must contain attributes and classes altogether
     # - You can ask for the execution of fidexGlo with the parameter fidexGlo
     # - parameters with_minimal_version and nb_fidex_rules only used with fidexGlo
@@ -1055,7 +1298,20 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
 
 
 class FidexGloStatsAlgorithm(DimlpfidexAlgorithm):
-    # - test_data must contain attributes and classes altogether
+    """
+    An algorithm class for calculating statistics from FidexGlo rules, implementing the DimlpfidexAlgorithm interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/fidex/fidexglostats/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this explanation algorithm may differ from this use case. Please use it with caution.
+    - The `test_data_filename` must contain both attributes and classes altogether.
+
+    :param model: The model to explain, which should be a subclass of DimlpfidexModel.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param attributes_file: Optional file specifying attribute and class names.
+    :param positive_class_index: Index of positive class to compute true/false positive/negative rates.
+    """
 
     def __init__(
         self,
@@ -1103,7 +1359,35 @@ class FidexGloStatsAlgorithm(DimlpfidexAlgorithm):
 
 
 class FidexGloAlgorithm(DimlpfidexAlgorithm):
-    # - train_data and test_data must contain attributes and classes altogether
+    """
+    An algorithm class for the FidexGlo explanation method, implementing the DimlpfidexAlgorithm interface.
+    The documentation for this model can be found here:
+    https://hes-xplain.github.io/documentation/algorithms/fidex/fidexglo/
+
+    **Important Notes:**
+    - HES-XPLAIN documentation concerning this explanation algorithm may differ from this use case. Please use it with caution.
+    - `training_data` and `testing_data` must contain both attributes and classes altogether.
+
+    :param model: The model to explain, which should be a subclass of DimlpfidexModel.
+    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
+    :param attributes_file: Optional file specifying attribute and class names.
+    :param with_minimal_version: Whether to use the minimal version, which only gets correct activated rules.
+    :param max_iterations: Maximum number of iterations to generate a rule.
+    :param min_covering: Minimum number of examples a rule must cover.
+    :param covering_strategy: Whether or not the algorithm uses a dichotomic strategy to compute a rule.
+    :param max_failed_attempts: Maximum number of failed attempts to generate a rule.
+    :param min_fidelity: Lowest fidelity score allowed for a rule.
+    :param lowest_min_fidelity: Lowest fidelity score to which we agree to go down when a rule must be generated.
+    :param nb_fidex_rules: Number of Fidex rules to compute per sample when launching the Fidex algorithm.
+    :param dropout_dim: Percentage of dimensions that are ignored during an iteration.
+    :param dropout_hyp: Percentage of hyperplanes that are ignored during an iteration.
+    :param nb_quant_levels: Number of "stairs" in the staircase function.
+    :param normalization_file: File containing the mean and standard deviation for specified attributes that have been normalized.
+    :param mus: Mean or median of each attribute index to denormalize in the rules.
+    :param sigmas: Standard deviation of each attribute index to denormalize in the rules.
+    :param normalization_indices: Indices of attributes to be denormalized in the rules.
+    :param seed: Random seed for reproducibility.
+    """
 
     def __init__(
         self,
@@ -1224,9 +1508,19 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
 
 # !all optional parameters must be specified inside KWARGS:
 class DimlpfidexExplainer(ExplainerBase):
-    # - An explainer algorithm must be instanciated (see DimlpfidexAlgorithms based classes) and specified
-    # - Optional argument verbose
-    # - preprocess_function must have train_data as only parameter
+    """
+    An explainer class for the Dimlpfidex explainer framework, implementing the ExplainerBase interface.
+
+    **Important Notes:**
+    - An explanation algorithm must be instantiated and provided in kwargs(see subclasses of DimlpfidexAlgorithm).
+    - `preprocess_function` must be a callable that processes the `training_data`.
+
+    :param training_data: Tabular data containing attributes and classes for training.
+    :param model: The model to train and explain, which should be a subclass of DimlpfidexModel.
+    :param preprocess_function: A callable function that preprocesses the training data.
+    :param kwargs: Additional arguments, including the explanation algorithm to use.
+    """
+
     alias = ["dimlpfidex"]
     mode = "classification"
 
@@ -1258,9 +1552,17 @@ class DimlpfidexExplainer(ExplainerBase):
     def explanation_type(self):
         return self.explainer.explanation_type
 
-    # If not using dimlpBT, predictions will not be performed so run_predict and X params are ignored and original test data from model training is used instead
-    # If X is None, original test data from model training is used. Else, you must use dimlpBT model instead of any other.
     def explain(self, X: Tabular | None = None) -> DimlpfidexExplanation:
+        """
+        Generates explanations using the specified explanation algorithm.
+
+        **Important Notes:**
+        - If not using DimlpBT, predictions will not be performed, so `run_predict` and `X` parameters are ignored, and the original test data from model training is used instead.
+        - If `X` is None, the original test data from model training is used. Otherwise, you must use the DimlpBT model instead of any other.
+
+        :param X: Optional Tabular test data for which to generate explanations.
+        :return: A DimlpfidexExplanation object containing the explanations.
+        """
         status = self.model.train()
 
         if status != 0:
@@ -1282,6 +1584,11 @@ class DimlpfidexExplainer(ExplainerBase):
         return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
 
     def explain_global(self):
+        """
+        Generates global explanations using the specified explanation algorithm.
+
+        :return: A DimlpfidexExplanation object containing the global explanations.
+        """
         status = self.model.train()
         if status != 0:
             raise ValueError("Something went wrong with the model execution...")
