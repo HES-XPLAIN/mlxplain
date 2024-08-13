@@ -12,7 +12,7 @@ from typing import Callable
 
 import pandas as pd
 from dimlpfidex.dimlp import dimlpBT
-from dimlpfidex.fidex import fidex, fidexGloRules, fidexGloStats
+from dimlpfidex.fidex import fidex, fidexGlo, fidexGloRules, fidexGloStats
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.base import ExplainerBase
 from trainings.gradBoostTrn import gradBoostTrn
@@ -849,11 +849,14 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
 
 class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
     # - train_data must contain attributes and classes altogether
+    # - You can ask for the execution of fidexGlo with the parameter fidexGlo
+    # - parameters with_minimal_version and nb_fidex_rules only used with fidexGlo
 
     def __init__(
         self,
         model: DimlpfidexModel,
         heuristic: int,
+        with_fidexGlo: bool,
         verbose_console: bool = False,
         attributes_file: str = None,
         max_iterations: int = 10,
@@ -873,9 +876,12 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         normalization_indices: list[int] = None,
         nb_threads: int = 1,
         seed: int = 0,
+        with_minimal_version: bool = False,
+        nb_fidex_rules: int = 1,
     ):
         self.model = model
         self.heuristic = heuristic
+        self.with_fidexGlo = with_fidexGlo
         self.nb_attributes = model.nb_attributes
         self.nb_classes = model.nb_classes
         self.global_rules_outfile = "fidexGloRules_output_rules.json"
@@ -900,6 +906,8 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
             self.normalization_indices = list(range(self.nb_attributes))
         self.nb_threads = nb_threads
         self.seed = seed
+        self.with_minimal_version = with_minimal_version
+        self.nb_fidex_rules = nb_fidex_rules
         self.explanation_type = "local"
 
     def _postprocess(self) -> dict:
@@ -975,6 +983,30 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         )
         stats.execute()
 
+        if self.with_fidexGlo:
+            fidexGlo = FidexGloAlgorithm(
+                model=self.model,
+                verbose_console=self.verbose_console,
+                attributes_file=self.attributes_file,
+                seed=self.seed,
+                with_minimal_version=self.with_minimal_version,
+                nb_fidex_rules=self.nb_fidex_rules,
+                max_iterations=self.max_iterations,
+                min_covering=self.min_covering,
+                covering_strategy=self.covering_strategy,
+                max_failed_attempts=self.max_failed_attempts,
+                min_fidelity=self.min_fidelity,
+                lowest_min_fidelity=self.lowest_min_fidelity,
+                dropout_dim=self.dropout_dim,
+                dropout_hyp=self.dropout_hyp,
+                nb_quant_levels=self.nb_quant_levels,
+                normalization_file=self.normalization_file,
+                mus=self.mus,
+                sigmas=self.sigmas,
+                normalization_indices=self.normalization_indices,
+            )
+            fidexGlo.execute()
+
         return self._postprocess()
 
 
@@ -1020,10 +1052,130 @@ class FidexGloStatsAlgorithm(DimlpfidexAlgorithm):
         status = fidexGloStats(command)
         if status != 0:
             raise ValueError(
-                "Something went wrong with the Fidex explainer execution..."
+                "Something went wrong with the FidexGloStats explainer execution..."
             )
 
         return None
+
+
+class FidexGloAlgorithm(DimlpfidexAlgorithm):
+    # - train_data and test_data must contain attributes and classes altogether
+
+    def __init__(
+        self,
+        model: DimlpfidexModel,
+        verbose_console: bool = False,
+        attributes_file: str = None,
+        with_minimal_version: bool = False,
+        max_iterations: int = 10,
+        min_covering: int = 2,
+        covering_strategy: bool = True,
+        max_failed_attempts: int = 30,
+        min_fidelity: float = 1.0,
+        lowest_min_fidelity: float = 0.75,
+        nb_fidex_rules: int = 1,
+        dropout_dim: float = 0.0,
+        dropout_hyp: float = 0.0,
+        nb_quant_levels: int = 50,
+        normalization_file: str = None,
+        mus: list[float] = None,
+        sigmas: list[float] = None,
+        normalization_indices: list[int] = None,
+        seed: int = 0,
+    ):
+        self.model = model
+        self.nb_attributes = model.nb_attributes
+        self.nb_classes = model.nb_classes
+        self.global_rules_file = "fidexGloRules_output_rules.json"
+        self.explanation_file = "explanations.txt"
+        self.verbose_console = verbose_console
+        self.attributes_file = attributes_file
+        self.with_minimal_version = with_minimal_version
+        self.max_iterations = max_iterations
+        self.min_covering = min_covering
+        self.covering_strategy = covering_strategy
+        self.max_failed_attempts = max_failed_attempts
+        self.min_fidelity = min_fidelity
+        self.lowest_min_fidelity = lowest_min_fidelity
+        self.nb_fidex_rules = nb_fidex_rules
+        self.dropout_dim = dropout_dim
+        self.dropout_hyp = dropout_hyp
+        self.nb_quant_levels = nb_quant_levels
+        self.normalization_file = normalization_file
+        self.mus = mus
+        self.sigmas = sigmas
+        self.normalization_indices = normalization_indices
+        if self.normalization_indices is None:
+            self.normalization_indices = list(range(self.nb_attributes))
+        self.seed = seed
+        self.explanation_type = "local"
+
+    def _postprocess(self) -> dict:
+        absolute_path = self.model.root_path.joinpath(self.explanation_file)
+        try:
+            with open(absolute_path) as file:
+                return json.load(file)
+        except FileNotFoundError:
+            print(f"Error: The file at {absolute_path} was not found.")
+            return {}
+        except json.JSONDecodeError:
+            print(f"Error: The file at {absolute_path} is not a valid JSON.")
+            return {}
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return {}
+
+    def execute(self) -> dict:
+        command = f"""
+                --root_folder {self.model.root_path}
+                --train_data_file {self.model.train_data_filename}
+                --train_pred_file {self.model._outputs["train_pred_outfile"]}
+                --test_data_file {self.model.test_data_filename}
+                --test_pred_file {self.model._outputs["test_pred_outfile"]}
+                --with_fidex True
+                --global_rules_file {self.global_rules_file}
+                --explanation_file {self.explanation_file}
+                --with_minimal_version {self.with_minimal_version}
+                --nb_attributes {self.nb_attributes}
+                --nb_classes {self.nb_classes}
+                --max_iterations {self.max_iterations}
+                --min_covering {self.min_covering}
+                --covering_strategy {self.covering_strategy}
+                --max_failed_attempts {self.max_failed_attempts}
+                --min_fidelity {self.min_fidelity}
+                --lowest_min_fidelity {self.lowest_min_fidelity}
+                --nb_fidex_rules {self.nb_fidex_rules}
+                --dropout_dim {self.dropout_dim}
+                --dropout_hyp {self.dropout_hyp}
+                --nb_quant_levels {self.nb_quant_levels}
+                --seed {self.seed}
+                """
+        if "weights_outfile" in self.model._outputs:
+            command += f" --weights_file {self.model._outputs['weights_outfile']}"
+        else:
+            command += f" --rules_file {self.model._outputs['rules_outfile']}"
+        if self.attributes_file is not None:
+            command += f" --attributes_file {self.attributes_file}"
+        if not self.verbose_console:
+            command += " --console_file fidexGloRulesResult.txt"
+        if self.normalization_file is not None:
+            command += f" --normalization_file {self.normalization_file}"
+        if self.mus is not None:
+            command += f" --mus {sanatizeList(self.mus)}"
+        if self.sigmas is not None:
+            command += f" --sigmas {sanatizeList(self.sigmas)}"
+        if self.normalization_indices is not None and self.normalization_file is None:
+            command += (
+                f" --normalization_indices {sanatizeList(self.normalization_indices)}"
+            )
+
+        status = fidexGlo(command)
+        if status != 0:
+            raise ValueError(
+                "Something went wrong with the FidexGlo explainer execution..."
+            )
+
+        return self._postprocess()
 
 
 # !all optional parameters must be specified inside KWARGS:
