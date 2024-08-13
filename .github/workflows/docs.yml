@@ -85,7 +85,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: artifact-sphinx
-          path: build/docs
+          path: build
 
       - name: Download artifact (coverage)
         uses: actions/download-artifact@v4
