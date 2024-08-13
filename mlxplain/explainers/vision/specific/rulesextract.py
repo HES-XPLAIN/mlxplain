@@ -85,7 +85,7 @@ class RulesExtractImage(ExplainerBase):
 
         df_train = make_target_df(train_features, self.target_class)
         X_train, y_train = df_train.iloc[:, :-3], df_train.iloc[:, -1]
-        # todo: check params hardcode
+
         all_rules = extract_all_rules(
             X_train, y_train, n_estimators=200, max_depth=2, random_state=1
         )
