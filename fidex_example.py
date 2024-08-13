@@ -12,9 +12,13 @@ from omnixai.data.tabular import Tabular
 from omnixai.explainers.tabular.auto import TabularExplainer
 from omnixai.visualization.dashboard import Dashboard
 
-from mlxplain.explainers.tabular.specific.dimlpfidex import (  # DimlpBTModel,; GradBoostModel,; RandomForestModel,; SVMModel,; FidexAlgorithm,; SVMModel,; GradBoostModel,; RandomForestModel,; DimlpBTModel; MLPModel,; SVMModel,
+from mlxplain.explainers.tabular.specific.dimlpfidex import (
+    DimlpBTModel,
     FidexAlgorithm,
     FidexGloRulesAlgorithm,
+    GradBoostModel,
+    MLPModel,
+    RandomForestModel,
     SVMModel,
 )
 
@@ -103,159 +107,8 @@ def load_dummy_data():
     return train_data, test_data, 3, 2
 
 
-if __name__ == "__main__":
-
-    # ensure path exists
-    output_path = pl.Path("/tmp/explainer/")
-    train_data_file = "train_data.txt"
-    test_data_file = "test_data.txt"
-
-    # do load data
-    train_data, test_data, nattributes, nclasses = load_data()
-
-    # model = DimlpBTModel(
-    #     output_path,
-    #     train_data,
-    #     test_data,
-    #     nattributes,
-    #     nclasses,
-    # )
-
-    # model = GradBoostModel(
-    #     output_path,
-    #     train_data,
-    #     test_data,
-    #     nattributes,
-    #     nclasses,
-    #     verbose_console=True,
-    #     seed=1,
-    #     n_estimators = 3,
-    #     learning_rate=32,
-    #     subsample=0.3,
-    #     criterion="squared_error",
-    #     max_depth="no_max_depth",
-    #     min_samples_split=0.5,
-    #     min_samples_leaf=0.5,
-    #     min_weight_fraction_leaf=0.1,
-    #     max_features=3,
-    #     max_leaf_nodes=3,
-    #     min_impurity_decrease=3,
-    #     init="zero",
-    #     verbose_scikit=12,
-    #     warm_start=True,
-    #     validation_fraction=0.2,
-    #     n_iter_no_change=35,
-    #     tol=0.1,
-    #     ccp_alpha=0.1
-    # )
-
-    # model = RandomForestModel(
-    #     output_path,
-    #     train_data,
-    #     test_data,
-    #     nattributes,
-    #     nclasses,
-    #     seed=1,
-    #     n_estimators = 3,
-    #     criterion="entropy",
-    #     max_depth=2,
-    #     min_samples_split=0.5,
-    #     min_samples_leaf=0.5,
-    #     min_weight_fraction_leaf=0.1,
-    #     max_features=3,
-    #     max_leaf_nodes=3,
-    #     min_impurity_decrease=3,
-    #     bootstrap=True,
-    #     oob_score=True,
-    #     n_jobs=-1,
-    #     verbose_scikit=12,
-    #     warm_start=True,
-    #     class_weight={0:1.2, 1:2.3},
-    #     ccp_alpha=0.1,
-    #     max_samples=2,
-    # )
-
-    model = SVMModel(
-        output_path,
-        train_data,
-        test_data,
-        nattributes,
-        nclasses,
-        # output_roc="roc_curve.png",
-        # positive_class_index=1,
-        # nb_quant_levels=45,
-        # K=0.1,
-        # C=0.1,
-        # kernel="sigmoid",
-        # degree=5,
-        # gamma=0.4,
-        # coef0=1.3,
-        # shrinking=False,
-        # tol=1,
-        # cache_size=150.2,
-        # class_weight={0: 1.2, 1: 3.5},
-        # max_iterations=50,
-        # decision_function_shape="ovo",
-        # break_ties=False,
-        verbose_console=True,
-    )
-
-    # model = MLPModel(
-    #     output_path,
-    #     train_data,
-    #     test_data,
-    #     nattributes,
-    #     nclasses,
-    #     verbose_console = True,
-    # nb_quant_levels=45,
-    # K=0.1,
-    # hidden_layer_sizes=[12, 13, 14],
-    # activation="tanh",
-    # solver="sgd",
-    # alpha=0.1,
-    # batch_size=2,
-    # learning_rate="adaptive",
-    # learning_rate_init=0.1,
-    # power_t=0.2,
-    # max_iterations=150,
-    # shuffle=False,
-    # seed=1,
-    # tol=0.3,
-    # verbose=True,
-    # warm_start=True,
-    # momentum=0.1,
-    # nesterovs_momentum=False,
-    # early_stopping=True,
-    # validation_fraction=0.2,
-    # beta_1=0.2,
-    # beta_2=0.2,
-    # epsilon=0.1,
-    # n_iter_no_change=1,
-    # max_fun=2,
-    # )
-
-    fidex = FidexAlgorithm(
-        model,
-        seed=1,
-        # attributes_file = "attributes.txt",
-        max_iterations=10,
-        min_covering=2,
-        # covering_strategy = False,
-        max_failed_attempts=35,
-        min_fidelity=0.9,
-        lowest_min_fidelity=0.8,
-        dropout_dim=0.5,
-        dropout_hyp=0.5,
-        # decision_threshold = 0.2,
-        # positive_class_index = 0,
-        nb_quant_levels=45,
-        # normalization_file = "normalization.txt",
-        # mus = [1,3],
-        # sigmas = [2,3],
-        # normalization_indices = [0,2]
-    )
-
-    fidexGloRules = FidexGloRulesAlgorithm(
+def get_fidexGloRules_explainer(model):
+    return FidexGloRulesAlgorithm(
         model,
         heuristic=2,
         with_fidexGlo=True,
@@ -282,6 +135,179 @@ if __name__ == "__main__":
         nb_fidex_rules=2,
     )
 
+
+def get_fidex_explainer(model):
+    return FidexAlgorithm(
+        model,
+        seed=1,
+        # attributes_file = "attributes.txt",
+        max_iterations=10,
+        min_covering=2,
+        # covering_strategy = False,
+        max_failed_attempts=35,
+        min_fidelity=0.9,
+        lowest_min_fidelity=0.8,
+        dropout_dim=0.5,
+        dropout_hyp=0.5,
+        # decision_threshold = 0.2,
+        # positive_class_index = 0,
+        nb_quant_levels=45,
+        # normalization_file = "normalization.txt",
+        # mus = [1,3],
+        # sigmas = [2,3],
+        # normalization_indices = [0,2]
+    )
+
+
+def get_fidexGlo_explainer():
+    pass
+
+
+def get_MLPModel(output_path, train_data, test_data, nattributes, nclasses):
+    return MLPModel(
+        output_path,
+        train_data,
+        test_data,
+        nattributes,
+        nclasses,
+        # verbose_console=True,
+        # nb_quant_levels=45,
+        # K=0.1,
+        # hidden_layer_sizes=[12, 13, 14],
+        # activation="tanh",
+        # solver="sgd",
+        # alpha=0.1,
+        # batch_size=2,
+        # learning_rate="adaptive",
+        # learning_rate_init=0.1,
+        # power_t=0.2,
+        # max_iterations=150,
+        # shuffle=False,
+        # seed=1,
+        # tol=0.3,
+        # verbose=True,
+        # warm_start=True,
+        # momentum=0.1,
+        # nesterovs_momentum=False,
+        # early_stopping=True,
+        # validation_fraction=0.2,
+        # beta_1=0.2,
+        # beta_2=0.2,
+        # epsilon=0.1,
+        # n_iter_no_change=1,
+        # max_fun=2,
+    )
+
+
+def get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses):
+    return DimlpBTModel(
+        output_path,
+        train_data,
+        test_data,
+        nattributes,
+        nclasses,
+    )
+
+
+def get_gradBoostModel(output_path, train_data, test_data, nattributes, nclasses):
+    GradBoostModel(
+        output_path,
+        train_data,
+        test_data,
+        nattributes,
+        nclasses,
+        verbose_console=True,
+        seed=1,
+        n_estimators=3,
+        learning_rate=32,
+        subsample=0.3,
+        criterion="squared_error",
+        max_depth="no_max_depth",
+        min_samples_split=0.5,
+        min_samples_leaf=0.5,
+        min_weight_fraction_leaf=0.1,
+        max_features=3,
+        max_leaf_nodes=3,
+        min_impurity_decrease=3,
+        init="zero",
+        verbose_scikit=12,
+        warm_start=True,
+        validation_fraction=0.2,
+        n_iter_no_change=35,
+        tol=0.1,
+        ccp_alpha=0.1,
+    )
+
+
+def get_randomForrestModel(output_path, train_data, test_data, nattributes, nclasses):
+    return RandomForestModel(
+        output_path,
+        train_data,
+        test_data,
+        nattributes,
+        nclasses,
+        seed=1,
+        n_estimators=3,
+        criterion="entropy",
+        max_depth=2,
+        min_samples_split=0.5,
+        min_samples_leaf=0.5,
+        min_weight_fraction_leaf=0.1,
+        max_features=3,
+        max_leaf_nodes=3,
+        min_impurity_decrease=3,
+        bootstrap=True,
+        oob_score=True,
+        n_jobs=-1,
+        verbose_scikit=12,
+        warm_start=True,
+        class_weight={0: 1.2, 1: 2.3},
+        ccp_alpha=0.1,
+        max_samples=2,
+    )
+
+
+def get_SVMModel(output_path, train_data, test_data, nattributes, nclasses):
+    return SVMModel(
+        output_path,
+        train_data,
+        test_data,
+        nattributes,
+        nclasses,
+        output_roc="roc_curve.png",
+        positive_class_index=1,
+        nb_quant_levels=45,
+        K=0.1,
+        C=0.1,
+        kernel="sigmoid",
+        degree=5,
+        gamma=0.4,
+        coef0=1.3,
+        shrinking=False,
+        tol=1,
+        cache_size=150.2,
+        class_weight={0: 1.2, 1: 3.5},
+        max_iterations=50,
+        decision_function_shape="ovo",
+        break_ties=False,
+        verbose_console=True,
+    )
+
+
+if __name__ == "__main__":
+
+    # ensure path exists
+    output_path = pl.Path("/tmp/explainer/")
+    train_data_file = "train_data.txt"
+    test_data_file = "test_data.txt"
+
+    # do load data
+    train_data, test_data, nattributes, nclasses = load_data()
+
+    fidexGloRules = get_fidexGloRules_explainer()
+    fidex = get_fidex_explainer()
+    model = get_dimlpBTModel(train_data, test_data, nattributes, nclasses)
+
     global_explainer = TabularExplainer(
         explainers=["dimlpfidex"],
         data=train_data,
@@ -299,7 +325,7 @@ if __name__ == "__main__":
     )
 
     le = local_explainer.explain(test_data, run_predict=False)
-    ge = global_explainer.explain(test_data, run_predict=False)
+    ge = global_explainer.explain_global()
 
     db = Dashboard(local_explanations=le, global_explanations=ge)
     db.show()
