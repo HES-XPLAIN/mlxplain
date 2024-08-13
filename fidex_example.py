@@ -110,7 +110,7 @@ def load_dummy_data():
 def get_fidexGloRules_explainer(model):
     return FidexGloRulesAlgorithm(
         model,
-        heuristic=2,
+        heuristic=1,
         with_fidexGlo=True,
         seed=1,
         verbose_console=True,
@@ -126,13 +126,13 @@ def get_fidexGloRules_explainer(model):
         # decision_threshold=0.2,
         positive_class_index=0,
         # nb_quant_levels=45,
-        normalization_file="normalization.txt",
+        # normalization_file="normalization.txt",
         # mus=[1, 3],
         # sigmas=[2, 3],
         # normalization_indices=[0, 2],
         nb_threads=4,
         with_minimal_version=True,
-        nb_fidex_rules=2,
+        # nb_fidex_rules=2,
     )
 
 
@@ -170,7 +170,7 @@ def get_MLPModel(output_path, train_data, test_data, nattributes, nclasses):
         test_data,
         nattributes,
         nclasses,
-        # verbose_console=True,
+        verbose_console=True,
         # nb_quant_levels=45,
         # K=0.1,
         # hidden_layer_sizes=[12, 13, 14],
@@ -304,9 +304,18 @@ if __name__ == "__main__":
     # do load data
     train_data, test_data, nattributes, nclasses = load_data()
 
-    fidexGloRules = get_fidexGloRules_explainer()
-    fidex = get_fidex_explainer()
-    model = get_dimlpBTModel(train_data, test_data, nattributes, nclasses)
+    model = get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses)
+    fidexGloRules = get_fidexGloRules_explainer(model)
+    fidex = get_fidex_explainer(model)
+
+    local_explainer = TabularExplainer(
+        explainers=["dimlpfidex"],
+        data=train_data,
+        mode="classification",
+        model=model,
+        params={"dimlpfidex": {"explainer": fidex, "verbose": True}},
+    )
+    le = local_explainer.explain(test_data, run_predict=False)
 
     global_explainer = TabularExplainer(
         explainers=["dimlpfidex"],
@@ -316,15 +325,6 @@ if __name__ == "__main__":
         params={"dimlpfidex": {"explainer": fidexGloRules, "verbose": True}},
     )
 
-    local_explainer = TabularExplainer(
-        explainers=["dimlpfidex"],
-        data=train_data,
-        mode="classification",
-        model=model,
-        params={"dimlpfidex": {"explainer": fidex, "verbose": True}},
-    )
-
-    le = local_explainer.explain(test_data, run_predict=False)
     ge = global_explainer.explain_global()
 
     db = Dashboard(local_explanations=le, global_explanations=ge)
