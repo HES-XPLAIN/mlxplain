@@ -145,6 +145,7 @@ class DimlpBTModel(DimlpfidexModel):
             "train_pred_outfile": "dimlpBTTrain.out",
             "test_pred_outfile": "dimlpBTTest.out",
             "weights_outfile": "dimlpBT.wts",
+            "hidden_layers_file": "hidden_layers.out",
         }
 
     def _set_preprocess_function(self, preprocess_function: Callable):
@@ -218,7 +219,10 @@ class DimlpBTModel(DimlpfidexModel):
             f"""
                             --root_folder {self.root_path}
                             --train_data_file {self.train_data_filename}
-                            --
+                            --weights_file {self._outputs["weights_outfile"]}
+                            --hidden_layers_file {self._outputs["hidden_layers_file"]}
+                            --nb_attributes {self.nb_attributes}
+                            --nb_classes {self.nb_classes}
                          """
         )
         return status
@@ -820,18 +824,19 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
             return {}
 
     def _preprocess_test_data(self, X: Tabular):
-        tabular_to_csv(X, self.root_path.joinpath(self.test_samples_filename))
+        tabular_to_csv(X, self.model.root_path.joinpath(self.test_samples_filename))
 
     def execute(
         self, test_data: Tabular | None = None, test_preds_file: str | None = None
     ) -> dict:
-        test_data = self.model.test_data_filename
-        test_pred = self.model._outputs["test_pred_outfile"]
 
         if test_data is not None and test_preds_file is not None:
             self._preprocess_test_data(test_data)
             test_data = self.test_samples_filename
             test_pred = test_preds_file
+        else:
+            test_data = self.model.test_data_filename
+            test_pred = self.model._outputs["test_pred_outfile"]
 
         command = f"""
                 --root_folder {self.model.root_path}
@@ -1126,7 +1131,7 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
         self.nb_attributes = model.nb_attributes
         self.nb_classes = model.nb_classes
         self.global_rules_file = "fidexGloRules_output_rules.json"
-        self.explanation_file = "explanations.txt"
+        self.explanation_file = "explanations.json"
         self.verbose_console = verbose_console
         self.attributes_file = attributes_file
         self.with_minimal_version = with_minimal_version
@@ -1164,7 +1169,7 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
             print(f"An unexpected error occurred: {e}")
             return {}
 
-    def execute(self) -> dict:
+    def execute(self) -> None:
         command = f"""
                 --root_folder {self.model.root_path}
                 --train_data_file {self.model.train_data_filename}
@@ -1214,7 +1219,7 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
                 "Something went wrong with the FidexGlo explainer execution..."
             )
 
-        return self._postprocess()
+        # return self._postprocess() #TODO nice to have JSON file format (TODO in C++)
 
 
 # !all optional parameters must be specified inside KWARGS:
