@@ -11,7 +11,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Callable
 
 import pandas as pd
-from dimlpfidex.dimlp import dimlpBT
+from dimlpfidex.dimlp import densCls, dimlpBT
 from dimlpfidex.fidex import fidex, fidexGlo, fidexGloRules, fidexGloStats
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.base import ExplainerBase
@@ -162,7 +162,7 @@ class DimlpBTModel(DimlpfidexModel):
             self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, data) -> int:
+    def train(self):
         self._preprocess()
 
         command = f"""
@@ -208,6 +208,19 @@ class DimlpBTModel(DimlpfidexModel):
             )
 
         status = dimlpBT(command)
+        return status
+
+    def __call__(self, data: Tabular) -> int:
+        test_samples_filename = "densCls_test_samples.txt"
+        tabular_to_csv(data, self.root_path.joinpath(test_samples_filename))
+
+        status = densCls(
+            f"""
+                            --root_folder {self.root_path}
+                            --train_data_file {self.train_data_filename}
+                            --
+                         """
+        )
         return status
 
 
@@ -299,7 +312,7 @@ class GradBoostModel(DimlpfidexModel):
             self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, data) -> int:
+    def train(self):
         self._preprocess()
 
         command = f"""
@@ -338,6 +351,9 @@ class GradBoostModel(DimlpfidexModel):
 
         status = gradBoostTrn(command)
         return status
+
+    def __call__(self, data) -> None:
+        print("Prediction is not available for this model.")
 
 
 class RandomForestModel(DimlpfidexModel):
@@ -424,7 +440,7 @@ class RandomForestModel(DimlpfidexModel):
             self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, data) -> int:
+    def train(self) -> int:
         self._preprocess()
 
         command = f"""
@@ -464,6 +480,9 @@ class RandomForestModel(DimlpfidexModel):
 
         status = randForestsTrn(command)
         return status
+
+    def __call__(self, data) -> int:
+        print("Prediction is not available for this model.")
 
 
 class SVMModel(DimlpfidexModel):
@@ -546,7 +565,7 @@ class SVMModel(DimlpfidexModel):
             self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, data) -> int:
+    def train(self):
         self._preprocess()
 
         command = f"""
@@ -584,6 +603,9 @@ class SVMModel(DimlpfidexModel):
 
         status = svmTrn(command)
         return status
+
+    def __call__(self, data) -> int:
+        print("Prediction is not available for this model.")
 
 
 class MLPModel(DimlpfidexModel):
@@ -682,7 +704,7 @@ class MLPModel(DimlpfidexModel):
             self.testing_data, self.root_path.joinpath(self.test_data_filename)
         )
 
-    def __call__(self, data) -> int:
+    def train(self) -> int:
         self._preprocess()
 
         command = f"""
@@ -724,6 +746,9 @@ class MLPModel(DimlpfidexModel):
 
         status = mlpTrn(command)
         return status
+
+    def __call__(self, data) -> int:
+        print("Prediction is not available for this model.")
 
 
 class FidexAlgorithm(DimlpfidexAlgorithm):
@@ -771,6 +796,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         self.nb_quant_levels = nb_quant_levels
         self.normalization_file = normalization_file
         self.mus = mus
+        self.test_samples_filename = "fidex_test_samples.txt"
         self.sigmas = sigmas
         self.normalization_indices = normalization_indices
         if self.normalization_indices is None:
@@ -793,13 +819,26 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
             print(f"An unexpected error occurred: {e}")
             return {}
 
-    def execute(self) -> dict:
+    def _preprocess_test_data(self, X: Tabular):
+        tabular_to_csv(X, self.root_path.joinpath(self.test_samples_filename))
+
+    def execute(
+        self, test_data: Tabular | None = None, test_preds_file: str | None = None
+    ) -> dict:
+        test_data = self.model.test_data_filename
+        test_pred = self.model._outputs["test_pred_outfile"]
+
+        if test_data is not None and test_preds_file is not None:
+            self._preprocess_test_data(test_data)
+            test_data = self.test_samples_filename
+            test_pred = test_preds_file
+
         command = f"""
                 --root_folder {self.model.root_path}
                 --train_data_file {self.model.train_data_filename}
                 --train_pred_file {self.model._outputs["train_pred_outfile"]}
-                --test_data_file {self.model.test_data_filename}
-                --test_pred_file {self.model._outputs["test_pred_outfile"]}
+                --test_data_file {test_data}
+                --test_pred_file {test_pred}
                 --rules_outfile {self.rules_outfile}
                 --nb_attributes {self.nb_attributes}
                 --nb_classes {self.nb_classes}
@@ -908,7 +947,7 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         self.seed = seed
         self.with_minimal_version = with_minimal_version
         self.nb_fidex_rules = nb_fidex_rules
-        self.explanation_type = "local"
+        self.explanation_type = "global"
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.root_path.joinpath(self.global_rules_outfile)
@@ -1214,17 +1253,33 @@ class DimlpfidexExplainer(ExplainerBase):
     def explanation_type(self):
         return self.explainer.explanation_type
 
-    def explain(self, X) -> DimlpfidexExplanation:
-        _ = X  # X is ignored because all needed data is already given at model initialization
-        status = self.model(None)  # ? Not sure if this is the way to do it
+    # If not using dimlpBT, predictions will not be performed so run_predict and X params are ignored and original test data from model training is used instead
+    # If X is None, original test data from model training is used. Else, you must use dimlpBT model instead of any other.
+    def explain(self, X: Tabular | None = None) -> DimlpfidexExplanation:
+        status = self.model.train()
+
+        if status != 0:
+            raise ValueError("Something went wrong with the model execution...")
+
+        if isinstance(self.model, DimlpBTModel) and X is not None:
+            # with dimlpBT, different test dataset & predictions
+            self.model(X)
+            test_pred_file = self.model._outputs["test_pred_outfile"]
+            result = self.explainer.execute(X, test_pred_file)
+        elif X is None:
+            # with any model, original test dataset & predictions
+            result = self.explainer.execute()
+        else:
+            # without dimlpBT but different test dataset
+            print("Cannot use a different test dataset with another model than dimlpBT")
+            return None  # TODO adapt this
+
+        return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
+
+    def explain_global(self):
+        status = self.model.train()
         if status != 0:
             raise ValueError("Something went wrong with the model execution...")
         result = self.explainer.execute()
 
-        return DimlpfidexExplanation(self.mode, result)
-
-    def explain_global(self):
-        pass  # TODO ?
-
-    def predict(self):
-        pass  # TODO ?
+        return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
