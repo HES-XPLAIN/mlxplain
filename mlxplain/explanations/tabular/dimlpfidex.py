@@ -7,6 +7,7 @@
 
 import matplotlib as plt
 import plotly.graph_objects as go
+from matplotlib.figure import Figure
 from omnixai.explanations.base import DashFigure, ExplanationBase
 
 # Rules JSON object hierarchy (what should be inside explanation):
@@ -32,31 +33,30 @@ from omnixai.explanations.base import DashFigure, ExplanationBase
 
 
 # Plot ideas:
-# - 5 best rules (by covering size)
-# - 5 most covered samples
-# - 5 least covered samples
-# - rule's metrics means and stds
+# - 10 best rules (by covering size)
+# - 10 most covered samples
+# - 10 least covered samples
+# - rule's metrics means, stds and other stats
 # - covering size evolution graph
-# - stats plot
 # - antecedents plots (5 most used attributes, 5 least used attributes)
 
 
 class DimlpfidexExplanation(ExplanationBase):
 
-    def __init__(self, mode, explanations: dict = {}) -> None:
+    def __init__(self, mode, nsamples: int, explanations: dict = {}) -> None:
         super().__init__()
         self.mode = mode
+        self.nsamples = nsamples
         self.explanations = explanations
 
     def __getitem__(self, i: int):
         assert i < len(self.explanations)
         return "salut"
 
-    def get_explanations(self) -> dict:
+    def get_explanations(plt, self) -> dict:
         return self.explanations
 
-    def plot(self, **kwargs) -> None:
-        figure, ax = plt.subplots()
+    def _plot_best_rules(axes, self) -> None:
         rules = self.explanations["rules"]
         idxs = []
         covered_samples = []
@@ -65,13 +65,32 @@ class DimlpfidexExplanation(ExplanationBase):
             idxs.append(f"Rule #{i}")
             covered_samples.append(rule["coveringSize"])
 
-        ax.bar(idxs, covered_samples)
+        axes.bar(idxs, covered_samples)
 
-        ax.set_ylabel("Number of covered samples")
-        ax.set_xlabel("Rules id's")
+        axes.set_xlabel("Rules id")
+        axes.set_ylabel("Number of covered samples")
+
+    def _plot_most_covered_samples(axes, self) -> None:
+        samplesIds = list(range(self.nsamples))
+        samplesCount = [0] * self.nsamples
+
+        for rule in self.explanations["rules"]:
+            for covered_sample in rule["coveredSamples"]:
+                samplesCount[covered_sample] += 1
+
+        axes.bar(samplesIds, samplesCount)
+
+        axes.set_xlabel("Samples id")
+        axes.set_ylabel("Most covered samples")
+
+    def plot(self, **kwargs) -> Figure:
+        figure, (ax1, ax2) = plt.subplots(2, 2)
+        self._plot_best_rules(ax1),
+        self._plot_most_covered_samples(ax2),
 
         return figure
 
+    # TODO: implement plots here for dashboard
     def plotly_plot(self, **kwargs) -> None:
         rules = self.explanations["rules"]
         idxs = []
