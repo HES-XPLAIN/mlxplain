@@ -272,6 +272,7 @@ class DimlpBTModel(DimlpfidexModel):
                             --hidden_layers_file {self._outputs["hidden_layers_file"]}
                             --nb_attributes {self.nb_attributes}
                             --nb_classes {self.nb_classes}
+                            --console_file densClsResult.txt
                          """
         )
         return status
@@ -439,6 +440,7 @@ class GradBoostModel(DimlpfidexModel):
 
     def __call__(self, data) -> None:
         print("Prediction is not available for this model.")
+        return
 
 
 class RandomForestModel(DimlpfidexModel):
@@ -598,6 +600,7 @@ class RandomForestModel(DimlpfidexModel):
 
     def __call__(self, data) -> int:
         print("Prediction is not available for this model.")
+        return
 
 
 class SVMModel(DimlpfidexModel):
@@ -750,6 +753,7 @@ class SVMModel(DimlpfidexModel):
 
     def __call__(self, data) -> int:
         print("Prediction is not available for this model.")
+        return
 
 
 class MLPModel(DimlpfidexModel):
@@ -930,6 +934,7 @@ class MLPModel(DimlpfidexModel):
 
     def __call__(self, data) -> int:
         print("Prediction is not available for this model.")
+        return
 
 
 class FidexAlgorithm(DimlpfidexAlgorithm):
@@ -985,6 +990,7 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         normalization_indices: list[int] = None,
         seed: int = 0,
     ):
+
         self.model = model
         self.verbose_console = verbose_console
         self.nb_attributes = model.nb_attributes
@@ -1031,24 +1037,20 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
     def _preprocess_test_data(self, X: Tabular):
         tabular_to_csv(X, self.model.root_path.joinpath(self.test_samples_filename))
 
-    def execute(
-        self, test_data: Tabular | None = None, test_preds_file: str | None = None
-    ) -> dict:
+    def execute(self, test_data: Tabular | None = None) -> dict:
 
-        if test_data is not None and test_preds_file is not None:
+        if test_data is not None:
             self._preprocess_test_data(test_data)
             test_data = self.test_samples_filename
-            test_pred = test_preds_file
         else:
             test_data = self.model.test_data_filename
-            test_pred = self.model._outputs["test_pred_outfile"]
 
         command = f"""
                 --root_folder {self.model.root_path}
                 --train_data_file {self.model.train_data_filename}
                 --train_pred_file {self.model._outputs["train_pred_outfile"]}
                 --test_data_file {test_data}
-                --test_pred_file {test_pred}
+                --test_pred_file {self.model._outputs["test_pred_outfile"]}
                 --rules_outfile {self.rules_outfile}
                 --nb_attributes {self.nb_attributes}
                 --nb_classes {self.nb_classes}
@@ -1506,23 +1508,56 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
         # return self._postprocess() #TODO nice to have JSON file format (TODO in C++)
 
 
-# !all optional parameters must be specified inside KWARGS:
-class DimlpfidexExplainer(ExplainerBase):
-    """
-    An explainer class for the Dimlpfidex explainer framework, implementing the ExplainerBase interface.
-
-    **Important Notes:**
-    - An explanation algorithm must be instantiated and provided in kwargs(see subclasses of DimlpfidexAlgorithm).
-    - `preprocess_function` must be a callable that processes the `training_data`.
-
-    :param training_data: Tabular data containing attributes and classes for training.
-    :param model: The model to train and explain, which should be a subclass of DimlpfidexModel.
-    :param preprocess_function: A callable function that preprocesses the training data.
-    :param kwargs: Additional arguments, including the explanation algorithm to use.
-    """
-
-    alias = ["dimlpfidex"]
+class FidexExplainer(ExplainerBase):
+    alias = ["fidex"]
     mode = "classification"
+    explanation = "local"
+
+    def __init__(
+        self,
+        training_data: Tabular,
+        model: DimlpBTModel,
+        preprocess_function: Callable = None,
+        **kwargs,
+    ):
+        super().__init__()
+        if not isinstance(model, DimlpBTModel):
+            raise RuntimeError(
+                "Cannot use the FidexExplainer with another model than a DimlpBTModel."
+            )
+
+        self.model = model
+        self.training_data = training_data
+        self.preprocess_function = preprocess_function
+        self.algorithm = FidexAlgorithm(**kwargs)  # TODO adapt Algorithms with kwargs
+        self.model._set_preprocess_function(self.preprocess_function)
+
+    def explain(self, X: Tabular) -> DimlpfidexExplanation:
+        """
+        Generates local explanation(s) using the specified explanation algorithm.
+
+        **Important Notes:**
+        - If not using DimlpBT, predictions will not be performed, so `run_predict` and `X` parameters are ignored, and the original test data from model training is used instead.
+        - If `X` is None, the original test data from model training is used. Otherwise, you must use the DimlpBT model instead of any other.
+
+        :param X: Optional Tabular test data for which to generate explanations.
+        :return: A DimlpfidexExplanation object containing the explanations.
+        """
+        status = self.model.train()
+
+        if status != 0:
+            raise RuntimeError("Something went wrong with the model execution...")
+
+        self.model(X)
+        result = self.explainer.execute(X)
+
+        return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
+
+
+class FidexGloRulesExplainer(ExplainerBase):
+    alias = ["fidexGloRules"]
+    mode = "classification"
+    explantion = "global"
 
     def __init__(
         self,
@@ -1535,63 +1570,24 @@ class DimlpfidexExplainer(ExplainerBase):
         self.model = model
         self.training_data = training_data
         self.preprocess_function = preprocess_function
-
-        if "explainer" not in kwargs:
-            raise ValueError(
-                "Dimlpfidex explainer error: you must add an 'explainer' algorithm inside the kwargs"
-            )
-        else:
-            self.explainer = kwargs["explainer"]
-
-        if not isinstance(self.model, DimlpfidexModel):
-            raise ValueError("Model must an instance of DimlpfidexModel based classes.")
-
+        self.algorithm = FidexGloRulesAlgorithm(
+            **kwargs
+        )  # TODO adapt Algorithms with kwargs
         self.model._set_preprocess_function(self.preprocess_function)
 
-    @property
-    def explanation_type(self):
-        return self.explainer.explanation_type
+        # TODO Add fidexGloStats and fidexGlo (according to the diagram)
 
-    def explain(self, X: Tabular | None = None) -> DimlpfidexExplanation:
-        """
-        Generates explanations using the specified explanation algorithm.
-
-        **Important Notes:**
-        - If not using DimlpBT, predictions will not be performed, so `run_predict` and `X` parameters are ignored, and the original test data from model training is used instead.
-        - If `X` is None, the original test data from model training is used. Otherwise, you must use the DimlpBT model instead of any other.
-
-        :param X: Optional Tabular test data for which to generate explanations.
-        :return: A DimlpfidexExplanation object containing the explanations.
-        """
-        status = self.model.train()
-
-        if status != 0:
-            raise ValueError("Something went wrong with the model execution...")
-
-        if isinstance(self.model, DimlpBTModel) and X is not None:
-            # with dimlpBT, different test dataset & predictions
-            self.model(X)
-            test_pred_file = self.model._outputs["test_pred_outfile"]
-            result = self.explainer.execute(X, test_pred_file)
-        elif X is None:
-            # with any model, original test dataset & predictions
-            result = self.explainer.execute()
-        else:
-            # without dimlpBT but different test dataset
-            print("Cannot use a different test dataset with another model than dimlpBT")
-            return None  # TODO adapt this
-
-        return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
-
-    def explain_global(self):
+    def explain(self):
         """
         Generates global explanations using the specified explanation algorithm.
 
         :return: A DimlpfidexExplanation object containing the global explanations.
         """
         status = self.model.train()
+
         if status != 0:
             raise ValueError("Something went wrong with the model execution...")
+
         result = self.explainer.execute()
 
         return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
