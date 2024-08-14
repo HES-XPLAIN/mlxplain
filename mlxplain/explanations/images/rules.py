@@ -37,6 +37,12 @@ class RuleImportance(ExplanationBase):
 
     @staticmethod
     def _plot(data, font_size=10):
+        """
+        Plots figures using Matplotlib.
+
+        :param font_size: The font size.
+        :return: A generic plot.
+        """
 
         import matplotlib.pyplot as plt
 
@@ -60,9 +66,12 @@ class RuleImportance(ExplanationBase):
 
         return fig, ax
 
-    def _get_labels(self, class_names):
+    def _get_labels(self, class_names=None):
         """
         Extract rules and labels.
+
+        :param class_names: A list of the class names indexed by the labels.
+        :return: A dataframe containing the rules and the related labels if class names is provided
         """
         # Determine the number of rules to include
         num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
@@ -89,12 +98,16 @@ class RuleImportance(ExplanationBase):
     def plot(self, class_names=None, font_size=10, **kwargs):
         """
         Plots figures in Matplotlib.
+
+        :param class_names: A list of the class names indexed by the labels.
+        :param font_size: The font size.
+        :return: A generic plot.
         """
-        # extract rules and labels
-        data_df = self._get_labels(class_names)
+        # Extract rules and labels
+        query_df = self._get_labels(class_names)
 
         # Call _plot to generate the table and get the figure and axes
-        fig, ax = self._plot(data_df, font_size, **kwargs)
+        fig, ax = self._plot(query_df, font_size, **kwargs)
 
         # Return the figure and axes
         return fig, ax
@@ -102,45 +115,29 @@ class RuleImportance(ExplanationBase):
     def ipython_plot(self, class_names=None, **kwargs):
         """
         Plots figures in IPython.
+
+        :param class_names: A list of the class names indexed by the labels.
+        :return: A plotly dash figure showing the extracted rules.
         """
         import plotly
         import plotly.figure_factory as ff
 
-        # extract rules and labels
-        data_df = self._get_labels(class_names)
+        # Extract rules and labels
+        query_df = self._get_labels(class_names)
 
         # Create and display the table using Plotly
-        return plotly.offline.iplot(ff.create_table(data_df))
+        return plotly.offline.iplot(ff.create_table(query_df))
 
     def plotly_plot(self, class_names=None, **kwargs):
         """
         Plots the generated rule explanations in Dash.
 
-        :param class_names: A list of the class names indexed by the labels, e.g.,
-            ``class_name = ['dog', 'cat']`` means that label 0 corresponds to 'dog' and
-            label 1 corresponds to 'cat'.
-        :return: A plotly dash figure showing the counterfactual examples.
+        :param class_names: A list of the class names indexed by the labels.
+        :return: A plotly dash figure showing the extracted rules.
         """
 
-        # Determine the number of rules to include
-        num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
-
-        # Prepare lists to store rules and labels
-        rules_list = []
-        labels_list = []
-
-        # Loop through the explanations and unpack the rules and labels
-        for i in range(num_rules):
-            rules, label = self.explanations[i]
-            rules_list.append(rules)
-            labels_list.append(label)
-
-        # Create a DataFrame from the rules and labels lists
-        query_df = pd.DataFrame({"rules": rules_list, "label": labels_list})
-
-        # If class_names is provided, map the labels to class names
-        if class_names is not None:
-            query_df["label"] = query_df["label"].map(lambda x: class_names[x])
+        # Extract rules and labels
+        query_df = self._get_labels(class_names)
 
         # Create a DashFigure to display the DataFrame
         return DashFigure(self._plotly_table(query_df, None))
@@ -149,6 +146,9 @@ class RuleImportance(ExplanationBase):
     def _plotly_table(query, context):
         """
         Plots a table showing the generated rules.
+
+        :param query: A dataframe of the extracted rules.
+        :return: A plotly table figure showing rules and labels.
         """
         from dash import dash_table
 
