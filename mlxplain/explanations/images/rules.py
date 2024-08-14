@@ -60,7 +60,10 @@ class RuleImportance(ExplanationBase):
 
         return fig, ax
 
-    def plot(self, class_names=None, font_size=10, **kwargs):
+    def _get_labels(self, class_names):
+        """
+        Extract rules and labels.
+        """
         # Determine the number of rules to include
         num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
 
@@ -81,6 +84,15 @@ class RuleImportance(ExplanationBase):
         if class_names is not None:
             data_df["labels"] = data_df["labels"].map(lambda x: class_names[x])
 
+        return data_df
+
+    def plot(self, class_names=None, font_size=10, **kwargs):
+        """
+        Plots figures in Matplotlib.
+        """
+        # extract rules and labels
+        data_df = self._get_labels(class_names)
+
         # Call _plot to generate the table and get the figure and axes
         fig, ax = self._plot(data_df, font_size, **kwargs)
 
@@ -94,28 +106,11 @@ class RuleImportance(ExplanationBase):
         import plotly
         import plotly.figure_factory as ff
 
-        # Determine the number of rules to include
-        num_rules = 5 if len(self.explanations) > 5 else len(self.explanations)
-
-        # Prepare lists to store rules and labels
-        rules_list = []
-        labels_list = []
-
-        # Loop through the explanations and unpack the rules and labels
-        for i in range(num_rules):
-            rules, label = self.explanations[i]
-            rules_list.append(rules)
-            labels_list.append(label)
-
-        # Create a DataFrame from the rules and labels lists
-        query_df = pd.DataFrame({"rules": rules_list, "label": labels_list})
-
-        # If class_names is provided, map the labels to class names
-        if class_names is not None:
-            query_df["label"] = query_df["label"].map(lambda x: class_names[x])
+        # extract rules and labels
+        data_df = self._get_labels(class_names)
 
         # Create and display the table using Plotly
-        return plotly.offline.iplot(ff.create_table(query_df))
+        return plotly.offline.iplot(ff.create_table(data_df))
 
     def plotly_plot(self, class_names=None, **kwargs):
         """
