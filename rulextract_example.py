@@ -43,21 +43,15 @@ with open("./data/idx_to_names.json", "r") as file:
 names_to_idx = {v: k for k, v in idx_to_names.items()}
 class_names = list(idx_to_names.values())
 
-# create filtered loaders
-model = model
-loader = test_loader
-device = device
-
 # test set
-correct_test_idx = filter_dataset(model=model, loader=loader, device=device)
+correct_test_idx = filter_dataset(model=model, loader=test_loader, device=device)
 test_filtered_dataset = Subset(test_loader.dataset, correct_test_idx)
 test_filtered_dataloader = DataLoader(
     dataset=test_filtered_dataset, batch_size=test_loader.batch_size, shuffle=False
 )
 
-loader = train_loader
 # train set
-correct_train_idx = filter_dataset(model=model, loader=loader, device=device)
+correct_train_idx = filter_dataset(model=model, loader=train_loader, device=device)
 train_filtered_dataset = Subset(train_loader.dataset, correct_train_idx)
 train_filtered_dataloader = DataLoader(
     dataset=train_filtered_dataset, batch_size=train_loader.batch_size, shuffle=False
