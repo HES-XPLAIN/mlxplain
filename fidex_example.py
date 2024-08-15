@@ -10,7 +10,6 @@ import pathlib as pl
 import pandas as pd
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.tabular.auto import TabularExplainer
-from omnixai.visualization.dashboard import Dashboard
 
 from mlxplain.explainers.tabular.specific.dimlpfidex import (
     DimlpBTModel,
@@ -19,6 +18,8 @@ from mlxplain.explainers.tabular.specific.dimlpfidex import (
     RandomForestModel,
     SVMModel,
 )
+
+# from omnixai.visualization.dashboard import Dashboard
 
 
 def load_data():
@@ -136,11 +137,15 @@ def get_global_explainer(model, train_data):
         params={
             "fidexGloRules": {
                 "heuristic": 1,
-                "with_fidexGlo": False,
+                "with_fidexGlo": True,
                 "seed": 1,
                 "positive_class_index": 0,
                 "nb_threads": 4,
                 "with_minimal_version": True,
+                "max_iterations": 10,
+                "min_covering": 2,
+                "dropout_dim": 0.5,
+                "dropout_hyp": 0.5,
             }
         },
     )
@@ -153,7 +158,7 @@ def get_MLPModel(output_path, train_data, test_data, nattributes, nclasses):
         test_data,
         nattributes,
         nclasses,
-        verbose_console=True,
+        # verbose_console=True,
         # nb_quant_levels=45,
         # K=0.1,
         # hidden_layer_sizes=[12, 13, 14],
@@ -193,32 +198,32 @@ def get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses):
 
 
 def get_gradBoostModel(output_path, train_data, test_data, nattributes, nclasses):
-    GradBoostModel(
+    return GradBoostModel(
         output_path,
         train_data,
         test_data,
         nattributes,
         nclasses,
-        verbose_console=True,
         seed=1,
-        n_estimators=3,
-        learning_rate=32,
-        subsample=0.3,
-        criterion="squared_error",
-        max_depth="no_max_depth",
-        min_samples_split=0.5,
-        min_samples_leaf=0.5,
-        min_weight_fraction_leaf=0.1,
-        max_features=3,
-        max_leaf_nodes=3,
-        min_impurity_decrease=3,
-        init="zero",
-        verbose_scikit=12,
-        warm_start=True,
-        validation_fraction=0.2,
-        n_iter_no_change=35,
-        tol=0.1,
-        ccp_alpha=0.1,
+        # verbose_console=True,
+        # n_estimators=3,
+        # learning_rate=32,
+        # subsample=0.3,
+        # criterion="squared_error",
+        # max_depth="no_max_depth",
+        # min_samples_split=0.5,
+        # min_samples_leaf=0.5,
+        # min_weight_fraction_leaf=0.1,
+        # max_features=3,
+        # max_leaf_nodes=3,
+        # min_impurity_decrease=3,
+        # init="zero",
+        # verbose_scikit=12,
+        # warm_start=True,
+        # validation_fraction=0.2,
+        # n_iter_no_change=35,
+        # tol=0.1,
+        # ccp_alpha=0.1,
     )
 
 
@@ -230,23 +235,23 @@ def get_randomForrestModel(output_path, train_data, test_data, nattributes, ncla
         nattributes,
         nclasses,
         seed=1,
-        n_estimators=3,
-        criterion="entropy",
-        max_depth=2,
-        min_samples_split=0.5,
-        min_samples_leaf=0.5,
-        min_weight_fraction_leaf=0.1,
-        max_features=3,
-        max_leaf_nodes=3,
-        min_impurity_decrease=3,
-        bootstrap=True,
-        oob_score=True,
-        n_jobs=-1,
-        verbose_scikit=12,
-        warm_start=True,
-        class_weight={0: 1.2, 1: 2.3},
-        ccp_alpha=0.1,
-        max_samples=2,
+        # n_estimators=3,
+        # criterion="entropy",
+        # max_depth=2,
+        # min_samples_split=0.5,
+        # min_samples_leaf=0.5,
+        # min_weight_fraction_leaf=0.1,
+        # max_features=3,
+        # max_leaf_nodes=3,
+        # min_impurity_decrease=3,
+        # bootstrap=True,
+        # oob_score=True,
+        # n_jobs=-1,
+        # verbose_scikit=12,
+        # warm_start=True,
+        # class_weight={0: 1.2, 1: 2.3},
+        # ccp_alpha=0.1,
+        # max_samples=2,
     )
 
 
@@ -257,44 +262,70 @@ def get_SVMModel(output_path, train_data, test_data, nattributes, nclasses):
         test_data,
         nattributes,
         nclasses,
-        output_roc="roc_curve.png",
-        positive_class_index=1,
-        nb_quant_levels=45,
-        K=0.1,
-        C=0.1,
-        kernel="sigmoid",
-        degree=5,
-        gamma=0.4,
-        coef0=1.3,
-        shrinking=False,
-        tol=1,
-        cache_size=150.2,
-        class_weight={0: 1.2, 1: 3.5},
-        max_iterations=50,
-        decision_function_shape="ovo",
-        break_ties=False,
-        verbose_console=True,
+        # output_roc="roc_curve.png",
+        # positive_class_index=1,
+        # nb_quant_levels=45,
+        # K=0.1,
+        # C=0.1,
+        # kernel="sigmoid",
+        # degree=5,
+        # gamma=0.4,
+        # coef0=1.3,
+        # shrinking=False,
+        # tol=1,
+        # cache_size=150.2,
+        # class_weight={0: 1.2, 1: 3.5},
+        # max_iterations=50,
+        # decision_function_shape="ovo",
+        # break_ties=False,
+        # verbose_console=True,
     )
+
+
+def run_tests(output_path, train_data, test_data, nattributes, nclasses):
+    model_getters = [
+        get_dimlpBTModel,
+        get_gradBoostModel,
+        get_MLPModel,
+        get_randomForrestModel,
+        get_SVMModel,
+    ]
+
+    for model_getter in model_getters:
+        model = model_getter(output_path, train_data, test_data, nattributes, nclasses)
+
+        if isinstance(model, DimlpBTModel):
+            print(f"Testing fidex & fidexGloRules with {type(model).__name__}")
+            local_explainer = get_local_explainer(model, train_data)
+            local_explainer.explain(X=test_data)
+            # local_explainations["fidex"].plotly_plot()
+        else:
+            print(f"Testing fidexGloRules with {type(model).__name__}")
+
+        global_explainer = get_global_explainer(model, train_data)
+        global_explainer.explain_global()
 
 
 if __name__ == "__main__":
 
     # ensure path exists
-    pl.Path("/tmp/explainer/").mkdir(parents=True, exist_ok=True)
     output_path = pl.Path("/tmp/explainer/")
+    output_path.mkdir(parents=True, exist_ok=True)
     train_data_file = "train_data.txt"
     test_data_file = "test_data.txt"
 
-    # do load data
+    # load data
     train_data, test_data, nattributes, nclasses = load_data()
 
-    model = get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses)
+    run_tests(output_path, train_data, test_data, nattributes, nclasses)
 
-    local_explainer = get_local_explainer(model, train_data)
-    global_explainer = get_global_explainer(model, train_data)
+    # model = get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses)
 
-    le = local_explainer.explain(test_data)
-    ge = global_explainer.explain_global()
+    # local_explainer = get_local_explainer(model, train_data)
+    # global_explainer = get_global_explainer(model, train_data)
 
-    db = Dashboard(local_explanations=le, global_explanations=ge)
-    db.show()
+    # le = local_explainer.explain(test_data)
+    # ge = global_explainer.explain_global()
+
+    # db = Dashboard(local_explanations=le, global_explanations=ge)
+    # db.show()
