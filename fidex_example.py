@@ -14,8 +14,6 @@ from omnixai.visualization.dashboard import Dashboard
 
 from mlxplain.explainers.tabular.specific.dimlpfidex import (
     DimlpBTModel,
-    FidexAlgorithm,
-    FidexGloRulesAlgorithm,
     GradBoostModel,
     MLPModel,
     RandomForestModel,
@@ -107,60 +105,45 @@ def load_dummy_data():
     return train_data, test_data, 3, 2
 
 
-def get_fidexGloRules_explainer(model):
-    return FidexGloRulesAlgorithm(
-        model,
-        heuristic=1,
-        with_fidexGlo=True,
-        seed=1,
-        verbose_console=True,
-        # attributes_file = "attributes.txt",
-        # max_iterations=10,
-        # min_covering=3,
-        # covering_strategy=False,
-        # max_failed_attempts=35,
-        # min_fidelity=0.9,
-        # lowest_min_fidelity=0.8,
-        # dropout_dim=0.5,
-        # dropout_hyp=0.5,
-        # decision_threshold=0.2,
-        positive_class_index=0,
-        # nb_quant_levels=45,
-        # normalization_file="normalization.txt",
-        # mus=[1, 3],
-        # sigmas=[2, 3],
-        # normalization_indices=[0, 2],
-        nb_threads=4,
-        with_minimal_version=True,
-        # nb_fidex_rules=2,
+def get_local_explainer(model, train_data):
+    return TabularExplainer(
+        explainers=["fidex"],
+        data=train_data,
+        model=model,
+        mode="classification",
+        params={
+            "fidex": {
+                "seed": 1,
+                "max_iterations": 10,
+                "min_covering": 2,
+                "max_failed_attempts": 35,
+                "min_fidelity": 0.9,
+                "lowest_min_fidelity": 0.8,
+                "dropout_dim": 0.5,
+                "dropout_hyp": 0.5,
+                "nb_quant_levels": 45,
+            }
+        },
     )
 
 
-def get_fidex_explainer(model):
-    return FidexAlgorithm(
-        model,
-        seed=1,
-        # attributes_file = "attributes.txt",
-        max_iterations=10,
-        min_covering=2,
-        # covering_strategy = False,
-        max_failed_attempts=35,
-        min_fidelity=0.9,
-        lowest_min_fidelity=0.8,
-        dropout_dim=0.5,
-        dropout_hyp=0.5,
-        # decision_threshold = 0.2,
-        # positive_class_index = 0,
-        nb_quant_levels=45,
-        # normalization_file = "normalization.txt",
-        # mus = [1,3],
-        # sigmas = [2,3],
-        # normalization_indices = [0,2]
+def get_global_explainer(model, train_data):
+    return TabularExplainer(
+        explainers=["fidexGloRules"],
+        data=train_data,
+        model=model,
+        mode="classification",
+        params={
+            "fidexGloRules": {
+                "heuristic": 1,
+                "with_fidexGlo": False,
+                "seed": 1,
+                "positive_class_index": 0,
+                "nb_threads": 4,
+                "with_minimal_version": True,
+            }
+        },
     )
-
-
-def get_fidexGlo_explainer():
-    pass
 
 
 def get_MLPModel(output_path, train_data, test_data, nattributes, nclasses):
@@ -297,6 +280,7 @@ def get_SVMModel(output_path, train_data, test_data, nattributes, nclasses):
 if __name__ == "__main__":
 
     # ensure path exists
+    pl.Path("/tmp/explainer/").mkdir(parents=True, exist_ok=True)
     output_path = pl.Path("/tmp/explainer/")
     train_data_file = "train_data.txt"
     test_data_file = "test_data.txt"
@@ -305,26 +289,11 @@ if __name__ == "__main__":
     train_data, test_data, nattributes, nclasses = load_data()
 
     model = get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses)
-    fidexGloRules = get_fidexGloRules_explainer(model)
-    fidex = get_fidex_explainer(model)
 
-    local_explainer = TabularExplainer(
-        explainers=["dimlpfidex"],
-        data=train_data,
-        mode="classification",
-        model=model,
-        params={"dimlpfidex": {"explainer": fidex, "verbose": True}},
-    )
-    le = local_explainer.explain(test_data, run_predict=False)
+    local_explainer = get_local_explainer(model, train_data)
+    global_explainer = get_global_explainer(model, train_data)
 
-    global_explainer = TabularExplainer(
-        explainers=["dimlpfidex"],
-        data=train_data,
-        mode="classification",
-        model=model,
-        params={"dimlpfidex": {"explainer": fidexGloRules, "verbose": True}},
-    )
-
+    le = local_explainer.explain(test_data)
     ge = global_explainer.explain_global()
 
     db = Dashboard(local_explanations=le, global_explanations=ge)

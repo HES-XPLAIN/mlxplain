@@ -968,56 +968,50 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
     :param seed: Random seed for reproducibility.
     """
 
-    def __init__(
-        self,
-        model: DimlpfidexModel,
-        verbose_console: bool = False,
-        attributes_file: str = None,
-        max_iterations: int = 10,
-        min_covering: int = 2,
-        covering_strategy: bool = True,
-        max_failed_attempts: int = 30,
-        min_fidelity: float = 1.0,
-        lowest_min_fidelity: float = 0.75,
-        dropout_dim: float = 0.0,
-        dropout_hyp: float = 0.0,
-        decision_threshold: float = None,
-        positive_class_index: int = None,
-        nb_quant_levels: int = 50,
-        normalization_file: str = None,
-        mus: list[float] = None,
-        sigmas: list[float] = None,
-        normalization_indices: list[int] = None,
-        seed: int = 0,
-    ):
+    def __init__(self, model: DimlpfidexModel, **kwargs):
 
         self.model = model
-        self.verbose_console = verbose_console
-        self.nb_attributes = model.nb_attributes
-        self.nb_classes = model.nb_classes
+
+        if self.model is None:
+            raise TypeError(
+                "A model must be provided when running FidexGloRules explainer."
+            )
+
+        self.nb_attributes = self.model.nb_attributes
+        self.nb_classes = self.model.nb_classes
+
+        if self.nb_attributes is None or self.nb_classes is None:
+            raise TypeError(
+                "The FidexGloRules explainer could not retreive the number of attributes or the number of classes from the given model."
+            )
+
         self.rules_outfile = "fidex_output_rules.json"
-        self.attributes_file = attributes_file
         self.stats_file = "statsFidex.txt"
-        self.max_iterations = max_iterations
-        self.min_covering = min_covering
-        self.covering_strategy = covering_strategy
-        self.max_failed_attempts = max_failed_attempts
-        self.min_fidelity = min_fidelity
-        self.lowest_min_fidelity = lowest_min_fidelity
-        self.dropout_dim = dropout_dim
-        self.dropout_hyp = dropout_hyp
-        self.decision_threshold = decision_threshold
-        self.positive_class_index = positive_class_index
-        self.nb_quant_levels = nb_quant_levels
-        self.normalization_file = normalization_file
-        self.mus = mus
         self.test_samples_filename = "fidex_test_samples.txt"
-        self.sigmas = sigmas
-        self.normalization_indices = normalization_indices
-        if self.normalization_indices is None:
-            self.normalization_indices = list(range(self.nb_attributes))
-        self.seed = seed
-        self.explanation_type = "local"
+
+        self.process_kwargs(**kwargs)
+
+    def process_kwargs(self, **kwargs):
+        self.verbose_console = kwargs.get("verbose_console", False)
+        self.attributes_file = kwargs.get("attributes_file", None)
+        self.max_iterations = kwargs.get("max_iterations", 10)
+        self.min_covering = kwargs.get("min_covering", 2)
+        self.covering_strategy = kwargs.get("covering_strategy", True)
+        self.max_failed_attempts = kwargs.get("max_failed_attempts", 30)
+        self.min_fidelity = kwargs.get("min_fidelity", 1.0)
+        self.lowest_min_fidelity = kwargs.get("lowest_min_fidelity", 0.75)
+        self.dropout_dim = kwargs.get("dropout_dim", 0.0)
+        self.dropout_hyp = kwargs.get("dropout_hyp", 0.0)
+        self.decision_threshold = kwargs.get("decision_threshold", None)
+        self.positive_class_index = kwargs.get("positive_class_index", None)
+        self.nb_quant_levels = kwargs.get("nb_quant_levels", 50)
+        self.normalization_file = kwargs.get("normalization_file", None)
+        self.mus = kwargs.get("mus", None)
+        self.sigmas = kwargs.get("sigmas", None)
+        self.normalization_indices = kwargs.get(
+            "normalization_indices", list(range(self.nb_attributes))
+        )
+        self.seed = kwargs.get("seed", 0)
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.root_path.joinpath(self.rules_outfile)
@@ -1141,63 +1135,54 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
     # - You can ask for the execution of fidexGlo with the parameter fidexGlo
     # - parameters with_minimal_version and nb_fidex_rules only used with fidexGlo
 
-    def __init__(
-        self,
-        model: DimlpfidexModel,
-        heuristic: int,
-        with_fidexGlo: bool,
-        verbose_console: bool = False,
-        attributes_file: str = None,
-        max_iterations: int = 10,
-        min_covering: int = 2,
-        covering_strategy: bool = True,
-        max_failed_attempts: int = 30,
-        min_fidelity: float = 1.0,
-        lowest_min_fidelity: float = 0.75,
-        dropout_dim: float = 0.0,
-        dropout_hyp: float = 0.0,
-        decision_threshold: float = None,
-        positive_class_index: int = None,
-        nb_quant_levels: int = 50,
-        normalization_file: str = None,
-        mus: list[float] = None,
-        sigmas: list[float] = None,
-        normalization_indices: list[int] = None,
-        nb_threads: int = 1,
-        seed: int = 0,
-        with_minimal_version: bool = False,
-        nb_fidex_rules: int = 1,
-    ):
+    def __init__(self, model: DimlpfidexModel, **kwargs):
         self.model = model
-        self.heuristic = heuristic
-        self.with_fidexGlo = with_fidexGlo
-        self.nb_attributes = model.nb_attributes
-        self.nb_classes = model.nb_classes
+        if self.model is None:
+            raise TypeError(
+                "A model must be provided when running FidexGloRules explainer."
+            )
+
+        self.nb_attributes = self.model.nb_attributes
+        self.nb_classes = self.model.nb_classes
+
+        if self.nb_attributes is None or self.nb_classes is None:
+            raise TypeError(
+                "The FidexGloRules explainer could not retreive the number of attributes or the number of classes from the given model."
+            )
+
+        self.fidexGlo = None
         self.global_rules_outfile = "fidexGloRules_output_rules.json"
-        self.verbose_console = verbose_console
-        self.attributes_file = attributes_file
-        self.max_iterations = max_iterations
-        self.min_covering = min_covering
-        self.covering_strategy = covering_strategy
-        self.max_failed_attempts = max_failed_attempts
-        self.min_fidelity = min_fidelity
-        self.lowest_min_fidelity = lowest_min_fidelity
-        self.dropout_dim = dropout_dim
-        self.dropout_hyp = dropout_hyp
-        self.decision_threshold = decision_threshold
-        self.positive_class_index = positive_class_index
-        self.nb_quant_levels = nb_quant_levels
-        self.normalization_file = normalization_file
-        self.mus = mus
-        self.sigmas = sigmas
-        self.normalization_indices = normalization_indices
-        if self.normalization_indices is None:
-            self.normalization_indices = list(range(self.nb_attributes))
-        self.nb_threads = nb_threads
-        self.seed = seed
-        self.with_minimal_version = with_minimal_version
-        self.nb_fidex_rules = nb_fidex_rules
-        self.explanation_type = "global"
+
+        self.process_kwargs(**kwargs)
+
+    def process_kwargs(self, **kwargs):
+        self.heuristic = kwargs.get("heuristic", 1)
+        self.with_fidexGlo = kwargs.get("with_fidexGlo", False)
+        if self.with_fidexGlo:
+            self.fidexGlo = FidexGloAlgorithm(self.model, **kwargs)
+        self.verbose_console = kwargs.get("verbose_console", False)
+        self.attributes_file = kwargs.get("attributes_file", None)
+        self.max_iterations = kwargs.get("max_iterations", 10)
+        self.min_covering = kwargs.get("min_covering", 2)
+        self.covering_strategy = kwargs.get("covering_strategy", True)
+        self.max_failed_attempts = kwargs.get("max_failed_attempts", 30)
+        self.min_fidelity = kwargs.get("min_fidelity", 1.0)
+        self.lowest_min_fidelity = kwargs.get("lowest_min_fidelity", 0.75)
+        self.dropout_dim = kwargs.get("dropout_dim", 0.0)
+        self.dropout_hyp = kwargs.get("dropout_hyp", 0.0)
+        self.decision_threshold = kwargs.get("decision_threshold", None)
+        self.positive_class_index = kwargs.get("positive_class_index", None)
+        self.nb_quant_levels = kwargs.get("nb_quant_levels", 50)
+        self.normalization_file = kwargs.get("normalization_file", None)
+        self.mus = kwargs.get("mus", None)
+        self.sigmas = kwargs.get("sigmas", None)
+        self.normalization_indices = kwargs.get(
+            "normalization_indices", list(range(self.nb_attributes))
+        )
+        self.nb_threads = kwargs.get("nb_threads", 1)
+        self.seed = kwargs.get("seed", 0)
+        self.with_minimal_version = kwargs.get("with_minimal_version", False)
+        self.nb_fidex_rules = kwargs.get("nb_fidex_rules", 1)
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.root_path.joinpath(self.global_rules_outfile)
@@ -1272,29 +1257,8 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         )
         stats.execute()
 
-        if self.with_fidexGlo:
-            fidexGlo = FidexGloAlgorithm(
-                model=self.model,
-                verbose_console=self.verbose_console,
-                attributes_file=self.attributes_file,
-                seed=self.seed,
-                with_minimal_version=self.with_minimal_version,
-                nb_fidex_rules=self.nb_fidex_rules,
-                max_iterations=self.max_iterations,
-                min_covering=self.min_covering,
-                covering_strategy=self.covering_strategy,
-                max_failed_attempts=self.max_failed_attempts,
-                min_fidelity=self.min_fidelity,
-                lowest_min_fidelity=self.lowest_min_fidelity,
-                dropout_dim=self.dropout_dim,
-                dropout_hyp=self.dropout_hyp,
-                nb_quant_levels=self.nb_quant_levels,
-                normalization_file=self.normalization_file,
-                mus=self.mus,
-                sigmas=self.sigmas,
-                normalization_indices=self.normalization_indices,
-            )
-            fidexGlo.execute()
+        if self.fidexGlo is not None:
+            self.fidexGlo.execute()
 
         return self._postprocess()
 
@@ -1391,54 +1355,49 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
     :param seed: Random seed for reproducibility.
     """
 
-    def __init__(
-        self,
-        model: DimlpfidexModel,
-        verbose_console: bool = False,
-        attributes_file: str = None,
-        with_minimal_version: bool = False,
-        max_iterations: int = 10,
-        min_covering: int = 2,
-        covering_strategy: bool = True,
-        max_failed_attempts: int = 30,
-        min_fidelity: float = 1.0,
-        lowest_min_fidelity: float = 0.75,
-        nb_fidex_rules: int = 1,
-        dropout_dim: float = 0.0,
-        dropout_hyp: float = 0.0,
-        nb_quant_levels: int = 50,
-        normalization_file: str = None,
-        mus: list[float] = None,
-        sigmas: list[float] = None,
-        normalization_indices: list[int] = None,
-        seed: int = 0,
-    ):
+    def __init__(self, model: DimlpfidexModel, **kwargs):
         self.model = model
-        self.nb_attributes = model.nb_attributes
-        self.nb_classes = model.nb_classes
+
+        if self.model is None:
+            raise TypeError(
+                "A model must be provided when running FidexGloRules explainer."
+            )
+
+        self.nb_attributes = self.model.nb_attributes
+        self.nb_classes = self.model.nb_classes
+
+        if self.nb_attributes is None or self.nb_classes is None:
+            raise TypeError(
+                "The FidexGloRules explainer could not retreive the number of attributes or the number of classes from the given model."
+            )
+
         self.global_rules_file = "fidexGloRules_output_rules.json"
         self.explanation_file = "explanations.json"
-        self.verbose_console = verbose_console
-        self.attributes_file = attributes_file
-        self.with_minimal_version = with_minimal_version
-        self.max_iterations = max_iterations
-        self.min_covering = min_covering
-        self.covering_strategy = covering_strategy
-        self.max_failed_attempts = max_failed_attempts
-        self.min_fidelity = min_fidelity
-        self.lowest_min_fidelity = lowest_min_fidelity
-        self.nb_fidex_rules = nb_fidex_rules
-        self.dropout_dim = dropout_dim
-        self.dropout_hyp = dropout_hyp
-        self.nb_quant_levels = nb_quant_levels
-        self.normalization_file = normalization_file
-        self.mus = mus
-        self.sigmas = sigmas
-        self.normalization_indices = normalization_indices
-        if self.normalization_indices is None:
-            self.normalization_indices = list(range(self.nb_attributes))
-        self.seed = seed
-        self.explanation_type = "local"
+
+        if kwargs["fidexGlo"] is not None:
+            self.process_kwargs(**kwargs["fidexGlo"])
+
+    def process_kwargs(self, **kwargs):
+        self.verbose_console = kwargs.get("verbose_console", False)
+        self.attributes_file = kwargs.get("attributes_file", None)
+        self.with_minimal_version = kwargs.get("with_minimal_version", False)
+        self.max_iterations = kwargs.get("max_iterations", 10)
+        self.min_covering = kwargs.get("min_covering", 2)
+        self.covering_strategy = kwargs.get("covering_strategy", True)
+        self.max_failed_attempts = kwargs.get("max_failed_attempts", 30)
+        self.min_fidelity = kwargs.get("min_fidelity", 1.0)
+        self.lowest_min_fidelity = kwargs.get("lowest_min_fidelity", 0.75)
+        self.nb_fidex_rules = kwargs.get("nb_fidex_rules", 1)
+        self.dropout_dim = kwargs.get("dropout_dim", 0.0)
+        self.dropout_hyp = kwargs.get("dropout_hyp", 0.0)
+        self.nb_quant_levels = kwargs.get("nb_quant_levels", 50)
+        self.normalization_file = kwargs.get("normalization_file", None)
+        self.mus = kwargs.get("mus", None)
+        self.sigmas = kwargs.get("sigmas", None)
+        self.normalization_indices = kwargs.get(
+            "normalization_indices", list(range(self.nb_attributes))
+        )
+        self.seed = kwargs.get("seed", 0)
 
     def _postprocess(self) -> dict:
         absolute_path = self.model.root_path.joinpath(self.explanation_file)
@@ -1511,7 +1470,7 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
 class FidexExplainer(ExplainerBase):
     alias = ["fidex"]
     mode = "classification"
-    explanation = "local"
+    explanation_type = "local"
 
     def __init__(
         self,
@@ -1529,7 +1488,9 @@ class FidexExplainer(ExplainerBase):
         self.model = model
         self.training_data = training_data
         self.preprocess_function = preprocess_function
-        self.algorithm = FidexAlgorithm(**kwargs)  # TODO adapt Algorithms with kwargs
+        self.algorithm = FidexAlgorithm(
+            model, **kwargs
+        )  # TODO adapt Algorithms with kwargs
         self.model._set_preprocess_function(self.preprocess_function)
 
     def explain(self, X: Tabular) -> DimlpfidexExplanation:
@@ -1549,7 +1510,7 @@ class FidexExplainer(ExplainerBase):
             raise RuntimeError("Something went wrong with the model execution...")
 
         self.model(X)
-        result = self.explainer.execute(X)
+        result = self.algorithm.execute(X)
 
         return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
 
@@ -1557,7 +1518,7 @@ class FidexExplainer(ExplainerBase):
 class FidexGloRulesExplainer(ExplainerBase):
     alias = ["fidexGloRules"]
     mode = "classification"
-    explantion = "global"
+    explanation_type = "global"
 
     def __init__(
         self,
@@ -1570,12 +1531,8 @@ class FidexGloRulesExplainer(ExplainerBase):
         self.model = model
         self.training_data = training_data
         self.preprocess_function = preprocess_function
-        self.algorithm = FidexGloRulesAlgorithm(
-            **kwargs
-        )  # TODO adapt Algorithms with kwargs
+        self.algorithm = FidexGloRulesAlgorithm(model, **kwargs)
         self.model._set_preprocess_function(self.preprocess_function)
-
-        # TODO Add fidexGloStats and fidexGlo (according to the diagram)
 
     def explain(self):
         """
@@ -1588,6 +1545,6 @@ class FidexGloRulesExplainer(ExplainerBase):
         if status != 0:
             raise ValueError("Something went wrong with the model execution...")
 
-        result = self.explainer.execute()
+        result = self.algorithm.execute()
 
         return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
