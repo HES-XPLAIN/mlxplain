@@ -23,6 +23,7 @@ from trainings.svmTrn import svmTrn
 from ....explanations.tabular.dimlpfidex import DimlpfidexExplanation
 
 
+# TODO adapt comments
 def tabular_to_csv(data: Tabular, path: pl.Path) -> None:
     """
     Converts a Tabular object to a CSV file.
@@ -263,6 +264,7 @@ class DimlpBTModel(DimlpfidexModel):
     def __call__(self, data: Tabular) -> int:
         test_samples_filename = "densCls_test_samples.txt"
         tabular_to_csv(data, self.root_path.joinpath(test_samples_filename))
+        # TODO Use test samples
 
         status = densCls(
             f"""
@@ -1028,22 +1030,17 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
             print(f"An unexpected error occurred: {e}")
             return {}
 
-    def _preprocess_test_data(self, X: Tabular):
-        tabular_to_csv(X, self.model.root_path.joinpath(self.test_samples_filename))
-
-    def execute(self, test_data: Tabular | None = None) -> dict:
-
-        if test_data is not None:
-            self._preprocess_test_data(test_data)
-            test_data = self.test_samples_filename
-        else:
-            test_data = self.model.test_data_filename
+    def execute(self, test_data: Tabular) -> dict:
+        tabular_to_csv(
+            test_data, self.model.root_path.joinpath(self.test_samples_filename)
+        )
+        # TODO check if test_data
 
         command = f"""
                 --root_folder {self.model.root_path}
                 --train_data_file {self.model.train_data_filename}
                 --train_pred_file {self.model._outputs["train_pred_outfile"]}
-                --test_data_file {test_data}
+                --test_data_file {self.test_samples_filename}
                 --test_pred_file {self.model._outputs["test_pred_outfile"]}
                 --rules_outfile {self.rules_outfile}
                 --nb_attributes {self.nb_attributes}
@@ -1374,10 +1371,10 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
         self.global_rules_file = "fidexGloRules_output_rules.json"
         self.explanation_file = "explanations.json"
 
-        if kwargs["fidexGlo"] is not None:
-            self.process_kwargs(**kwargs["fidexGlo"])
+        self.process_kwargs(**kwargs)
 
     def process_kwargs(self, **kwargs):
+        kwargs = kwargs.get("fidexGlo", {})
         self.verbose_console = kwargs.get("verbose_console", False)
         self.attributes_file = kwargs.get("attributes_file", None)
         self.with_minimal_version = kwargs.get("with_minimal_version", False)
@@ -1488,9 +1485,7 @@ class FidexExplainer(ExplainerBase):
         self.model = model
         self.training_data = training_data
         self.preprocess_function = preprocess_function
-        self.algorithm = FidexAlgorithm(
-            model, **kwargs
-        )  # TODO adapt Algorithms with kwargs
+        self.algorithm = FidexAlgorithm(model, **kwargs)
         self.model._set_preprocess_function(self.preprocess_function)
 
     def explain(self, X: Tabular) -> DimlpfidexExplanation:
