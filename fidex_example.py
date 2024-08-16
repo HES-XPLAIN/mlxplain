@@ -10,6 +10,7 @@ import pathlib as pl
 import pandas as pd
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.tabular.auto import TabularExplainer
+from omnixai.visualization.dashboard import Dashboard
 
 from mlxplain.explainers.tabular.specific.dimlpfidex import (
     DimlpBTModel,
@@ -18,8 +19,6 @@ from mlxplain.explainers.tabular.specific.dimlpfidex import (
     RandomForestModel,
     SVMModel,
 )
-
-# from omnixai.visualization.dashboard import Dashboard
 
 
 def load_data():
@@ -117,12 +116,11 @@ def get_local_explainer(model, train_data):
                 "seed": 1,
                 "max_iterations": 10,
                 "min_covering": 2,
-                "max_failed_attempts": 35,
-                "min_fidelity": 0.9,
-                "lowest_min_fidelity": 0.8,
-                "dropout_dim": 0.5,
-                "dropout_hyp": 0.5,
-                "nb_quant_levels": 45,
+                "max_failed_attempts": 15,
+                "min_fidelity": 1.0,
+                "lowest_min_fidelity": 0.9,
+                "dropout_dim": 0.8,
+                "dropout_hyp": 0.8,
             }
         },
     )
@@ -204,7 +202,8 @@ def get_gradBoostModel(output_path, train_data, test_data, nattributes, nclasses
         test_data,
         nattributes,
         nclasses,
-        seed=1,
+        seed=1,  # print(f"FIDEX: Test data shape is {test_data.shape}")
+        # print(f"FIDEX: Test preds shape is {test_preds.shape}")
         # verbose_console=True,
         # n_estimators=3,
         # learning_rate=32,
@@ -298,7 +297,6 @@ def run_tests(output_path, train_data, test_data, nattributes, nclasses):
             print(f"Testing fidex & fidexGloRules with {type(model).__name__}")
             local_explainer = get_local_explainer(model, train_data)
             local_explainer.explain(X=test_data)
-            # local_explainations["fidex"].plotly_plot()
         else:
             print(f"Testing fidexGloRules with {type(model).__name__}")
 
@@ -317,15 +315,14 @@ if __name__ == "__main__":
     # load data
     train_data, test_data, nattributes, nclasses = load_data()
 
-    run_tests(output_path, train_data, test_data, nattributes, nclasses)
+    # run_tests(output_path, train_data, test_data, nattributes, nclasses)
 
-    # model = get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses)
+    model = get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses)
+    model.train()
 
-    # local_explainer = get_local_explainer(model, train_data)
-    # global_explainer = get_global_explainer(model, train_data)
-
-    # le = local_explainer.explain(test_data)
-    # ge = global_explainer.explain_global()
-
-    # db = Dashboard(local_explanations=le, global_explanations=ge)
-    # db.show()
+    explainer = get_local_explainer(model, train_data)
+    explainerg = get_global_explainer(model, train_data)
+    le = explainer.explain(test_data[0])
+    ge = explainerg.explain_global()
+    db = Dashboard(local_explanations=le, global_explanations=ge)
+    db.show()
