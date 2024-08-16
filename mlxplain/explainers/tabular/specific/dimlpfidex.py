@@ -10,6 +10,7 @@ import pathlib as pl
 from abc import ABCMeta, abstractmethod
 from typing import Callable
 
+import numpy as np
 import pandas as pd
 from dimlpfidex.dimlp import densCls, dimlpBT
 from dimlpfidex.fidex import fidex, fidexGlo, fidexGloRules, fidexGloStats
@@ -34,17 +35,23 @@ def tabular_to_csv(data: Tabular, path: pl.Path) -> None:
     data.to_pd().to_csv(path, index=False, header=False)
 
 
-def csv_to_tabular(path: str) -> Tabular:
+def csv_to_tabular(path: str, sep=None) -> Tabular:
     """
     Loads a CSV file and converts it into a Tabular object.
 
     :param path: The path to the CSV file to load.
     :return: The Tabular object corresponding to the data in the CSV file.
     """
-    return Tabular(pd.read_csv(path))
+    df = pd.read_csv(path, sep=sep, index_col=False, header=None, skip_blank_lines=True)
+    df.dropna(axis=1, how="all")
+    res = Tabular(data=df)
+    print(df.head())
+    print(res[:5])
+
+    return res
 
 
-def sanatizeList(data: list) -> str:
+def sanatize_list(data: list) -> str:
     """
     Converts a list into a string of a list without spaces.
     :param data: The list to convert.
@@ -189,6 +196,9 @@ class DimlpBTModel(DimlpfidexModel):
             self.normalization_indices = list(range(nb_attributes))
         self.seed = seed
         self.preprocess_function = None
+        self.densCls_test_samples_file = None
+        self.densCls_predictions_file = None
+        self.has_predicted = False
 
         # values to be known for further output manipulation
         self._outputs = {
@@ -240,7 +250,7 @@ class DimlpBTModel(DimlpfidexModel):
         if self.first_hidden_layer is not None:
             command += f" --first_hidden_layer {self.first_hidden_layer}"
         if self.hidden_layers is not None:
-            command += f" --hidden_layers {sanatizeList(self.hidden_layers)}"
+            command += f" --hidden_layers {sanatize_list(self.hidden_layers)}"
         if self.with_rule_extraction:
             command += " --global_rules_outfile dimlpBTRules.rls"
         if self.error_thresh is not None:
@@ -250,34 +260,52 @@ class DimlpBTModel(DimlpfidexModel):
         if self.normalization_file is not None:
             command += f" --normalization_file {self.normalization_file}"
         if self.mus is not None:
-            command += f" --mus {sanatizeList(self.mus)}"
+            command += f" --mus {sanatize_list(self.mus)}"
         if self.sigmas is not None:
-            command += f" --sigmas {sanatizeList(self.sigmas)}"
+            command += f" --sigmas {sanatize_list(self.sigmas)}"
         if self.normalization_indices is not None and self.normalization_file is None:
             command += (
-                f" --normalization_indices {sanatizeList(self.normalization_indices)}"
+                f" --normalization_indices {sanatize_list(self.normalization_indices)}"
             )
 
         status = dimlpBT(command)
         return status
 
     def __call__(self, data: Tabular) -> int:
-        test_samples_filename = "densCls_test_samples.txt"
-        tabular_to_csv(data, self.root_path.joinpath(test_samples_filename))
-        # TODO Use test samples
+        self.predict_test_samples_file = "densCls_test_samples.txt"
+        self.predict_predictions_file = "densCls_test_preds.txt"
 
-        status = densCls(
-            f"""
+        if self.preprocess_function is not None:
+            self.preprocess_function(self.predict_predictions_file)
+
+        tabular_to_csv(data, self.root_path.joinpath(self.predict_test_samples_file))
+        # TODO hidden layer file has weird behaviour when executed more than once
+
+        command = f"""
                             --root_folder {self.root_path}
                             --train_data_file {self.train_data_filename}
                             --weights_file {self._outputs["weights_outfile"]}
+                            --test_data_file {self.predict_test_samples_file}
+                            --test_pred_outfile {self.predict_predictions_file}
                             --hidden_layers_file {self._outputs["hidden_layers_file"]}
                             --nb_attributes {self.nb_attributes}
                             --nb_classes {self.nb_classes}
                             --console_file densClsResult.txt
                          """
-        )
-        return status
+        self.has_predicted = True
+        status = densCls(command)
+
+        if status != 0:
+            print("Something went wrong with DensCls (DimlpBT prediction) execution...")
+
+        results = []
+        with open(
+            self.root_path.joinpath(self.predict_predictions_file), "r"
+        ) as predictions:
+            for line in predictions:
+                results.append([float(e) for e in line.strip().split(" ")])
+
+        return np.array(results)
 
 
 class GradBoostModel(DimlpfidexModel):
@@ -435,7 +463,7 @@ class GradBoostModel(DimlpfidexModel):
         if self.seed is not None:
             command += f" --seed {self.seed}"
         if self.n_iter_no_change is not None:
-            command += f" --n_iter_no_change {sanatizeList(self.n_iter_no_change)}"
+            command += f" --n_iter_no_change {sanatize_list(self.n_iter_no_change)}"
 
         status = gradBoostTrn(command)
         return status
@@ -592,7 +620,7 @@ class RandomForestModel(DimlpfidexModel):
             command += f" --seed {self.seed}"
         if self.class_weight is not None:
             if isinstance(self.class_weight, dict):
-                self.class_weight = sanatizeList(self.class_weight)
+                self.class_weight = sanatize_list(self.class_weight)
             command += f" --class_weight {self.class_weight}"
         if self.max_samples is not None:
             command += f" --max_samples {self.max_samples}"
@@ -745,7 +773,7 @@ class SVMModel(DimlpfidexModel):
             command += f" --positive_class_index {self.positive_class_index}"
         if self.class_weight is not None:
             if isinstance(self.class_weight, dict):
-                self.class_weight = sanatizeList(self.class_weight)
+                self.class_weight = sanatize_list(self.class_weight)
             command += f" --class_weight {self.class_weight}"
         if self.output_roc is not None:
             command += f" --output_roc {self.output_roc}"
@@ -902,7 +930,7 @@ class MLPModel(DimlpfidexModel):
                     --nb_classes {self.nb_classes}
                     --nb_quant_levels {self.nb_quant_levels}
                     --K {self.K}
-                    --hidden_layer_sizes {sanatizeList(self.hidden_layer_sizes)}
+                    --hidden_layer_sizes {sanatize_list(self.hidden_layer_sizes)}
                     --activation {self.activation}
                     --solver {self.solver}
                     --alpha {self.alpha}
@@ -1034,14 +1062,18 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         tabular_to_csv(
             test_data, self.model.root_path.joinpath(self.test_samples_filename)
         )
-        # TODO check if test_data
+
+        if self.model.has_predicted:
+            test_preds_file = self.model.predict_predictions_file
+        else:
+            test_preds_file = self.model._outputs["test_pred_outfile"]
 
         command = f"""
                 --root_folder {self.model.root_path}
                 --train_data_file {self.model.train_data_filename}
                 --train_pred_file {self.model._outputs["train_pred_outfile"]}
                 --test_data_file {self.test_samples_filename}
-                --test_pred_file {self.model._outputs["test_pred_outfile"]}
+                --test_pred_file {test_preds_file}
                 --rules_outfile {self.rules_outfile}
                 --nb_attributes {self.nb_attributes}
                 --nb_classes {self.nb_classes}
@@ -1072,12 +1104,12 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
         if self.normalization_file is not None:
             command += f" --normalization_file {self.normalization_file}"
         if self.mus is not None:
-            command += f" --mus {sanatizeList(self.mus)}"
+            command += f" --mus {sanatize_list(self.mus)}"
         if self.sigmas is not None:
-            command += f" --sigmas {sanatizeList(self.sigmas)}"
+            command += f" --sigmas {sanatize_list(self.sigmas)}"
         if self.normalization_indices is not None and self.normalization_file is None:
             command += (
-                f" --normalization_indices {sanatizeList(self.normalization_indices)}"
+                f" --normalization_indices {sanatize_list(self.normalization_indices)}"
             )
 
         status = fidex(command)
@@ -1232,12 +1264,13 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
         if self.normalization_file is not None:
             command += f" --normalization_file {self.normalization_file}"
         if self.mus is not None:
-            command += f" --mus {sanatizeList(self.mus)}"
+            command += f" --mus {sanatize_list(self.mus)}"
         if self.sigmas is not None:
-            command += f" --sigmas {sanatizeList(self.sigmas)}"
+            command += f" --sigmas {sanatize_list(self.sigmas)}"
         if self.normalization_indices is not None and self.normalization_file is None:
+
             command += (
-                f" --normalization_indices {sanatizeList(self.normalization_indices)}"
+                f" --normalization_indices {sanatize_list(self.normalization_indices)}"
             )
 
         status = fidexGloRules(command)
@@ -1447,12 +1480,12 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
         if self.normalization_file is not None:
             command += f" --normalization_file {self.normalization_file}"
         if self.mus is not None:
-            command += f" --mus {sanatizeList(self.mus)}"
+            command += f" --mus {sanatize_list(self.mus)}"
         if self.sigmas is not None:
-            command += f" --sigmas {sanatizeList(self.sigmas)}"
+            command += f" --sigmas {sanatize_list(self.sigmas)}"
         if self.normalization_indices is not None and self.normalization_file is None:
             command += (
-                f" --normalization_indices {sanatizeList(self.normalization_indices)}"
+                f" --normalization_indices {sanatize_list(self.normalization_indices)}"
             )
 
         status = fidexGlo(command)
@@ -1499,10 +1532,6 @@ class FidexExplainer(ExplainerBase):
         :param X: Optional Tabular test data for which to generate explanations.
         :return: A DimlpfidexExplanation object containing the explanations.
         """
-        status = self.model.train()
-
-        if status != 0:
-            raise RuntimeError("Something went wrong with the model execution...")
 
         self.model(X)
         result = self.algorithm.execute(X)
