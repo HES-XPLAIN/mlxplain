@@ -90,21 +90,70 @@ class DimlpfidexExplanation(ExplanationBase):
 
         return figure
 
-    # TODO: implement plots here for dashboard
     def plotly_plot(self, **kwargs) -> None:
         rules = self.explanations["rules"]
         idxs = []
         covered_samples = []
+        rule_str = []
 
         for i, rule in enumerate(rules):
             idxs.append(f"Rule #{i}")
             covered_samples.append(rule["coveringSize"])
+            rule_str.append(self.json_rule_to_string(i, rule))
 
         fig = go.Figure(
-            data=[go.Bar(x=idxs, y=covered_samples)],
+            data=[
+                go.Bar(
+                    x=idxs,
+                    y=covered_samples,
+                    customdata=rule_str,
+                    hovertemplate="%{customdata}",
+                )
+            ],
             layout_title_text="Generated rules",
         )
+
         return DashFigure(fig)
 
     def ipython_plot(self, **kwargs) -> None:
         pass  # TODO
+
+    def json_rule_to_string(
+        self, i, json_rule, attribute_names=None, classes_names=None
+    ):
+        rule = f"Rule #{i}: "
+
+        for antecedant in json_rule["antecedents"]:
+
+            if attribute_names is not None:
+                attribute = attribute_names[antecedant["attribute"]]
+            else:
+                attribute = f"X{antecedant['attribute']}"
+
+            rule += f"{attribute}"
+
+            if antecedant["inequality"]:
+                rule += ">="
+            else:
+                rule += "<"
+
+            rule += "{:.2f}".format(antecedant["value"]) + " "
+
+        if classes_names is not None:
+            output_class = classes_names[json_rule["outputClass"]]
+        else:
+            output_class = f"class {json_rule['outputClass']}"
+
+        rule += f" = {output_class}"
+
+        accuracy = json_rule["accuracy"]
+        confidence = json_rule["confidence"]
+        coveringSize = len(json_rule["coveredSamples"])
+        fidelity = json_rule["fidelity"]
+
+        rule += "<br>Confidence: {:.2f}".format(confidence)
+        rule += "<br>Accuracy: {:.2f}".format(accuracy)
+        rule += f"<br>Samples covered: {coveringSize}"
+        rule += "<br>Fidelity: {:.2f}".format(fidelity)
+
+        return rule
