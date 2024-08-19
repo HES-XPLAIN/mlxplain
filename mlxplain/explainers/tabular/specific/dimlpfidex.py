@@ -24,7 +24,6 @@ from trainings.svmTrn import svmTrn
 from ....explanations.tabular.dimlpfidex import DimlpfidexExplanation
 
 
-# TODO adapt comments
 def tabular_to_csv(data: Tabular, path: pl.Path) -> None:
     """
     Converts a Tabular object to a CSV file.
@@ -279,7 +278,6 @@ class DimlpBTModel(DimlpfidexModel):
             self.preprocess_function(self.predict_predictions_file)
 
         tabular_to_csv(data, self.root_path.joinpath(self.predict_test_samples_file))
-        # TODO hidden layer file has weird behaviour when executed more than once
 
         command = f"""
                             --root_folder {self.root_path}
@@ -978,24 +976,25 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
     - The `training_data` and `testing_data` must contain both attributes and classes altogether.
 
     :param model: The model to explain, which should be a subclass of DimlpfidexModel.
-    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
-    :param attributes_file: Optional file specifying attribute and class names.
-    :param max_iterations: Maximum number of iterations to generate a rule.
-    :param min_covering: Minimum number of examples a rule must cover.
-    :param covering_strategy: Whether or not the algorithm uses a dichotomic strategy to compute a rule.
-    :param max_failed_attempts: Maximum number of failed attempts to generate a rule.
-    :param min_fidelity: Lowest fidelity score allowed for a rule.
-    :param lowest_min_fidelity: Lowest fidelity score to which we agree to go down when a rule must be generated.
-    :param dropout_dim: Percentage of dimensions that are ignored during an iteration.
-    :param dropout_hyp: Percentage of hyperplanes that are ignored during an iteration.
-    :param decision_threshold: Threshold for predictions to be considered as correct.
-    :param positive_class_index: Index of the positive class for the usage of decision threshold.
-    :param nb_quant_levels: Number of "stairs" in the staircase function.
-    :param normalization_file: File containing the mean and standard deviation for specified attributes that have been normalized.
-    :param mus: Mean or median of each attribute index to denormalize in the rules.
-    :param sigmas: Standard deviation of each attribute index to denormalize in the rules.
-    :param normalization_indices: Indices of attributes to be denormalized in the rules.
-    :param seed: Random seed for reproducibility.
+    :param kwargs: Dictionary of additional parameters that can be provided to configure the algorithm. The following keys are recognized:
+        - verbose_console (bool, optional): If True, verbose output will be printed to the console, else it will be saved in a file.
+        - attributes_file (str, optional): Optional file specifying attribute and class names.
+        - max_iterations (int, optional): Maximum number of iterations to generate a rule. Defaults to 10.
+        - min_covering (int, optional): Minimum number of examples a rule must cover. Defaults to 2.
+        - covering_strategy (bool, optional): Whether or not the algorithm uses a dichotomic strategy to compute a rule. Defaults to True.
+        - max_failed_attempts (int, optional): Maximum number of failed attempts to generate a rule. Defaults to 30.
+        - min_fidelity (float, optional): Lowest fidelity score allowed for a rule. Defaults to 1.0.
+        - lowest_min_fidelity (float, optional): Lowest fidelity score to which we agree to go down when a rule must be generated. Defaults to 0.75.
+        - dropout_dim (float, optional): Percentage of dimensions that are ignored during an iteration. Defaults to 0.0.
+        - dropout_hyp (float, optional): Percentage of hyperplanes that are ignored during an iteration. Defaults to 0.0.
+        - decision_threshold (float, optional): Threshold for predictions to be considered as correct.
+        - positive_class_index (int, optional): Index of the positive class for the usage of decision threshold.
+        - nb_quant_levels (int, optional): Number of "stairs" in the staircase function. Defaults to 50.
+        - normalization_file (str, optional): File containing the mean and standard deviation for specified attributes that have been normalized.
+        - mus (list[float], optional): Mean or median of each attribute index to denormalize in the rules.
+        - sigmas (list[float], optional): Standard deviation of each attribute index to denormalize in the rules.
+        - normalization_indices (list[int], optional): Indices of attributes to be denormalized in the rules. Defaults to all attributes.
+        - seed (int, optional): Random seed for reproducibility. Defaults to 0.
     """
 
     def __init__(self, model: DimlpfidexModel, **kwargs):
@@ -1135,29 +1134,31 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
     - Parameters `with_minimal_version` and `nb_fidex_rules` are only used with FidexGlo.
 
     :param model: The model to explain, which should be a subclass of DimlpfidexModel.
-    :param heuristic: The heuristic to use for rule generation.
-    :param with_fidexGlo: If True, FidexGlo will also be executed.
-    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
-    :param attributes_file: Optional file specifying attribute and class names.
-    :param max_iterations: Maximum number of iterations to generate a rule.
-    :param min_covering: Minimum number of examples a rule must cover.
-    :param covering_strategy: Whether or not the algorithm uses a dichotomic strategy to compute a rule.
-    :param max_failed_attempts: Maximum number of failed attempts to generate a rule.
-    :param min_fidelity: Lowest fidelity score allowed for a rule.
-    :param lowest_min_fidelity: Lowest fidelity score to which we agree to go down when a rule must be generated.
-    :param dropout_dim: Percentage of dimensions that are ignored during an iteration.
-    :param dropout_hyp: Percentage of hyperplanes that are ignored during an iteration.
-    :param decision_threshold: Threshold for predictions to be considered as correct.
-    :param positive_class_index: Index of the positive class for the usage of decision threshold.
-    :param nb_quant_levels: Number of "stairs" in the staircase function.
-    :param normalization_file: File containing the mean and standard deviation for specified attributes that have been normalized.
-    :param mus: Mean or median of each attribute index to denormalize in the rules.
-    :param sigmas: Standard deviation of each attribute index to denormalize in the rules.
-    :param normalization_indices: Indices of attributes to be denormalized in the rules.
-    :param nb_threads: Number of threads to use for processing.
-    :param seed: Random seed for reproducibility.
-    :param with_minimal_version: Whether to use the minimal version, which only gets correct activated rules.
-    :param nb_fidex_rules: Number of Fidex rules to compute per sample when launching the Fidex algorithm.
+    :param kwargs: Dictionary of additional parameters that can be provided to configure the algorithm. The following keys are recognized:
+        - heuristic (int, optional): The heuristic to use for rule generation. Defaults to 1.
+        - with_fidexGlo (bool, optional): If True, FidexGlo will also be executed. Defaults to False.
+        - fidexGlo (dict, optional): If `with_fidexGlo` is True, you can pass an additional dictionary with the key `'fidexGlo'`, containing keyword arguments to configure the FidexGlo algorithm. Refer to the `FidexGloAlgorithm` class documentation for detailed information on the available parameters.
+        - verbose_console (bool, optional): If True, verbose output will be printed to the console, else it will be saved in a file. Defaults to False.
+        - attributes_file (str, optional): Optional file specifying attribute and class names.
+        - max_iterations (int, optional): Maximum number of iterations to generate a rule. Defaults to 10.
+        - min_covering (int, optional): Minimum number of examples a rule must cover. Defaults to 2.
+        - covering_strategy (bool, optional): Whether or not the algorithm uses a dichotomic strategy to compute a rule. Defaults to True.
+        - max_failed_attempts (int, optional): Maximum number of failed attempts to generate a rule. Defaults to 30.
+        - min_fidelity (float, optional): Lowest fidelity score allowed for a rule. Defaults to 1.0.
+        - lowest_min_fidelity (float, optional): Lowest fidelity score to which we agree to go down when a rule must be generated. Defaults to 0.75.
+        - dropout_dim (float, optional): Percentage of dimensions that are ignored during an iteration. Defaults to 0.0.
+        - dropout_hyp (float, optional): Percentage of hyperplanes that are ignored during an iteration. Defaults to 0.0.
+        - decision_threshold (float, optional): Threshold for predictions to be considered as correct.
+        - positive_class_index (int, optional): Index of the positive class for the usage of decision threshold.
+        - nb_quant_levels (int, optional): Number of "stairs" in the staircase function. Defaults to 50.
+        - normalization_file (str, optional): File containing the mean and standard deviation for specified attributes that have been normalized.
+        - mus (list[float], optional): Mean or median of each attribute index to denormalize in the rules.
+        - sigmas (list[float], optional): Standard deviation of each attribute index to denormalize in the rules.
+        - normalization_indices (list[int], optional): Indices of attributes to be denormalized in the rules. Defaults to all attributes.
+        - nb_threads (int, optional): Number of threads to use for processing. Defaults to 1.
+        - seed (int, optional): Random seed for reproducibility. Defaults to 0.
+        - with_minimal_version (bool, optional): Whether to use the minimal version, which only gets correct activated rules. Defaults to False.
+        - nb_fidex_rules (int, optional): Number of Fidex rules to compute per sample when launching the Fidex algorithm. Defaults to 1.
     """
 
     # - train_data must contain attributes and classes altogether
@@ -1354,6 +1355,7 @@ class FidexGloStatsAlgorithm(DimlpfidexAlgorithm):
         return None
 
 
+# TODO adapt comments
 class FidexGloAlgorithm(DimlpfidexAlgorithm):
     """
     An algorithm class for the FidexGlo explanation method, implementing the DimlpfidexAlgorithm interface.
@@ -1365,24 +1367,25 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
     - `training_data` and `testing_data` must contain both attributes and classes altogether.
 
     :param model: The model to explain, which should be a subclass of DimlpfidexModel.
-    :param verbose_console: If True, verbose output will be printed to the console, else it will be saved in a file.
-    :param attributes_file: Optional file specifying attribute and class names.
-    :param with_minimal_version: Whether to use the minimal version, which only gets correct activated rules.
-    :param max_iterations: Maximum number of iterations to generate a rule.
-    :param min_covering: Minimum number of examples a rule must cover.
-    :param covering_strategy: Whether or not the algorithm uses a dichotomic strategy to compute a rule.
-    :param max_failed_attempts: Maximum number of failed attempts to generate a rule.
-    :param min_fidelity: Lowest fidelity score allowed for a rule.
-    :param lowest_min_fidelity: Lowest fidelity score to which we agree to go down when a rule must be generated.
-    :param nb_fidex_rules: Number of Fidex rules to compute per sample when launching the Fidex algorithm.
-    :param dropout_dim: Percentage of dimensions that are ignored during an iteration.
-    :param dropout_hyp: Percentage of hyperplanes that are ignored during an iteration.
-    :param nb_quant_levels: Number of "stairs" in the staircase function.
-    :param normalization_file: File containing the mean and standard deviation for specified attributes that have been normalized.
-    :param mus: Mean or median of each attribute index to denormalize in the rules.
-    :param sigmas: Standard deviation of each attribute index to denormalize in the rules.
-    :param normalization_indices: Indices of attributes to be denormalized in the rules.
-    :param seed: Random seed for reproducibility.
+    :param kwargs: Additional parameters for configuring the algorithm. The following keys are recognized:
+        - verbose_console (bool, optional): If True, verbose output will be printed to the console; otherwise, it will be saved in a file.
+        - attributes_file (str, optional): Path to an optional file specifying attribute and class names.
+        - with_minimal_version (bool, optional): Whether to use the minimal version, which only retrieves correctly activated rules.
+        - max_iterations (int, optional): Maximum number of iterations to generate a rule.
+        - min_covering (int, optional): Minimum number of examples a rule must cover.
+        - covering_strategy (bool, optional): Whether or not the algorithm uses a dichotomic strategy to compute a rule.
+        - max_failed_attempts (int, optional): Maximum number of failed attempts to generate a rule.
+        - min_fidelity (float, optional): Lowest fidelity score allowed for a rule.
+        - lowest_min_fidelity (float, optional): Lowest fidelity score to which we agree to go down when a rule must be generated.
+        - nb_fidex_rules (int, optional): Number of Fidex rules to compute per sample when launching the Fidex algorithm.
+        - dropout_dim (float, optional): Percentage of dimensions that are ignored during an iteration.
+        - dropout_hyp (float, optional): Percentage of hyperplanes that are ignored during an iteration.
+        - nb_quant_levels (int, optional): Number of "stairs" in the staircase function.
+        - normalization_file (str, optional): File containing the mean and standard deviation for specified attributes that have been normalized.
+        - mus (list[float], optional): Mean or median of each attribute index to denormalize in the rules.
+        - sigmas (list[float], optional): Standard deviation of each attribute index to denormalize in the rules.
+        - normalization_indices (list[int], optional): Indices of attributes to be denormalized in the rules.
+        - seed (int, optional): Random seed for reproducibility.
     """
 
     def __init__(self, model: DimlpfidexModel, **kwargs):
@@ -1498,6 +1501,13 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
 
 
 class FidexExplainer(ExplainerBase):
+    """
+    FidexExplainer is a local explanation class for the 'DimlpBTModel' model.
+
+    This class provides a method to generate local explanations for classification tasks.
+    It uses the Fidex algorithm and integrates with a given 'DimlpBTModel' model.
+    """
+
     alias = ["fidex"]
     mode = "classification"
     explanation_type = "local"
@@ -1525,11 +1535,7 @@ class FidexExplainer(ExplainerBase):
         """
         Generates local explanation(s) using the specified explanation algorithm.
 
-        **Important Notes:**
-        - If not using DimlpBT, predictions will not be performed, so `run_predict` and `X` parameters are ignored, and the original test data from model training is used instead.
-        - If `X` is None, the original test data from model training is used. Otherwise, you must use the DimlpBT model instead of any other.
-
-        :param X: Optional Tabular test data for which to generate explanations.
+        :param X: Tabular test data for which to generate explanations.
         :return: A DimlpfidexExplanation object containing the explanations.
         """
 
@@ -1540,6 +1546,13 @@ class FidexExplainer(ExplainerBase):
 
 
 class FidexGloRulesExplainer(ExplainerBase):
+    """
+    FidexGloRulesExplainer is a global explanation class for models of type DimlpfidexModel.
+
+    This class provides a method to generate global explanations for classification tasks.
+    It uses the FidexGloRules algorithm to generate global explanations based on rules.
+    """
+
     alias = ["fidexGloRules"]
     mode = "classification"
     explanation_type = "global"
@@ -1564,10 +1577,6 @@ class FidexGloRulesExplainer(ExplainerBase):
 
         :return: A DimlpfidexExplanation object containing the global explanations.
         """
-        status = self.model.train()
-
-        if status != 0:
-            raise ValueError("Something went wrong with the model execution...")
 
         result = self.algorithm.execute()
 
