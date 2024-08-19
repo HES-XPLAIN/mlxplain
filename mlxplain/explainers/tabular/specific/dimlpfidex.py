@@ -24,6 +24,16 @@ from trainings.svmTrn import svmTrn
 from ....explanations.tabular.dimlpfidex import DimlpfidexExplanation
 
 
+def csv_to_list(path: str, sep=None) -> list[str]:
+    res = []
+
+    with open(path, "r") as f:
+        for line in f:
+            res += line.strip().split(sep)
+
+    return res
+
+
 def tabular_to_csv(data: Tabular, path: pl.Path) -> None:
     """
     Converts a Tabular object to a CSV file.
@@ -44,8 +54,6 @@ def csv_to_tabular(path: str, sep=None) -> Tabular:
     df = pd.read_csv(path, sep=sep, index_col=False, header=None, skip_blank_lines=True)
     df.dropna(axis=1, how="all")
     res = Tabular(data=df)
-    print(df.head())
-    print(res[:5])
 
     return res
 
@@ -198,6 +206,7 @@ class DimlpBTModel(DimlpfidexModel):
         self.densCls_test_samples_file = None
         self.densCls_predictions_file = None
         self.has_predicted = False
+        self.preprocess_function = None
 
         # values to be known for further output manipulation
         self._outputs = {
@@ -717,6 +726,7 @@ class SVMModel(DimlpfidexModel):
         self.max_iterations = max_iterations
         self.decision_function_shape = decision_function_shape
         self.break_ties = break_ties
+        self.preprocess_function = None
 
         # values to be known for further output manipulation
         self._outputs = {
@@ -894,6 +904,7 @@ class MLPModel(DimlpfidexModel):
         self.epsilon = epsilon
         self.n_iter_no_change = n_iter_no_change
         self.max_fun = max_fun
+        self.preprocess_function = None
 
         # values to be known for further output manipulation
         self._outputs = {
@@ -1022,10 +1033,10 @@ class FidexAlgorithm(DimlpfidexAlgorithm):
 
     def process_kwargs(self, **kwargs):
         self.verbose_console = kwargs.get("verbose_console", False)
-        self.attributes_file = kwargs.get("attributes_file", None)
         self.max_iterations = kwargs.get("max_iterations", 10)
         self.min_covering = kwargs.get("min_covering", 2)
         self.covering_strategy = kwargs.get("covering_strategy", True)
+        self.attributes_file = kwargs.get("attributes_file", None)
         self.max_failed_attempts = kwargs.get("max_failed_attempts", 30)
         self.min_fidelity = kwargs.get("min_fidelity", 1.0)
         self.lowest_min_fidelity = kwargs.get("lowest_min_fidelity", 0.75)
@@ -1187,11 +1198,11 @@ class FidexGloRulesAlgorithm(DimlpfidexAlgorithm):
 
     def process_kwargs(self, **kwargs):
         self.heuristic = kwargs.get("heuristic", 1)
+        self.attributes_file = kwargs.get("attributes_file", None)
         self.with_fidexGlo = kwargs.get("with_fidexGlo", False)
         if self.with_fidexGlo:
             self.fidexGlo = FidexGloAlgorithm(self.model, **kwargs)
         self.verbose_console = kwargs.get("verbose_console", False)
-        self.attributes_file = kwargs.get("attributes_file", None)
         self.max_iterations = kwargs.get("max_iterations", 10)
         self.min_covering = kwargs.get("min_covering", 2)
         self.covering_strategy = kwargs.get("covering_strategy", True)
@@ -1355,7 +1366,6 @@ class FidexGloStatsAlgorithm(DimlpfidexAlgorithm):
         return None
 
 
-# TODO adapt comments
 class FidexGloAlgorithm(DimlpfidexAlgorithm):
     """
     An algorithm class for the FidexGlo explanation method, implementing the DimlpfidexAlgorithm interface.
@@ -1369,8 +1379,8 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
     :param model: The model to explain, which should be a subclass of DimlpfidexModel.
     :param kwargs: Additional parameters for configuring the algorithm. The following keys are recognized:
         - verbose_console (bool, optional): If True, verbose output will be printed to the console; otherwise, it will be saved in a file.
-        - attributes_file (str, optional): Path to an optional file specifying attribute and class names.
         - with_minimal_version (bool, optional): Whether to use the minimal version, which only retrieves correctly activated rules.
+        - attributes_file (str, optional): Path to an optional file specifying attribute and class names.
         - max_iterations (int, optional): Maximum number of iterations to generate a rule.
         - min_covering (int, optional): Minimum number of examples a rule must cover.
         - covering_strategy (bool, optional): Whether or not the algorithm uses a dichotomic strategy to compute a rule.
@@ -1412,8 +1422,8 @@ class FidexGloAlgorithm(DimlpfidexAlgorithm):
     def process_kwargs(self, **kwargs):
         kwargs = kwargs.get("fidexGlo", {})
         self.verbose_console = kwargs.get("verbose_console", False)
-        self.attributes_file = kwargs.get("attributes_file", None)
         self.with_minimal_version = kwargs.get("with_minimal_version", False)
+        self.attributes_file = kwargs.get("attributes_file", None)
         self.max_iterations = kwargs.get("max_iterations", 10)
         self.min_covering = kwargs.get("min_covering", 2)
         self.covering_strategy = kwargs.get("covering_strategy", True)
@@ -1541,8 +1551,20 @@ class FidexExplainer(ExplainerBase):
 
         self.model(X)
         result = self.algorithm.execute(X)
+        attributes = None
+        classes = None
 
-        return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
+        if self.algorithm.attributes_file is not None:
+            labels = csv_to_list(
+                self.model.root_path.joinpath(self.algorithm.attributes_file)
+            )
+
+            attributes = labels[: self.algorithm.nb_attributes]
+            classes = labels[self.algorithm.nb_attributes :]
+
+        return DimlpfidexExplanation(
+            self.mode, self.training_data.shape[0], result, attributes, classes
+        )
 
 
 class FidexGloRulesExplainer(ExplainerBase):
@@ -1579,5 +1601,17 @@ class FidexGloRulesExplainer(ExplainerBase):
         """
 
         result = self.algorithm.execute()
+        attributes = None
+        classes = None
 
-        return DimlpfidexExplanation(self.mode, self.training_data.shape[0], result)
+        if self.algorithm.attributes_file is not None:
+            labels = csv_to_list(
+                self.model.root_path.joinpath(self.algorithm.attributes_file)
+            )
+
+            attributes = labels[: self.algorithm.nb_attributes]
+            classes = labels[self.algorithm.nb_attributes :]
+
+        return DimlpfidexExplanation(
+            self.mode, self.training_data.shape[0], result, attributes, classes
+        )
