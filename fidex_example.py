@@ -10,7 +10,6 @@ import pathlib as pl
 import pandas as pd
 from omnixai.data.tabular import Tabular
 from omnixai.explainers.tabular.auto import TabularExplainer
-from omnixai.visualization.dashboard import Dashboard
 
 from mlxplain.explainers.tabular.specific.dimlpfidex import (
     DimlpBTModel,
@@ -21,7 +20,7 @@ from mlxplain.explainers.tabular.specific.dimlpfidex import (
 )
 
 
-def load_data():
+def load_data(root_folder: pl.Path):
     dataset = pd.read_csv("ObesityDataSet.csv")
 
     # reducing labels names size
@@ -67,9 +66,12 @@ def load_data():
     dataset.drop(["Gender", "MTRANS", "OLD"], axis=1, inplace=True)
 
     labels = list(dataset.columns)
+    classes = [label for label in labels if label.startswith("OLD_")]
+    attributes = labels[: len(labels) - len(classes)]
 
-    nclasses = sum(1 for label in labels if label.startswith("OLD_"))
-    nattributes = len(labels) - nclasses
+    with open(root_folder.joinpath("attributes.txt"), "w") as f:
+        for label in labels:
+            f.write(f"{label}\n")
 
     nRecords = dataset.shape[0]
     trainSplit = int(0.75 * nRecords)
@@ -80,7 +82,7 @@ def load_data():
     train = Tabular(data=trainds, feature_columns=labels)
     test = Tabular(data=testds, feature_columns=labels)
 
-    return train, test, nattributes, nclasses
+    return train, test, attributes, classes
 
 
 def load_dummy_data():
@@ -115,6 +117,7 @@ def get_local_explainer(model, train_data):
             "fidex": {
                 "seed": 1,
                 "max_iterations": 10,
+                "attributes_file": "attributes.txt",
                 "min_covering": 2,
                 "max_failed_attempts": 15,
                 "min_fidelity": 1.0,
@@ -136,6 +139,7 @@ def get_global_explainer(model, train_data):
             "fidexGloRules": {
                 "heuristic": 1,
                 "with_fidexGlo": True,
+                "attributes_file": "attributes.txt",
                 "seed": 1,
                 "positive_class_index": 0,
                 "nb_threads": 4,
@@ -156,6 +160,7 @@ def get_MLPModel(output_path, train_data, test_data, nattributes, nclasses):
         test_data,
         nattributes,
         nclasses,
+        seed=1,
         # verbose_console=True,
         # nb_quant_levels=45,
         # K=0.1,
@@ -192,6 +197,8 @@ def get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses):
         test_data,
         nattributes,
         nclasses,
+        seed=1,
+        attributes_file="attributes.txt",
     )
 
 
@@ -202,8 +209,7 @@ def get_gradBoostModel(output_path, train_data, test_data, nattributes, nclasses
         test_data,
         nattributes,
         nclasses,
-        seed=1,  # print(f"FIDEX: Test data shape is {test_data.shape}")
-        # print(f"FIDEX: Test preds shape is {test_preds.shape}")
+        seed=1,
         # verbose_console=True,
         # n_estimators=3,
         # learning_rate=32,
@@ -292,16 +298,19 @@ def run_tests(output_path, train_data, test_data, nattributes, nclasses):
 
     for model_getter in model_getters:
         model = model_getter(output_path, train_data, test_data, nattributes, nclasses)
+        model.train()
 
         if isinstance(model, DimlpBTModel):
             print(f"Testing fidex & fidexGloRules with {type(model).__name__}")
             local_explainer = get_local_explainer(model, train_data)
-            local_explainer.explain(X=test_data)
+            le = local_explainer.explain(X=test_data)
+            le["fidex"].ipython_plot()
         else:
             print(f"Testing fidexGloRules with {type(model).__name__}")
 
         global_explainer = get_global_explainer(model, train_data)
-        global_explainer.explain_global()
+        ge = global_explainer.explain_global()
+        ge["fidexGloRules"].ipython_plot()
 
 
 if __name__ == "__main__":
@@ -313,16 +322,6 @@ if __name__ == "__main__":
     test_data_file = "test_data.txt"
 
     # load data
-    train_data, test_data, nattributes, nclasses = load_data()
+    train_data, test_data, attributes, classes = load_data(output_path)
 
-    # run_tests(output_path, train_data, test_data, nattributes, nclasses)
-
-    model = get_dimlpBTModel(output_path, train_data, test_data, nattributes, nclasses)
-    model.train()
-
-    explainer = get_local_explainer(model, train_data)
-    explainerg = get_global_explainer(model, train_data)
-    le = explainer.explain(test_data[0])
-    ge = explainerg.explain_global()
-    db = Dashboard(local_explanations=le, global_explanations=ge)
-    db.show()
+    run_tests(output_path, train_data, test_data, len(attributes), len(classes))
