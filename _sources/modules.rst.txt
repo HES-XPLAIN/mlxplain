@@ -4,6 +4,7 @@ mlxplain
 .. toctree::
    :maxdepth: 4
 
+   fidex_example
    mlxplain
    rulextract_example
    tests

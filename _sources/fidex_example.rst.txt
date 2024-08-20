@@ -1,0 +1,7 @@
+fidex\_example module
+=====================
+
+.. automodule:: fidex_example
+   :members:
+   :undoc-members:
+   :show-inheritance:
