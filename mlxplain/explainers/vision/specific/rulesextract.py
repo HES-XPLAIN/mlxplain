@@ -39,6 +39,7 @@ class RulesExtractImage(ExplainerBase):
         target_class: str,
         top_rules: int,
         mode: str = "classification",
+        feature_activations: pd.DataFrame = None,
         **kwargs,
     ):
         """
@@ -56,6 +57,7 @@ class RulesExtractImage(ExplainerBase):
         self.target_class = target_class
         self.top_rules = top_rules
         self.mode = mode
+        self.feature_activations = feature_activations
 
         if not is_torch_available():
             # import torch.nn as nn
@@ -73,24 +75,30 @@ class RulesExtractImage(ExplainerBase):
         :return: The tuples explanations for all the instances, e.g., rules and their associated classes.
         :rtype: RuleImportance
         """
-        device = (
-            torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-        )
-        index_to_classes = {
-            str(index): name for index, name in enumerate(self.class_names)
-        }
-        train_features = compute_avg_features(
-            self.model, self.dataloader, index_to_classes, device
-        )
+        if self.dataloader is not None:
+            device = (
+                torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+            )
+            index_to_classes = {
+                str(index): name for index, name in enumerate(self.class_names)
+            }
+            avg_activations = compute_avg_features(
+                self.model, self.dataloader, index_to_classes, device
+            )
+            feature_activations = make_target_df(avg_activations, self.target_class)
+        else:
+            if self.feature_activations is not None:
+                feature_activations = self.feature_activations
+            else:
+                raise ValueError("Either dataloader or feature_activations must be provided.")
 
-        df_train = make_target_df(train_features, self.target_class)
-        X_train, y_train = df_train.iloc[:, :-3], df_train.iloc[:, -1]
+        X, y = feature_activations.iloc[:, :-3], feature_activations.iloc[:, -1]
 
         all_rules = extract_all_rules(
-            X_train, y_train, n_estimators=200, max_depth=2, random_state=1
+            X, y, n_estimators=200, max_depth=2, random_state=1
         )
 
-        explanations = RuleRanker(all_rules, X_train, y_train).rank_rules(
+        explanations = RuleRanker(all_rules, X, y).rank_rules(
             N=self.top_rules
         )
         return RuleImportance(explanations=explanations)
