@@ -4,9 +4,9 @@ import json
 import numpy as np
 import sklearn
 import torch
-from omnixai.data.image import Image as OmniImage
-from omnixai.explainers.vision import VisionExplainer
-from omnixai.visualization.dashboard import Dashboard
+from omnixai_community.data.image import Image as OmniImage
+from omnixai_community.explainers.vision import VisionExplainer
+from omnixai_community.visualization.dashboard import Dashboard
 from rules_extraction.utils import filter_dataset
 from torch.utils.data import DataLoader, Subset
 from torchvision import transforms

@@ -14,8 +14,8 @@ import numpy as np
 import pandas as pd
 from dimlpfidex.dimlp import densCls, dimlpBT
 from dimlpfidex.fidex import fidex, fidexGlo, fidexGloRules, fidexGloStats
-from omnixai.data.tabular import Tabular
-from omnixai.explainers.base import ExplainerBase
+from omnixai_community.data.tabular import Tabular
+from omnixai_community.explainers.base import ExplainerBase
 from trainings.gradBoostTrn import gradBoostTrn
 from trainings.mlpTrn import mlpTrn
 from trainings.randForestsTrn import randForestsTrn
