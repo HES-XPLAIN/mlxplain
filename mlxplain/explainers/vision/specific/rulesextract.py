@@ -7,8 +7,13 @@
 """
 The Rules Extraction methods for vision tasks.
 """
+from typing import List, Optional
+
 import torch
 import torch.nn as nn
+import pandas as pd
+from torch.utils.data import DataLoader
+
 from omnixai.explainers.base import ExplainerBase
 from omnixai.utils.misc import is_torch_available
 from rules_extraction.rules import RuleRanker
@@ -33,13 +38,13 @@ class RulesExtractImage(ExplainerBase):
 
     def __init__(
         self,
-        model,
-        dataloader,
-        class_names,
+        model: nn.Module,
+        class_names: List[str],
         target_class: str,
         top_rules: int,
         mode: str = "classification",
-        feature_activations: pd.DataFrame = None,
+        dataloader: Optional[DataLoader] = None,
+        feature_activations: Optional[pd.DataFrame] = None,
         **kwargs,
     ):
         """
@@ -52,15 +57,16 @@ class RulesExtractImage(ExplainerBase):
         """
         super().__init__()
         self.model = model
-        self.dataloader = dataloader
         self.class_names = class_names
         self.target_class = target_class
         self.top_rules = top_rules
         self.mode = mode
+        if dataloader is None and feature_activations is None:
+            raise ValueError("Either dataloader or feature_activations must be provided.")
+        self.dataloader = dataloader
         self.feature_activations = feature_activations
 
         if not is_torch_available():
-            # import torch.nn as nn
             raise EnvironmentError("Torch cannot be found.")
 
         if not isinstance(model, nn.Module):
@@ -68,7 +74,7 @@ class RulesExtractImage(ExplainerBase):
                 f"`model` should be a torch.nn.Module instead of {type(model)}"
             )
 
-    def explain(self):
+    def explain(self) -> RuleImportance:
         """
         Generates the explanations for the input instances.
 
@@ -89,8 +95,6 @@ class RulesExtractImage(ExplainerBase):
         else:
             if self.feature_activations is not None:
                 feature_activations = self.feature_activations
-            else:
-                raise ValueError("Either dataloader or feature_activations must be provided.")
 
         X, y = feature_activations.iloc[:, :-3], feature_activations.iloc[:, -1]
 
