@@ -9,11 +9,9 @@ The Rules Extraction methods for vision tasks.
 """
 from typing import List, Optional
 
+import pandas as pd
 import torch
 import torch.nn as nn
-import pandas as pd
-from torch.utils.data import DataLoader
-
 from omnixai.explainers.base import ExplainerBase
 from omnixai.utils.misc import is_torch_available
 from rules_extraction.rules import RuleRanker
@@ -22,6 +20,7 @@ from rules_extraction.utils import (
     extract_all_rules,
     make_target_df,
 )
+from torch.utils.data import DataLoader
 
 from mlxplain.explanations.images.rules import RuleImportance
 
@@ -62,7 +61,9 @@ class RulesExtractImage(ExplainerBase):
         self.top_rules = top_rules
         self.mode = mode
         if dataloader is None and feature_activations is None:
-            raise ValueError("Either dataloader or feature_activations must be provided.")
+            raise ValueError(
+                "Either dataloader or feature_activations must be provided."
+            )
         self.dataloader = dataloader
         self.feature_activations = feature_activations
 
@@ -83,7 +84,9 @@ class RulesExtractImage(ExplainerBase):
         """
         if self.dataloader is not None:
             device = (
-                torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+                torch.device("cuda")
+                if torch.cuda.is_available()
+                else torch.device("cpu")
             )
             index_to_classes = {
                 str(index): name for index, name in enumerate(self.class_names)
@@ -102,7 +105,5 @@ class RulesExtractImage(ExplainerBase):
             X, y, n_estimators=200, max_depth=2, random_state=1
         )
 
-        explanations = RuleRanker(all_rules, X, y).rank_rules(
-            N=self.top_rules
-        )
+        explanations = RuleRanker(all_rules, X, y).rank_rules(N=self.top_rules)
         return RuleImportance(explanations=explanations)
