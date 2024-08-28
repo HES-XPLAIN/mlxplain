@@ -7,6 +7,9 @@
 """
 The Rules Extraction methods for vision tasks.
 """
+from typing import List, Optional
+
+import pandas as pd
 import torch
 import torch.nn as nn
 from omnixai.explainers.base import ExplainerBase
@@ -17,6 +20,7 @@ from rules_extraction.utils import (
     extract_all_rules,
     make_target_df,
 )
+from torch.utils.data import DataLoader
 
 from mlxplain.explanations.images.rules import RuleImportance
 
@@ -33,12 +37,13 @@ class RulesExtractImage(ExplainerBase):
 
     def __init__(
         self,
-        model,
-        dataloader,
-        class_names,
+        model: nn.Module,
+        class_names: List[str],
         target_class: str,
         top_rules: int,
         mode: str = "classification",
+        dataloader: Optional[DataLoader] = None,
+        feature_activations: Optional[pd.DataFrame] = None,
         **kwargs,
     ):
         """
@@ -51,14 +56,18 @@ class RulesExtractImage(ExplainerBase):
         """
         super().__init__()
         self.model = model
-        self.dataloader = dataloader
         self.class_names = class_names
         self.target_class = target_class
         self.top_rules = top_rules
         self.mode = mode
+        if dataloader is None and feature_activations is None:
+            raise ValueError(
+                "Either dataloader or feature_activations must be provided."
+            )
+        self.dataloader = dataloader
+        self.feature_activations = feature_activations
 
         if not is_torch_available():
-            # import torch.nn as nn
             raise EnvironmentError("Torch cannot be found.")
 
         if not isinstance(model, nn.Module):
@@ -66,31 +75,35 @@ class RulesExtractImage(ExplainerBase):
                 f"`model` should be a torch.nn.Module instead of {type(model)}"
             )
 
-    def explain(self):
+    def explain(self) -> RuleImportance:
         """
         Generates the explanations for the input instances.
 
         :return: The tuples explanations for all the instances, e.g., rules and their associated classes.
         :rtype: RuleImportance
         """
-        device = (
-            torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-        )
-        index_to_classes = {
-            str(index): name for index, name in enumerate(self.class_names)
-        }
-        train_features = compute_avg_features(
-            self.model, self.dataloader, index_to_classes, device
-        )
+        if self.dataloader is not None:
+            device = (
+                torch.device("cuda")
+                if torch.cuda.is_available()
+                else torch.device("cpu")
+            )
+            index_to_classes = {
+                str(index): name for index, name in enumerate(self.class_names)
+            }
+            avg_activations = compute_avg_features(
+                self.model, self.dataloader, index_to_classes, device
+            )
+            feature_activations = make_target_df(avg_activations, self.target_class)
+        else:
+            if self.feature_activations is not None:
+                feature_activations = self.feature_activations
 
-        df_train = make_target_df(train_features, self.target_class)
-        X_train, y_train = df_train.iloc[:, :-3], df_train.iloc[:, -1]
+        X, y = feature_activations.iloc[:, :-3], feature_activations.iloc[:, -1]
 
         all_rules = extract_all_rules(
-            X_train, y_train, n_estimators=200, max_depth=2, random_state=1
+            X, y, n_estimators=200, max_depth=2, random_state=1
         )
 
-        explanations = RuleRanker(all_rules, X_train, y_train).rank_rules(
-            N=self.top_rules
-        )
+        explanations = RuleRanker(all_rules, X, y).rank_rules(N=self.top_rules)
         return RuleImportance(explanations=explanations)
