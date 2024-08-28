@@ -12,8 +12,8 @@ from typing import List, Optional
 import pandas as pd
 import torch
 import torch.nn as nn
-from omnixai.explainers.base import ExplainerBase
-from omnixai.utils.misc import is_torch_available
+from omnixai_community.explainers.base import ExplainerBase
+from omnixai_community.utils.misc import is_torch_available
 from rules_extraction.rules import RuleRanker
 from rules_extraction.utils import (
     compute_avg_features,

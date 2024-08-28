@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import plotly
 import plotly.graph_objects as go
 from matplotlib.figure import Figure
-from omnixai.explanations.base import DashFigure, ExplanationBase
+from omnixai_community.explanations.base import DashFigure, ExplanationBase
 
 # Rules JSON object hierarchy (what should be inside explanation):
 # {
@@ -33,7 +33,6 @@ from omnixai.explanations.base import DashFigure, ExplanationBase
 # }
 
 
-# TODO add comments
 class DimlpfidexExplanation(ExplanationBase):
     """
     Represents an explanation for a Dimlpfidex algorithm.

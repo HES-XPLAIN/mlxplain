@@ -8,8 +8,8 @@
 import pathlib as pl
 
 import pandas as pd
-from omnixai.data.tabular import Tabular
-from omnixai.explainers.tabular.auto import TabularExplainer
+from omnixai_community.data.tabular import Tabular
+from omnixai_community.explainers.tabular.auto import TabularExplainer
 
 from mlxplain.explainers.tabular.specific.dimlpfidex import (
     DimlpBTModel,

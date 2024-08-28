@@ -9,7 +9,7 @@ Rules Extraction explanations for vision tasks.
 """
 
 import pandas as pd
-from omnixai.explanations.base import DashFigure, ExplanationBase
+from omnixai_community.explanations.base import DashFigure, ExplanationBase
 
 
 class RuleImportance(ExplanationBase):
