@@ -1,6 +1,6 @@
 [project]
 name = "mlxplain"
-version = "1.0.2"
+version = "1.0.3"
 description = "An open platform for accelerating the development of eXplainable AI systems"
 license = {text = "3-Clause BSD License" }
 authors = [
