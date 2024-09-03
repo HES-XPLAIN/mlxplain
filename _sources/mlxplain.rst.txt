@@ -9,17 +9,6 @@ Subpackages
 
    mlxplain.explanations
 
-Submodules
-----------
-
-mlxplain.hello module
----------------------
-
-.. automodule:: mlxplain.hello
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

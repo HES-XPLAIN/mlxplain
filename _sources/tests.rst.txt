@@ -1,17 +1,6 @@
 tests package
 =============
 
-Submodules
-----------
-
-tests.test\_hello module
-------------------------
-
-.. automodule:: tests.test_hello
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
