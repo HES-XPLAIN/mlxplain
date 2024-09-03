@@ -99,15 +99,20 @@ class RulesExtractImage(ExplainerBase):
             if self.feature_activations is not None:
                 feature_activations = self.feature_activations
 
-	# Existing columns to potentially drop
-	columns_to_drop = ['label', 'path']
-	existing_columns = [col for col in columns_to_drop if col in feature_activations.columns]
+        columns_to_drop = ["label", "path"]
+        existing_columns = [
+            col for col in columns_to_drop if col in feature_activations.columns
+        ]
 
-	# Drop the existing columns and create X
-	X = feature_activations.drop(existing_columns, axis=1)
-	y = feature_activations['label'] if 'label' in feature_activations.columns else None
-	if y is None:
-	    raise ValueError("The 'label' column is missing from the DataFrame.")
+        # Drop the existing columns and create X
+        X = feature_activations.drop(existing_columns, axis=1)
+        y = (
+            feature_activations["label"]
+            if "label" in feature_activations.columns
+            else None
+        )
+        if y is None:
+            raise ValueError("The 'label' column is missing from the DataFrame.")
 
         all_rules = extract_all_rules(
             X, y, n_estimators=200, max_depth=2, random_state=1
