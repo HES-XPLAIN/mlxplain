@@ -94,11 +94,15 @@ class RulesExtractImage(ExplainerBase):
             avg_activations = compute_avg_features(
                 self.model, self.dataloader, index_to_classes, device
             )
-            target_feature_activations = make_target_df(avg_activations, self.target_class)
+            target_feature_activations = make_target_df(
+                avg_activations, self.target_class
+            )
         else:
             if self.feature_activations is not None:
                 feature_activations = self.feature_activations
-                target_feature_activations = make_target_df(feature_activations, self.target_class)
+                target_feature_activations = make_target_df(
+                    feature_activations, self.target_class
+                )
 
         columns_to_drop = ["binary_label", "label", "path"]
         existing_columns = [
@@ -110,9 +114,11 @@ class RulesExtractImage(ExplainerBase):
         y = (
             target_feature_activations["binary_label"]
             if "binary_label" in target_feature_activations.columns
-            else target_feature_activations["label"]
-            if "label" in target_feature_activations.columns
-            else None
+            else (
+                target_feature_activations["label"]
+                if "label" in target_feature_activations.columns
+                else None
+            )
         )
 
         if y.empty:
@@ -121,4 +127,6 @@ class RulesExtractImage(ExplainerBase):
             X, y, n_estimators=200, max_depth=2, random_state=1
         )
         explanations = RuleRanker(all_rules, X, y).rank_rules(N=self.top_rules)
-        return RuleImportance(mode=self.mode, explanations=explanations, target_class=self.target_class)
+        return RuleImportance(
+            mode=self.mode, explanations=explanations, target_class=self.target_class
+        )
