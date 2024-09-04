@@ -96,66 +96,45 @@
 </section>
 <section id="module-mlxplain.explanations.images.rules">
 <span id="mlxplain-explanations-images-rules-module"></span><h2>mlxplain.explanations.images.rules module<a class="headerlink" href="#module-mlxplain.explanations.images.rules" title="Link to this heading"></a></h2>
-<p>Rules Extraction explanations for vision tasks.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="mlxplain.explanations.images.rules.RuleImportance">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlxplain.explanations.images.rules.</span></span><span class="sig-name descname"><span class="pre">RuleImportance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classification'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlxplain.explanations.images.rules.</span></span><span class="sig-name descname"><span class="pre">RuleImportance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classification'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExplanationBase</span></code></p>
-<p>The class for rules extraction explanation. It stores a batch of rules and the corresponding
-class names. Each rule represents a rule importance explanation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mlxplain.explanations.images.rules.RuleImportance.get_explanations">
 <span class="sig-name descname"><span class="pre">get_explanations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance.get_explanations" title="Link to this definition"></a></dt>
 <dd><p>Gets the generated explanations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The explanation for one specific image (a tuple of ‘rule’ and concerned ‘class’)
-or the explanations for all the instances (a list of tuples).</p>
+<dd class="field-odd"><p>A dict or a list containing the explanations.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mlxplain.explanations.images.rules.RuleImportance.ipython_plot">
-<span class="sig-name descname"><span class="pre">ipython_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance.ipython_plot" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ipython_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance.ipython_plot" title="Link to this definition"></a></dt>
 <dd><p>Plots figures in IPython.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>class_names</strong> – A list of the class names indexed by the labels.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A plotly dash figure showing the extracted rules.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mlxplain.explanations.images.rules.RuleImportance.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance.plot" title="Link to this definition"></a></dt>
-<dd><p>Plots figures in Matplotlib.</p>
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance.plot" title="Link to this definition"></a></dt>
+<dd><p>Returns a matplotlib figure showing the explanations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>class_names</strong> – A list of the class names indexed by the labels.</p></li>
-<li><p><strong>font_size</strong> – The font size.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A generic plot.</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A matplotlib figure.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mlxplain.explanations.images.rules.RuleImportance.plotly_plot">
-<span class="sig-name descname"><span class="pre">plotly_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance.plotly_plot" title="Link to this definition"></a></dt>
-<dd><p>Plots the generated rule explanations in Dash.</p>
+<span class="sig-name descname"><span class="pre">plotly_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlxplain.explanations.images.rules.RuleImportance.plotly_plot" title="Link to this definition"></a></dt>
+<dd><p>Returns a plotly dash component showing the explanations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>class_names</strong> – A list of the class names indexed by the labels.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A plotly dash figure showing the extracted rules.</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A plotly dash component.</p>
 </dd>
 </dl>
 </dd></dl>
