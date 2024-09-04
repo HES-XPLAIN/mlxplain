@@ -116,7 +116,9 @@ class RulesExtractImage(ExplainerBase):
         elif "label" in target_feature_activations.columns:
             y = target_feature_activations["label"]
         else:
-            raise ValueError("Neither 'binary_label' nor 'label' column found in the DataFrame.")
+            raise ValueError(
+                "Neither 'binary_label' nor 'label' column found in the DataFrame."
+            )
 
         if y.empty:
             raise ValueError("The target column is empty.")
