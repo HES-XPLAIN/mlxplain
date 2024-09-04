@@ -94,25 +94,28 @@ class RulesExtractImage(ExplainerBase):
             avg_activations = compute_avg_features(
                 self.model, self.dataloader, index_to_classes, device
             )
-            feature_activations = make_target_df(avg_activations, self.target_class)
+            target_feature_activations = self._get_target_feature_activations(avg_activations)
         else:
             if self.feature_activations is not None:
                 feature_activations = self.feature_activations
+                target_feature_activations = self._get_target_feature_activations(feature_activations)
 
-        columns_to_drop = ["label", "path"]
+        columns_to_drop = ["binary_label", "label", "path"]
         existing_columns = [
-            col for col in columns_to_drop if col in feature_activations.columns
+            col for col in columns_to_drop if col in target_feature_activations.columns
         ]
 
         # Drop the existing columns and create X
-        X = feature_activations.drop(existing_columns, axis=1)
+        X = target_feature_activations.drop(existing_columns, axis=1)
         y = (
-            feature_activations["label"]
-            if "label" in feature_activations.columns
+            target_feature_activations["binary_label"]
+            if "binary_label" in target_feature_activations.columns
+            else target_feature_activations["label"]
+            if "label" in target_feature_activations.columns
             else None
         )
         if y is None:
-            raise ValueError("The 'label' column is missing from the DataFrame.")
+            raise ValueError("The 'binary_label' or 'label' column are missing from the DataFrame.")
 
         all_rules = extract_all_rules(
             X, y, n_estimators=200, max_depth=2, random_state=1
@@ -120,3 +123,10 @@ class RulesExtractImage(ExplainerBase):
 
         explanations = RuleRanker(all_rules, X, y).rank_rules(N=self.top_rules)
         return RuleImportance(explanations=explanations)
+    
+    def _get_target_feature_activations(self, feature_activations: pd.DataFrame) -> pd.DataFrame:
+        """
+        Get the target feature activations from the feature activations.
+        """
+        target_feature_activations = make_target_df(feature_activations, self.target_class)
+        return target_feature_activations
