@@ -111,18 +111,15 @@ class RulesExtractImage(ExplainerBase):
 
         X = target_feature_activations.drop(existing_columns, axis=1)
 
-        y = (
-            target_feature_activations["binary_label"]
-            if "binary_label" in target_feature_activations.columns
-            else (
-                target_feature_activations["label"]
-                if "label" in target_feature_activations.columns
-                else None
-            )
-        )
+        if "binary_label" in target_feature_activations.columns:
+            y = target_feature_activations["binary_label"]
+        elif "label" in target_feature_activations.columns:
+            y = target_feature_activations["label"]
+        else:
+            raise ValueError("Neither 'binary_label' nor 'label' column found in the DataFrame.")
 
         if y.empty:
-            raise ValueError("The target column is missing from the DataFrame.")
+            raise ValueError("The target column is empty.")
         all_rules = extract_all_rules(
             X, y, n_estimators=200, max_depth=2, random_state=1
         )
