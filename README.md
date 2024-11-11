@@ -9,6 +9,12 @@ An open platform for accelerating the development of eXplainable AI systems
 pip install mlxplain
 ```
 
+## How to add a new algorithm
+
+1. Create an XAI algorithm in a new GitHub repository
+2. Add the compatibility layer to the `mlxplain` package, using [OmnixXAI documentation](https://opensource.salesforce.com/OmniXAI/latest/omnixai.html#how-to-contribute) as reference (explainer, explanation).
+3. Adjust dependencies in `pyproject.toml`
+
 ## Contribution
 
 ### Install Python
